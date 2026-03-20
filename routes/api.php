@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PrivateFileController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentPortfolioController;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -17,6 +18,25 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum');
+
+Route::get('/docs/openapi', function () {
+    $openApiPath = public_path('docs/swagger/openapi.yaml');
+
+    if (! File::exists($openApiPath)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'OpenAPI spec tidak ditemukan.',
+            'data' => null,
+            'errors' => null,
+            'meta' => null,
+        ], 404);
+    }
+
+    return response()->file($openApiPath, [
+        'Content-Type' => 'application/yaml; charset=UTF-8',
+        'Cache-Control' => 'public, max-age=300',
+    ]);
+});
 
 Route::middleware('auth:sanctum')->prefix('school')->group(function () {
     Route::get('/students', [SchoolStudentController::class, 'index']);

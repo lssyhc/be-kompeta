@@ -11,10 +11,10 @@ info:
     - errors: object|null
     - meta: object|null
 servers:
-  - url: http://127.0.0.1:8000/api
-    description: Local
-  - url: http://localhost:8000/api
-    description: Localhost
+  - url: /api
+    description: Current host
+  - url: https://api.example.com/api
+    description: Production example
 
 tags:
   - name: Auth

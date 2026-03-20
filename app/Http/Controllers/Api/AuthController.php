@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\AdminProfile;
 use App\Models\CompanyProfile;
 use App\Models\SchoolProfile;
 use App\Models\StudentProfile;
@@ -93,13 +94,19 @@ class AuthController extends Controller
                 ]);
             }
 
+            if ($role === User::ROLE_ADMIN) {
+                AdminProfile::query()->create([
+                    'user_id' => $user->id,
+                    'full_name' => $validated['name'] ?? $validated['email'],
+                ]);
+            }
+
             return $user;
         });
 
-        $user->load($this->resolveProfileRelations($user));
-
         return $this->successResponse([
-            'user' => $user,
+            'user' => $this->compactUser($user),
+            'role_profile' => $this->resolveRoleProfile($user),
         ], 'Registrasi berhasil.', 201);
     }
 
@@ -135,13 +142,13 @@ class AuthController extends Controller
             [$user->role]
         )->plainTextToken;
 
-        $user->load($this->resolveProfileRelations($user));
         $onboarding = $this->resolveOnboardingState($user);
 
         return $this->successResponse([
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => $this->compactUser($user),
+            'role_profile' => $this->resolveRoleProfile($user),
             'requires_skill_setup' => $onboarding['requires_skill_setup'],
             'next_step' => $onboarding['next_step'],
         ], 'Login berhasil.');
@@ -168,11 +175,11 @@ class AuthController extends Controller
             return $this->errorResponse('Unauthenticated.', 401);
         }
 
-        $user->load($this->resolveProfileRelations($user));
         $onboarding = $this->resolveOnboardingState($user);
 
         return $this->successResponse([
-            'user' => $user,
+            'user' => $this->compactUser($user),
+            'role_profile' => $this->resolveRoleProfile($user),
             'requires_skill_setup' => $onboarding['requires_skill_setup'],
             'next_step' => $onboarding['next_step'],
         ], 'Data user berhasil diambil.');
@@ -194,25 +201,43 @@ class AuthController extends Controller
         return 'active';
     }
 
-    private function resolveProfileRelations(User $user): array
+    private function compactUser(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'mitra_type' => $user->mitra_type,
+            'account_status' => $user->account_status,
+            'is_active' => $user->is_active,
+            'last_login_at' => $user->last_login_at,
+        ];
+    }
+
+    private function resolveRoleProfile(User $user): mixed
     {
         if ($user->role === User::ROLE_SEKOLAH) {
-            return ['schoolProfile'];
+            return SchoolProfile::query()->where('user_id', $user->id)->first();
         }
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_PERUSAHAAN) {
-            return ['companyProfile'];
+            return CompanyProfile::query()->where('user_id', $user->id)->first();
         }
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_UMKM) {
-            return ['umkmProfile'];
+            return UmkmProfile::query()->where('user_id', $user->id)->first();
         }
 
         if ($user->role === User::ROLE_SISWA) {
-            return ['studentProfile'];
+            return StudentProfile::query()->where('user_id', $user->id)->first();
         }
 
-        return [];
+        if ($user->role === User::ROLE_ADMIN) {
+            return AdminProfile::query()->where('user_id', $user->id)->first();
+        }
+
+        return null;
     }
 
     private function resolveEmailPasswordLoginUser(array $validated, string $role): ?User

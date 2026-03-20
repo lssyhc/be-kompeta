@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\PrivateFileController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentPortfolioController;
@@ -22,6 +23,11 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->prefix('profile')->group(function () {
+    Route::get('/', [ProfileController::class, 'show']);
+    Route::put('/', [ProfileController::class, 'update']);
+});
 
 Route::get('/docs/openapi', function () {
     $openApiPath = public_path('docs/swagger/openapi.yaml');
@@ -52,7 +58,6 @@ Route::middleware('auth:sanctum')->prefix('school')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->prefix('student')->group(function () {
-    Route::put('/profile', [StudentPortfolioController::class, 'updateProfile']);
     Route::post('/portfolio-items', [StudentPortfolioController::class, 'storePortfolioItem']);
     Route::get('/application-reminder', [StudentPortfolioController::class, 'applicationReminder']);
 });

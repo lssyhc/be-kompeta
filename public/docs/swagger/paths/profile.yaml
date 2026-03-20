@@ -1,0 +1,236 @@
+paths:
+  /profile:
+    get:
+      tags: [Profile]
+      summary: Ambil profile user login lintas role
+      description: |
+        Endpoint profile universal untuk semua role.
+        Field `role_profile` diisi dari tabel profile sesuai role user:
+        - admin -> admin_profiles
+        - sekolah -> school_profiles
+        - mitra perusahaan -> company_profiles
+        - mitra umkm -> umkm_profiles
+        - siswa -> student_profiles (+ portfolio terkait)
+      responses:
+        "200":
+          description: Profil berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeProfile"
+              example:
+                success: true
+                message: Profil berhasil diambil.
+                data:
+                  user:
+                    id: 1
+                    name: System Admin
+                    email: admin@kompeta.test
+                    role: admin
+                    mitra_type: null
+                    account_status: active
+                    is_active: true
+                  role_profile:
+                    id: 1
+                    user_id: 1
+                    full_name: System Admin
+                    avatar_path: null
+                    avatar_url: null
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+
+    put:
+      tags: [Profile]
+      summary: Update profile user login lintas role
+      description: |
+        Update profile universal untuk semua role.
+        Payload menggunakan dua object:
+        - `user` (opsional): data umum user (contoh: `name`)
+        - `profile` (opsional): data profile spesifik role
+
+        Contoh field `profile` per role:
+        - admin: `full_name`
+        - sekolah: `short_description`, `address`, `accreditation`, `expertise_fields`
+        - mitra perusahaan: `short_description`, `office_address`, `website_or_social_url`, `industry_sector`, `employee_total_range`
+        - mitra umkm: `short_description`, `business_address`, `business_type`, `owner_personal_nib`
+        - siswa: `description`, `phone_number`, `address`, `class_year`
+
+        Kompatibilitas siswa:
+        - Selain format `profile.{field}`, siswa juga bisa kirim format lama (`description`, `phone_number`, `address`, `class_year`) di level root.
+
+        Response sukses untuk semua role seragam:
+        - `message`: `Profil berhasil diperbarui.`
+        - `data.user`
+        - `data.role_profile`
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      maxLength: 255
+                profile:
+                  type: object
+                  additionalProperties: true
+                description:
+                  type: string
+                  nullable: true
+                  maxLength: 2000
+                phone_number:
+                  type: string
+                  nullable: true
+                  maxLength: 30
+                address:
+                  type: string
+                  nullable: true
+                class_year:
+                  type: string
+                  nullable: true
+                  minLength: 4
+                  maxLength: 4
+            examples:
+              admin:
+                summary: Update profile admin
+                value:
+                  user:
+                    name: Admin Kompeta
+                  profile:
+                    full_name: Admin Kompeta
+              sekolah:
+                summary: Update profile sekolah
+                value:
+                  user:
+                    name: SMK Negeri 1
+                  profile:
+                    short_description: Sekolah vokasi unggulan.
+                    address: Jl. Pendidikan No. 1
+                    accreditation: A
+                    expertise_fields:
+                      - RPL
+                      - TKJ
+              mitra_perusahaan:
+                summary: Update profile mitra perusahaan
+                value:
+                  profile:
+                    short_description: Perusahaan software enterprise.
+                    office_address: Jl. Sudirman No. 10
+                    website_or_social_url: https://example.com
+                    industry_sector: Teknologi Informasi
+                    employee_total_range: 51-200
+              siswa:
+                summary: Update profile siswa
+                value:
+                  description: Siswa RPL fokus backend Laravel.
+                  phone_number: "081234567890"
+                  address: Jakarta Selatan
+                  class_year: "2026"
+              siswa_nested:
+                summary: Update profile siswa (format nested)
+                value:
+                  profile:
+                    description: Siswa RPL fokus backend Laravel.
+                    phone_number: "081234567890"
+                    address: Jakarta Selatan
+                    class_year: "2026"
+      responses:
+        "200":
+          description: Profil berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeProfile"
+              examples:
+                admin:
+                  summary: Update profile admin
+                  value:
+                    success: true
+                    message: Profil berhasil diperbarui.
+                    data:
+                      user:
+                        id: 1
+                        name: Admin Kompeta
+                        email: admin@kompeta.test
+                        role: admin
+                        mitra_type: null
+                        account_status: active
+                        is_active: true
+                      role_profile:
+                        id: 1
+                        user_id: 1
+                        full_name: Admin Kompeta
+                        avatar_path: null
+                        avatar_url: null
+                    errors: null
+                    meta: null
+                siswa:
+                  summary: Update profile siswa
+                  value:
+                    success: true
+                    message: Profil berhasil diperbarui.
+                    data:
+                      user:
+                        id: 20
+                        name: Siswa Uji
+                        email: null
+                        role: siswa
+                        mitra_type: null
+                        account_status: active
+                        is_active: true
+                      role_profile:
+                        id: 10
+                        user_id: 20
+                        full_name: Siswa Uji
+                        nisn: "1112223334"
+                        major: RPL
+                        school_origin: SMK Negeri 1
+                        graduation_status: Belum Lulus
+                        class_year: "2026"
+                        description: Siswa RPL fokus backend Laravel.
+                        phone_number: "081234567890"
+                        address: Jakarta Selatan
+                    errors: null
+                    meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  profile.full_name:
+                    - The profile.full name field must be a string.
+                meta: null

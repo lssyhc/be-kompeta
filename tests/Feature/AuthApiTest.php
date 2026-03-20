@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminProfile;
+use App\Models\SchoolProfile;
 use App\Models\StudentProfile;
 use App\Models\StudentSkill;
 use App\Models\User;
@@ -41,7 +43,8 @@ class AuthApiTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.user.role', User::ROLE_SEKOLAH)
-            ->assertJsonPath('data.user.account_status', 'active');
+            ->assertJsonPath('data.user.account_status', 'active')
+            ->assertJsonPath('data.role_profile.npsn', '12345678');
 
         $this->assertDatabaseHas('users', [
             'email' => 'smk@example.com',
@@ -339,12 +342,16 @@ class AuthApiTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'message',
-                'data' => ['token', 'token_type', 'user', 'requires_skill_setup', 'next_step'],
+                'data' => ['token', 'token_type', 'user', 'role_profile', 'requires_skill_setup', 'next_step'],
                 'errors',
                 'meta',
             ])
             ->assertJsonPath('data.requires_skill_setup', true)
-            ->assertJsonPath('data.next_step', 'add_skill');
+            ->assertJsonPath('data.next_step', 'add_skill')
+            ->assertJsonPath('data.user.role', User::ROLE_SISWA)
+            ->assertJsonPath('data.role_profile.nisn', '1234567890');
+
+        $response->assertJsonMissingPath('data.user.student_profile');
 
         $this->assertNotNull($studentUser->fresh()->last_login_at);
     }
@@ -383,7 +390,8 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('data.requires_skill_setup', false)
-            ->assertJsonPath('data.next_step', null);
+            ->assertJsonPath('data.next_step', null)
+            ->assertJsonPath('data.role_profile.nisn', '5556667778');
     }
 
     public function test_school_can_login_with_email_and_password(): void
@@ -407,11 +415,139 @@ class AuthApiTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'message',
-                'data' => ['token', 'token_type', 'user', 'requires_skill_setup', 'next_step'],
+                'data' => ['token', 'token_type', 'user', 'role_profile', 'requires_skill_setup', 'next_step'],
                 'errors',
                 'meta',
-            ]);
+            ])
+            ->assertJsonPath('data.role_profile', null);
 
         $this->assertNotNull($school->fresh()->last_login_at);
+    }
+
+    public function test_school_profile_endpoint_returns_role_specific_profile_data(): void
+    {
+        $school = User::factory()->create([
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => 'active',
+            'is_active' => true,
+        ]);
+
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Profil Universal',
+            'npsn' => '87654321',
+            'accreditation' => 'A',
+            'address' => 'Jl. Universal No. 1',
+            'expertise_fields' => ['RPL', 'TKJ'],
+            'logo_path' => 'schools/logo.png',
+            'short_description' => 'Sekolah untuk pengujian endpoint profile universal.',
+            'operational_license_path' => 'schools/license.pdf',
+        ]);
+
+        Sanctum::actingAs($school);
+
+        $response = $this->getJson('/api/profile');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.role', User::ROLE_SEKOLAH)
+            ->assertJsonPath('data.role_profile.school_name', 'SMK Profil Universal')
+            ->assertJsonPath('data.role_profile.npsn', '87654321');
+
+        $response->assertJsonMissingPath('data.user.school_profile');
+    }
+
+    public function test_admin_profile_endpoint_can_create_and_update_admin_profile(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => 'active',
+            'is_active' => true,
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->putJson('/api/profile', [
+            'profile' => [
+                'full_name' => 'Admin Utama',
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.role', User::ROLE_ADMIN)
+            ->assertJsonPath('data.role_profile.full_name', 'Admin Utama');
+
+        $this->assertDatabaseHas('admin_profiles', [
+            'user_id' => $admin->id,
+            'full_name' => 'Admin Utama',
+        ]);
+
+        $this->assertInstanceOf(AdminProfile::class, $admin->fresh()->adminProfile);
+    }
+
+    public function test_admin_profile_update_rejects_unsupported_fields(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => 'active',
+            'is_active' => true,
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->putJson('/api/profile', [
+            'profile' => [
+                'phone_number' => '081234567890',
+            ],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_student_profile_update_via_profile_endpoint_returns_standardized_response(): void
+    {
+        $student = User::factory()->create([
+            'role' => User::ROLE_SISWA,
+            'account_status' => 'active',
+            'is_active' => true,
+        ]);
+
+        StudentProfile::query()->create([
+            'user_id' => $student->id,
+            'full_name' => 'Siswa Uji',
+            'nisn' => '1112223334',
+            'major' => 'RPL',
+            'school_origin' => 'SMK Negeri 1',
+            'graduation_status' => 'Belum Lulus',
+            'unique_code' => 'ABCD1234',
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $response = $this->putJson('/api/profile', [
+            'description' => 'Siswa fokus backend Laravel.',
+            'phone_number' => '081234567890',
+            'address' => 'Jakarta Selatan',
+            'class_year' => '2026',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Profil berhasil diperbarui.')
+            ->assertJsonPath('data.user.role', User::ROLE_SISWA)
+            ->assertJsonPath('data.role_profile.description', 'Siswa fokus backend Laravel.')
+            ->assertJsonPath('data.role_profile.phone_number', '081234567890')
+            ->assertJsonPath('data.role_profile.address', 'Jakarta Selatan')
+            ->assertJsonPath('data.role_profile.class_year', '2026');
+
+        $this->assertDatabaseHas('student_profiles', [
+            'user_id' => $student->id,
+            'description' => 'Siswa fokus backend Laravel.',
+            'phone_number' => '081234567890',
+            'address' => 'Jakarta Selatan',
+            'class_year' => '2026',
+        ]);
     }
 }

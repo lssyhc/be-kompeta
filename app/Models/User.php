@@ -91,6 +91,11 @@ class User extends Authenticatable
         return $this->hasOne(StudentProfile::class);
     }
 
+    public function adminProfile(): HasOne
+    {
+        return $this->hasOne(AdminProfile::class);
+    }
+
     public function managedStudents(): HasMany
     {
         return $this->hasMany(StudentProfile::class, 'school_user_id');

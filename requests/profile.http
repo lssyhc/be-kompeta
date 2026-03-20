@@ -1,0 +1,279 @@
+### ============================================================
+### UNIVERSAL PROFILE API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### SETUP TOKEN ADMIN
+### ============================================================
+
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "admin",
+  "email": "admin@kompeta.test",
+  "password": "admin12345",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### SETUP TOKEN SEKOLAH
+### ============================================================
+
+# @name loginSekolah
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "school.a@kompeta.test",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### SETUP TOKEN MITRA PERUSAHAAN
+### ============================================================
+
+# @name loginMitraPerusahaan
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.company.a@kompeta.test",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### SETUP TOKEN MITRA UMKM
+### ============================================================
+
+# @name loginMitraUmkm
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.umkm.a@kompeta.test",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### SETUP TOKEN SISWA
+### ============================================================
+
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "1234567890",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "unique_code": "GANTIDULU",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 1. GET PROFILE ADMIN
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 2. UPDATE PROFILE ADMIN
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+{
+  "user": {
+    "name": "System Admin Kompeta"
+  },
+  "profile": {
+    "full_name": "System Admin Kompeta"
+  }
+}
+
+###
+
+### ============================================================
+### 3. GET PROFILE SEKOLAH
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 4. UPDATE PROFILE SEKOLAH
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+{
+  "profile": {
+    "short_description": "Sekolah vokasi unggulan untuk bidang teknologi dan bisnis.",
+    "address": "Jl. Pendidikan No. 1, Bogor",
+    "accreditation": "A",
+    "expertise_fields": ["RPL", "TKJ", "AKL"]
+  }
+}
+
+###
+
+### ============================================================
+### 5. GET PROFILE MITRA PERUSAHAAN
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 6. UPDATE PROFILE MITRA PERUSAHAAN
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+{
+  "profile": {
+    "short_description": "Perusahaan outsourcing dan operasional bisnis.",
+    "office_address": "Jakarta Selatan",
+    "website_or_social_url": "https://example.com/binajasa",
+    "industry_sector": "Outsourcing",
+    "employee_total_range": "501-1000"
+  }
+}
+
+###
+
+### ============================================================
+### 7. GET PROFILE MITRA UMKM
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 8. UPDATE PROFILE MITRA UMKM
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+{
+  "profile": {
+    "short_description": "UMKM bakery dengan fokus produksi harian.",
+    "business_address": "Semarang, Jawa Tengah",
+    "business_type": "Kuliner",
+    "owner_personal_nib": "NIB-UMKM-001"
+  }
+}
+
+###
+
+### ============================================================
+### 9. VALIDASI - ADMIN MENGIRIM FIELD TIDAK DIDUKUNG (expect 422)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+{
+  "profile": {
+    "phone_number": "081234567890"
+  }
+}
+
+###
+
+### ============================================================
+### 10. GET PROFILE SISWA
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 11. UPDATE PROFILE SISWA
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+{
+  "description": "Siswa RPL fokus backend Laravel.",
+  "phone_number": "081234567890",
+  "address": "Jakarta Selatan",
+  "class_year": "2026"
+}
+
+###
+
+### ============================================================
+### 12. UPDATE PROFILE SISWA (format nested juga didukung)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+{
+  "profile": {
+    "description": "Siswa RPL fokus backend Laravel (nested).",
+    "phone_number": "081234567890",
+    "address": "Jakarta Selatan",
+    "class_year": "2026"
+  }
+}

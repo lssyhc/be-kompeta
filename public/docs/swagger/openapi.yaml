@@ -18,6 +18,7 @@ servers:
 
 tags:
   - name: Auth
+  - name: Profile
   - name: School Students
   - name: Student Portfolio
   - name: Files
@@ -41,6 +42,9 @@ paths:
   /user:
     $ref: "./paths/auth.yaml#/paths/~1user"
 
+  /profile:
+    $ref: "./paths/profile.yaml#/paths/~1profile"
+
   /school/students:
     $ref: "./paths/school-students.yaml#/paths/~1school~1students"
   /school/students/search:
@@ -48,8 +52,6 @@ paths:
   /school/students/{id}:
     $ref: "./paths/school-students.yaml#/paths/~1school~1students~1{id}"
 
-  /student/profile:
-    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1profile"
   /student/portfolio-items:
     $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items"
   /student/application-reminder:
@@ -145,6 +147,14 @@ components:
               properties:
                 user:
                   $ref: "#/components/schemas/User"
+                role_profile:
+                  nullable: true
+                  oneOf:
+                    - $ref: "#/components/schemas/AdminProfile"
+                    - $ref: "#/components/schemas/SchoolProfile"
+                    - $ref: "#/components/schemas/CompanyProfile"
+                    - $ref: "#/components/schemas/UmkmProfile"
+                    - $ref: "#/components/schemas/StudentProfileDetail"
 
     SuccessEnvelopeAuthLogin:
       allOf:
@@ -161,6 +171,14 @@ components:
                   example: Bearer
                 user:
                   $ref: "#/components/schemas/User"
+                role_profile:
+                  nullable: true
+                  oneOf:
+                    - $ref: "#/components/schemas/AdminProfile"
+                    - $ref: "#/components/schemas/SchoolProfile"
+                    - $ref: "#/components/schemas/CompanyProfile"
+                    - $ref: "#/components/schemas/UmkmProfile"
+                    - $ref: "#/components/schemas/StudentProfileDetail"
                 requires_skill_setup:
                   type: boolean
                 next_step:
@@ -178,11 +196,38 @@ components:
               properties:
                 user:
                   $ref: "#/components/schemas/User"
+                role_profile:
+                  nullable: true
+                  oneOf:
+                    - $ref: "#/components/schemas/AdminProfile"
+                    - $ref: "#/components/schemas/SchoolProfile"
+                    - $ref: "#/components/schemas/CompanyProfile"
+                    - $ref: "#/components/schemas/UmkmProfile"
+                    - $ref: "#/components/schemas/StudentProfileDetail"
                 requires_skill_setup:
                   type: boolean
                 next_step:
                   nullable: true
                   type: string
+
+    SuccessEnvelopeProfile:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+                role_profile:
+                  nullable: true
+                  oneOf:
+                    - $ref: "#/components/schemas/AdminProfile"
+                    - $ref: "#/components/schemas/SchoolProfile"
+                    - $ref: "#/components/schemas/CompanyProfile"
+                    - $ref: "#/components/schemas/UmkmProfile"
+                    - $ref: "#/components/schemas/StudentProfileDetail"
 
     SuccessEnvelopeSchoolStoreStudent:
       allOf:
@@ -240,17 +285,6 @@ components:
               properties:
                 student:
                   $ref: "#/components/schemas/StudentProfileDetail"
-
-    SuccessEnvelopeStudentProfile:
-      allOf:
-        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
-        - type: object
-          properties:
-            data:
-              type: object
-              properties:
-                profile:
-                  $ref: "#/components/schemas/StudentProfile"
 
     SuccessEnvelopePortfolioItem:
       allOf:
@@ -317,18 +351,22 @@ components:
           nullable: true
           type: string
           format: date-time
-        school_profile:
+
+    AdminProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        full_name:
+          type: string
+        avatar_path:
           nullable: true
-          $ref: "#/components/schemas/SchoolProfile"
-        company_profile:
+          type: string
+        avatar_url:
           nullable: true
-          $ref: "#/components/schemas/CompanyProfile"
-        umkm_profile:
-          nullable: true
-          $ref: "#/components/schemas/UmkmProfile"
-        student_profile:
-          nullable: true
-          $ref: "#/components/schemas/StudentProfile"
+          type: string
 
     SchoolProfile:
       type: object
@@ -918,18 +956,6 @@ components:
           type: string
           minLength: 4
           maxLength: 4
-        phone_number:
-          type: string
-          maxLength: 30
-        address:
-          type: string
-
-    UpdateStudentProfileRequest:
-      type: object
-      properties:
-        description:
-          type: string
-          maxLength: 2000
         phone_number:
           type: string
           maxLength: 30

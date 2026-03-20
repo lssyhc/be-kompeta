@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AdminProfile;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,7 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->updateOrCreate(
+        $admin = User::query()->updateOrCreate(
             ['email' => 'admin@kompeta.test'],
             [
                 'name' => 'System Admin',
@@ -25,6 +26,11 @@ class DatabaseSeeder extends Seeder
                 'account_status' => 'active',
                 'is_active' => true,
             ]
+        );
+
+        AdminProfile::query()->updateOrCreate(
+            ['user_id' => $admin->id],
+            ['full_name' => $admin->name]
         );
 
         $this->call(ExploreDummySeeder::class);

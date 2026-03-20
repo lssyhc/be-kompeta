@@ -78,6 +78,9 @@ paths:
                     mitra_type: null
                     account_status: active
                     is_active: true
+                  role_profile:
+                    school_name: SMK Negeri 1
+                    npsn: "12345678"
                 errors: null
                 meta: null
         "422":
@@ -148,6 +151,10 @@ paths:
                     mitra_type: null
                     account_status: active
                     is_active: true
+                  role_profile:
+                    full_name: Andi Pratama
+                    nisn: "1234567890"
+                    school_origin: SMK Negeri 1
                   requires_skill_setup: true
                   next_step: add_skill
                 errors: null
@@ -224,6 +231,10 @@ paths:
                     mitra_type: null
                     account_status: active
                     is_active: true
+                  role_profile:
+                    full_name: Andi Pratama
+                    nisn: "1234567890"
+                    school_origin: SMK Negeri 1
                   requires_skill_setup: false
                   next_step: null
                 errors: null

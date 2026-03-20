@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentPortfolioItemRequest;
-use App\Http\Requests\Student\UpdateStudentProfileRequest;
 use App\Models\StudentAchievement;
 use App\Models\StudentApplication;
 use App\Models\StudentExperience;
@@ -16,21 +15,6 @@ use Illuminate\Http\Request;
 
 class StudentPortfolioController extends Controller
 {
-    public function updateProfile(UpdateStudentProfileRequest $request): JsonResponse
-    {
-        $studentProfile = $this->resolveStudentProfile($request);
-
-        if (! $studentProfile) {
-            return $this->errorResponse('Hanya user siswa yang dapat mengubah profil siswa.', 403);
-        }
-
-        $studentProfile->update($request->validated());
-
-        return $this->successResponse([
-            'profile' => $studentProfile,
-        ], 'Profil siswa berhasil diperbarui.');
-    }
-
     public function storePortfolioItem(StoreStudentPortfolioItemRequest $request): JsonResponse
     {
         $studentProfile = $this->resolveStudentProfile($request);

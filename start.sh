@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 set -eu
 
-echo "[start] Installing composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+echo "[start] Discovering packages..."
+php artisan package:discover --ansi
 
 echo "[start] Preparing Laravel caches..."
+mkdir -p resources/views storage/framework/views
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
 
 echo "[start] Running database migrations..."
 php artisan migrate --force

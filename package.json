@@ -3,7 +3,7 @@
     "private": true,
     "scripts": {
         "prepare": "husky",
-        "format": "vendor/bin/pint"
+        "format": "php vendor/bin/pint"
     },
     "devDependencies": {
         "husky": "^9.1.7",

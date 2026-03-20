@@ -1,0 +1,96 @@
+### ============================================================
+### FOR YOU API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### 1. LIST FOR YOU (default sort: paling relevan)
+### Endpoint: GET /api/public/for-you/jobs
+### ============================================================
+
+# @name forYouListDefault
+GET {{baseUrl}}/public/for-you/jobs
+Accept: application/json
+
+###
+
+### ============================================================
+### 2. LIST FOR YOU - sort baru ditambahkan
+### Endpoint: GET /api/public/for-you/jobs?sort_by=baru_ditambahkan
+### ============================================================
+
+# @name forYouSortNewest
+GET {{baseUrl}}/public/for-you/jobs?sort_by=baru_ditambahkan
+Accept: application/json
+
+###
+
+### ============================================================
+### 3. LIST FOR YOU - sort remote/wfh
+### Endpoint: GET /api/public/for-you/jobs?sort_by=remote_wfh
+### ============================================================
+
+# @name forYouSortRemote
+GET {{baseUrl}}/public/for-you/jobs?sort_by=remote_wfh
+Accept: application/json
+
+###
+
+### ============================================================
+### 4. LIST FOR YOU - sort hybrid
+### Endpoint: GET /api/public/for-you/jobs?sort_by=hybrid
+### ============================================================
+
+# @name forYouSortHybrid
+GET {{baseUrl}}/public/for-you/jobs?sort_by=hybrid
+Accept: application/json
+
+###
+
+### ============================================================
+### 5. LIST FOR YOU - sort part-time
+### Endpoint: GET /api/public/for-you/jobs?sort_by=part_time
+### ============================================================
+
+# @name forYouSortPartTime
+GET {{baseUrl}}/public/for-you/jobs?sort_by=part_time
+Accept: application/json
+
+###
+
+### ============================================================
+### 6. LIST FOR YOU - public preference context
+### Endpoint:
+### GET /api/public/for-you/jobs?preferred_skills[]=sql&preferred_skills[]=php&preferred_work_policies[]=remote&preferred_job_types[]=paruh_waktu&preferred_province=DKI%20Jakarta
+### ============================================================
+
+# @name forYouWithPreferences
+GET {{baseUrl}}/public/for-you/jobs?preferred_skills[]=sql&preferred_skills[]=php&preferred_work_policies[]=remote&preferred_job_types[]=paruh_waktu&preferred_province=DKI%20Jakarta
+Accept: application/json
+
+###
+
+### ============================================================
+### 7. DETAIL FOR YOU
+### Endpoint: GET /api/public/for-you/jobs/{slug}
+### Cara pakai:
+### - Jalankan forYouListDefault
+### - Copy slug dari response data[0].slug
+### ============================================================
+
+# @name forYouDetail
+GET {{baseUrl}}/public/for-you/jobs/accounting-staff-1602be
+Accept: application/json
+
+###
+
+### ============================================================
+### 8. SORT OPTIONS FOR YOU
+### Endpoint: GET /api/public/for-you/sort-options
+### ============================================================
+
+# @name forYouSortOptions
+GET {{baseUrl}}/public/for-you/sort-options
+Accept: application/json
+
+###

@@ -44,7 +44,15 @@ class CompanyProfile extends Model
 
     public function getCompanyLogoUrlAttribute(): ?string
     {
-        return $this->company_logo_path ? Storage::disk('public')->url($this->company_logo_path) : null;
+        if (! $this->company_logo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->company_logo_path, 'http://') || str_starts_with($this->company_logo_path, 'https://')) {
+            return $this->company_logo_path;
+        }
+
+        return Storage::disk('public')->url($this->company_logo_path);
     }
 
     public function getImage1UrlAttribute(): ?string

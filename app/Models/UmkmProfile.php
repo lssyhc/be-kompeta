@@ -43,31 +43,79 @@ class UmkmProfile extends Model
 
     public function getUmkmLogoUrlAttribute(): ?string
     {
-        return $this->umkm_logo_path ? Storage::disk('public')->url($this->umkm_logo_path) : null;
+        if (! $this->umkm_logo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->umkm_logo_path, 'http://') || str_starts_with($this->umkm_logo_path, 'https://')) {
+            return $this->umkm_logo_path;
+        }
+
+        return Storage::disk('public')->url($this->umkm_logo_path);
     }
 
     public function getImage1UrlAttribute(): ?string
     {
-        return $this->image_1_path ? Storage::disk('public')->url($this->image_1_path) : null;
+        if (! $this->image_1_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_1_path, 'http://') || str_starts_with($this->image_1_path, 'https://')) {
+            return $this->image_1_path;
+        }
+
+        return Storage::disk('public')->url($this->image_1_path);
     }
 
     public function getImage2UrlAttribute(): ?string
     {
-        return $this->image_2_path ? Storage::disk('public')->url($this->image_2_path) : null;
+        if (! $this->image_2_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_2_path, 'http://') || str_starts_with($this->image_2_path, 'https://')) {
+            return $this->image_2_path;
+        }
+
+        return Storage::disk('public')->url($this->image_2_path);
     }
 
     public function getImage3UrlAttribute(): ?string
     {
-        return $this->image_3_path ? Storage::disk('public')->url($this->image_3_path) : null;
+        if (! $this->image_3_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_3_path, 'http://') || str_starts_with($this->image_3_path, 'https://')) {
+            return $this->image_3_path;
+        }
+
+        return Storage::disk('public')->url($this->image_3_path);
     }
 
     public function getImage4UrlAttribute(): ?string
     {
-        return $this->image_4_path ? Storage::disk('public')->url($this->image_4_path) : null;
+        if (! $this->image_4_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_4_path, 'http://') || str_starts_with($this->image_4_path, 'https://')) {
+            return $this->image_4_path;
+        }
+
+        return Storage::disk('public')->url($this->image_4_path);
     }
 
     public function getImage5UrlAttribute(): ?string
     {
-        return $this->image_5_path ? Storage::disk('public')->url($this->image_5_path) : null;
+        if (! $this->image_5_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->image_5_path, 'http://') || str_starts_with($this->image_5_path, 'https://')) {
+            return $this->image_5_path;
+        }
+
+        return Storage::disk('public')->url($this->image_5_path);
     }
 }

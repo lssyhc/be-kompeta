@@ -64,6 +64,14 @@ class StudentProfile extends Model
 
     public function getPhotoProfileUrlAttribute(): ?string
     {
-        return $this->photo_profile_path ? Storage::disk('public')->url($this->photo_profile_path) : null;
+        if (! $this->photo_profile_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->photo_profile_path, 'http://') || str_starts_with($this->photo_profile_path, 'https://')) {
+            return $this->photo_profile_path;
+        }
+
+        return Storage::disk('public')->url($this->photo_profile_path);
     }
 }

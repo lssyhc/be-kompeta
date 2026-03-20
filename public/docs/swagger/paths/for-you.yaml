@@ -1,0 +1,172 @@
+paths:
+  /public/for-you/jobs:
+    get:
+      tags: [For You]
+      summary: List rekomendasi lowongan untuk halaman for you
+      parameters:
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+            enum:
+              [paling_relevan, baru_ditambahkan, remote_wfh, hybrid, part_time]
+            default: paling_relevan
+        - in: query
+          name: preferred_skills[]
+          schema:
+            type: array
+            items:
+              type: string
+          description: Preferensi skill (opsional, untuk mode publik tanpa login)
+        - in: query
+          name: preferred_work_policies[]
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [kantor, hybrid, remote]
+        - in: query
+          name: preferred_job_types[]
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+        - in: query
+          name: preferred_province
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Daftar rekomendasi lowongan berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Daftar rekomendasi lowongan berhasil diambil.
+                data:
+                  - id: 4
+                    slug: junior-qa-tester-abc123
+                    position_name: Junior QA Tester
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: remote
+                    work_policy_label: Kerja remote/dari rumah
+                    created_at_human: 4 hari yang lalu
+                    salary_label: Rp 5 jt-6,5 jt
+                    mitra_name: PT Surya Data Nusantara
+                    mitra_type: perusahaan
+                    province: Jawa Barat
+                    location: Bandung, Jawa Barat
+                    skills: [Manual Testing, Postman]
+                    benefits: [Learning Budget]
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/for-you/jobs/{slug}:
+    get:
+      tags: [For You]
+      summary: Detail lowongan halaman for you (ringkas)
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detail rekomendasi lowongan berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Detail rekomendasi lowongan berhasil diambil.
+                data:
+                  job:
+                    id: 4
+                    slug: junior-qa-tester-abc123
+                    position_name: Junior QA Tester
+                    mitra_name: PT Surya Data Nusantara
+                    mitra_type: perusahaan
+                    mitra_logo_url: https://example.com/storage/logo.png
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: remote
+                    work_policy_label: Kerja remote/dari rumah
+                    created_at_human: 8 hari yang lalu
+                    updated_at_human: 4 hari yang lalu
+                    share_link: https://example.test/for-you/junior-qa-tester-abc123
+                    requirements: Mengerti dasar software testing.
+                    skills: [Manual Testing, Test Case Writing, Postman]
+                    work_benefits: [Remote Allowance, Learning Budget]
+                    managed_by: PT Surya Data Nusantara
+                    job_description: Menguji fitur aplikasi web dan mobile serta menuliskan bug report.
+                    location: Bandung, Jawa Barat
+                    province: Jawa Barat
+                    about_company:
+                      name: PT Surya Data Nusantara
+                      industry_sector: Teknologi informasi
+                      employee_total_range: 201-500
+                      description: Mitra digitalisasi operasional dan pengolahan data untuk bisnis menengah.
+                      address: Bandung, Jawa Barat
+                      website_or_social_url: https://example.com/surya-data
+                      logo_url: https://example.com/storage/profiles/companies/logos/surya-data.png
+                      category_label: Perusahaan
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/for-you/sort-options:
+    get:
+      tags: [For You]
+      summary: Opsi urutan pada halaman for you
+      responses:
+        "200":
+          description: Opsi urutan for you berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Opsi urutan for you berhasil diambil.
+                data:
+                  sort_by:
+                    - value: paling_relevan
+                      label: Paling Relevan
+                    - value: baru_ditambahkan
+                      label: Baru Ditambahkan
+                    - value: remote_wfh
+                      label: Remote/WFH
+                    - value: hybrid
+                      label: Hybrid
+                    - value: part_time
+                      label: Part-time
+                errors: null
+                meta: null

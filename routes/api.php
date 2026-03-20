@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExploreController;
+use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\PrivateFileController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentPortfolioController;
@@ -62,4 +63,10 @@ Route::prefix('public/explore')->group(function () {
     Route::get('/jobs', [ExploreController::class, 'index']);
     Route::get('/jobs/{slug}', [ExploreController::class, 'show']);
     Route::get('/filters', [ExploreController::class, 'filterOptions']);
+});
+
+Route::prefix('public/for-you')->group(function () {
+    Route::get('/jobs', [ForYouController::class, 'index']);
+    Route::get('/jobs/{slug}', [ForYouController::class, 'show']);
+    Route::get('/sort-options', [ForYouController::class, 'sortOptions']);
 });

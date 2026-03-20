@@ -1,0 +1,171 @@
+paths:
+  /public/explore/jobs:
+    get:
+      tags: [Explore]
+      summary: List lowongan untuk halaman explore
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Cari berdasarkan posisi, skill, atau nama mitra
+        - in: query
+          name: job_types[]
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+        - in: query
+          name: work_policies[]
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [kantor, hybrid, remote]
+        - in: query
+          name: provinces[]
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: experience_levels[]
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+        - in: query
+          name: updated_within
+          schema:
+            type: string
+            enum: [24h, 7d, 30d, any]
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Daftar lowongan berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Daftar lowongan berhasil diambil.
+                data:
+                  - id: 1
+                    slug: accounting-staff-abc123
+                    position_name: Accounting Staff
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: kantor
+                    work_policy_label: Kerja di kantor
+                    created_at_human: 5 jam yang lalu
+                    salary_label: Rp 5,7 jt-5,8 jt
+                    mitra_name: PT Binajasa Sumber Sarana
+                    mitra_type: perusahaan
+                    province: DKI Jakarta
+                    location: Jakarta Selatan, DKI Jakarta
+                    skills: [MYOB, Excel]
+                    benefits: [BPJS Kesehatan]
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/explore/jobs/{slug}:
+    get:
+      tags: [Explore]
+      summary: Detail lowongan explore
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detail lowongan berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Detail lowongan berhasil diambil.
+                data:
+                  job:
+                    id: 1
+                    slug: accounting-staff-abc123
+                    position_name: Accounting Staff
+                    mitra_name: PT Binajasa Sumber Sarana
+                    salary_label: Rp 5,7 jt-5,8 jt
+                    category: Keuangan
+                    share_link: https://example.test/explore/accounting-staff-abc123
+                    requirements: Minimal Sarjana (S1)
+                    skills: [MYOB, Excel]
+                    work_benefits: [BPJS Kesehatan]
+                    managed_by: PT Binajasa Sumber Sarana
+                    job_description: Deskripsi pekerjaan
+                    about_company:
+                      name: PT Binajasa Sumber Sarana
+                      industry_sector: Outsourcing
+                      employee_total_range: 501-1000
+                      description: Tentang perusahaan
+                      address: Jakarta Selatan, DKI Jakarta
+                  recommendations: []
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/explore/filters:
+    get:
+      tags: [Explore]
+      summary: Opsi filter halaman explore
+      responses:
+        "200":
+          description: Opsi filter explore berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Opsi filter explore berhasil diambil.
+                data:
+                  job_types:
+                    - value: penuh_waktu
+                      label: Penuh Waktu
+                  work_policies:
+                    - value: kantor
+                      label: Kerja di kantor
+                  provinces:
+                    - DKI Jakarta
+                    - Jawa Barat
+                  experience_levels:
+                    - value: fresh_graduate
+                      label: Fresh Graduate
+                  updated_within:
+                    - value: 7d
+                      label: Seminggu terakhir
+                errors: null
+                meta: null

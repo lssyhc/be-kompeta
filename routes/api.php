@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\PrivateFileController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentPortfolioController;
@@ -55,4 +56,10 @@ Route::middleware('auth:sanctum')->prefix('student')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('files')->group(function () {
     Route::get('/me/{type}', [PrivateFileController::class, 'downloadMyDocument']);
+});
+
+Route::prefix('public/explore')->group(function () {
+    Route::get('/jobs', [ExploreController::class, 'index']);
+    Route::get('/jobs/{slug}', [ExploreController::class, 'show']);
+    Route::get('/filters', [ExploreController::class, 'filterOptions']);
 });

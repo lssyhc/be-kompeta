@@ -95,4 +95,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(StudentProfile::class, 'school_user_id');
     }
+
+    public function jobVacancies(): HasMany
+    {
+        return $this->hasMany(JobVacancy::class, 'mitra_user_id');
+    }
 }

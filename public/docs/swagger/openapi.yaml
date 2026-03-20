@@ -21,6 +21,7 @@ tags:
   - name: School Students
   - name: Student Portfolio
   - name: Files
+  - name: Explore
 
 security:
   - bearerAuth: []
@@ -53,6 +54,13 @@ paths:
 
   /files/me/{type}:
     $ref: "./paths/files.yaml#/paths/~1files~1me~1{type}"
+
+  /public/explore/jobs:
+    $ref: "./paths/explore.yaml#/paths/~1public~1explore~1jobs"
+  /public/explore/jobs/{slug}:
+    $ref: "./paths/explore.yaml#/paths/~1public~1explore~1jobs~1{slug}"
+  /public/explore/filters:
+    $ref: "./paths/explore.yaml#/paths/~1public~1explore~1filters"
 
 components:
   securitySchemes:

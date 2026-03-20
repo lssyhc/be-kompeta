@@ -1,0 +1,149 @@
+### ============================================================
+### EXPLORE API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### PRASYARAT DATA DUMMY
+### Jalankan sekali jika belum ada data explore:
+### php artisan migrate
+### php artisan db:seed
+### ============================================================
+
+### ============================================================
+### 1. LIST LOWONGAN EXPLORE (default)
+### Endpoint: GET /api/public/explore/jobs
+### ============================================================
+
+# @name exploreListDefault
+GET {{baseUrl}}/public/explore/jobs
+Accept: application/json
+
+###
+
+### ============================================================
+### 2. LIST LOWONGAN - PAGINATION
+### Endpoint: GET /api/public/explore/jobs?page=1&per_page=6
+### ============================================================
+
+# @name exploreListPagination
+GET {{baseUrl}}/public/explore/jobs?page=1&per_page=6
+Accept: application/json
+
+###
+
+### ============================================================
+### 3. SEARCH - by posisi
+### Endpoint: GET /api/public/explore/jobs?q=accounting
+### ============================================================
+
+# @name exploreSearchPosition
+GET {{baseUrl}}/public/explore/jobs?q=accounting
+Accept: application/json
+
+###
+
+### ============================================================
+### 4. SEARCH - by skill
+### Endpoint: GET /api/public/explore/jobs?q=myob
+### ============================================================
+
+# @name exploreSearchSkill
+GET {{baseUrl}}/public/explore/jobs?q=myob
+Accept: application/json
+
+###
+
+### ============================================================
+### 5. SEARCH - by nama mitra (perusahaan/umkm)
+### Endpoint: GET /api/public/explore/jobs?q=binajasa
+### ============================================================
+
+# @name exploreSearchMitra
+GET {{baseUrl}}/public/explore/jobs?q=binajasa
+Accept: application/json
+
+###
+
+### ============================================================
+### 6. FILTER - tipe pekerjaan + kebijakan kerja + lokasi + pengalaman + updated
+### Endpoint:
+### GET /api/public/explore/jobs?job_types[]=penuh_waktu&work_policies[]=kantor&provinces[]=DKI%20Jakarta&experience_levels[]=kurang_dari_setahun&updated_within=7d
+### ============================================================
+
+# @name exploreFilterCombined
+GET {{baseUrl}}/public/explore/jobs?job_types[]=penuh_waktu&work_policies[]=kantor&provinces[]=DKI%20Jakarta&experience_levels[]=kurang_dari_setahun&updated_within=7d
+Accept: application/json
+
+###
+
+### ============================================================
+### 7. FILTER - multiple job type sekaligus
+### Endpoint: GET /api/public/explore/jobs?job_types[]=freelance&job_types[]=magang
+### ============================================================
+
+# @name exploreFilterMultiJobType
+GET {{baseUrl}}/public/explore/jobs?job_types[]=freelance&job_types[]=magang
+Accept: application/json
+
+###
+
+### ============================================================
+### 8. FILTER - format comma separated (didukung)
+### Endpoint: GET /api/public/explore/jobs?job_types=freelance,magang
+### ============================================================
+
+# @name exploreFilterCommaSeparated
+GET {{baseUrl}}/public/explore/jobs?job_types=freelance,magang
+Accept: application/json
+
+###
+
+### ============================================================
+### 9. AMBIL DETAIL LOWONGAN
+### Endpoint: GET /api/public/explore/jobs/{slug}
+### Cara pakai:
+### - Jalankan exploreListDefault dulu
+### - Copy slug dari response data[0].slug
+### - Ganti placeholder SLUG_DI_SINI
+### ============================================================
+
+# @name exploreDetail
+GET {{baseUrl}}/public/explore/jobs/accounting-staff-1602be
+Accept: application/json
+
+###
+
+### ============================================================
+### 10. DETAIL LOWONGAN - contoh not found (404)
+### Endpoint: GET /api/public/explore/jobs/slug-tidak-ada
+### ============================================================
+
+# @name exploreDetailNotFound
+GET {{baseUrl}}/public/explore/jobs/slug-tidak-ada
+Accept: application/json
+
+###
+
+### ============================================================
+### 11. OPSI FILTER EXPLORE
+### Endpoint: GET /api/public/explore/filters
+### ============================================================
+
+# @name exploreFilters
+GET {{baseUrl}}/public/explore/filters
+Accept: application/json
+
+###
+
+### ============================================================
+### 12. VALIDASI - updated_within tidak valid (422)
+### Endpoint: GET /api/public/explore/jobs?updated_within=invalid
+### ============================================================
+
+# @name exploreInvalidUpdatedWithin
+GET {{baseUrl}}/public/explore/jobs?updated_within=invalid
+Accept: application/json
+
+###

@@ -23,6 +23,8 @@ tags:
   - name: Files
   - name: Explore
   - name: For You
+  - name: Mitra
+  - name: Schools
 
 security:
   - bearerAuth: []
@@ -69,6 +71,16 @@ paths:
     $ref: "./paths/for-you.yaml#/paths/~1public~1for-you~1jobs~1{slug}"
   /public/for-you/sort-options:
     $ref: "./paths/for-you.yaml#/paths/~1public~1for-you~1sort-options"
+
+  /public/mitra:
+    $ref: "./paths/mitra.yaml#/paths/~1public~1mitra"
+  /public/mitra/{id}:
+    $ref: "./paths/mitra.yaml#/paths/~1public~1mitra~1{id}"
+
+  /public/schools:
+    $ref: "./paths/schools.yaml#/paths/~1public~1schools"
+  /public/schools/{id}:
+    $ref: "./paths/schools.yaml#/paths/~1public~1schools~1{id}"
 
 components:
   securitySchemes:

@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
+use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\PrivateFileController;
+use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentPortfolioController;
 use Illuminate\Support\Facades\File;
@@ -69,4 +71,14 @@ Route::prefix('public/for-you')->group(function () {
     Route::get('/jobs', [ForYouController::class, 'index']);
     Route::get('/jobs/{slug}', [ForYouController::class, 'show']);
     Route::get('/sort-options', [ForYouController::class, 'sortOptions']);
+});
+
+Route::prefix('public/mitra')->group(function () {
+    Route::get('/', [MitraController::class, 'index']);
+    Route::get('/{id}', [MitraController::class, 'show'])->whereNumber('id');
+});
+
+Route::prefix('public/schools')->group(function () {
+    Route::get('/', [SchoolController::class, 'index']);
+    Route::get('/{id}', [SchoolController::class, 'show'])->whereNumber('id');
 });

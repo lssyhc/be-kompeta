@@ -1,0 +1,81 @@
+### ============================================================
+### SCHOOLS API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### PRASYARAT DATA DUMMY
+### Jalankan sekali jika belum ada data sekolah:
+### php artisan migrate
+### php artisan db:seed
+### ============================================================
+
+### ============================================================
+### 1. LIST SEKOLAH (default — page 1)
+### Endpoint: GET /api/public/schools
+### ============================================================
+
+# @name schoolListDefault
+GET {{baseUrl}}/public/schools
+Accept: application/json
+
+###
+
+### ============================================================
+### 2. LIST SEKOLAH - PAGINATION
+### Endpoint: GET /api/public/schools?page=1&per_page=6
+### ============================================================
+
+# @name schoolListPagination
+GET {{baseUrl}}/public/schools?page=1&per_page=6
+Accept: application/json
+
+###
+
+### ============================================================
+### 3. SEARCH - by nama sekolah
+### Endpoint: GET /api/public/schools?q=negeri
+### ============================================================
+
+# @name schoolSearchByName
+GET {{baseUrl}}/public/schools?q=negeri
+Accept: application/json
+
+###
+
+### ============================================================
+### 4. SEARCH - partial match (case insensitive)
+### Endpoint: GET /api/public/schools?q=SMA
+### ============================================================
+
+# @name schoolSearchSMA
+GET {{baseUrl}}/public/schools?q=SMA
+Accept: application/json
+
+###
+
+### ============================================================
+### 5. DETAIL SEKOLAH
+### Endpoint: GET /api/public/schools/{id}
+### Ganti {schoolId} dengan ID user sekolah yang valid
+### ============================================================
+
+@schoolId = 6
+
+# @name schoolDetail
+GET {{baseUrl}}/public/schools/{{schoolId}}
+Accept: application/json
+
+###
+
+### ============================================================
+### 6. DETAIL SEKOLAH - ID tidak ditemukan (404)
+### Endpoint: GET /api/public/schools/999999
+### ============================================================
+
+# @name schoolDetailNotFound
+GET {{baseUrl}}/public/schools/999999
+Accept: application/json
+
+###

@@ -1,0 +1,146 @@
+paths:
+  /public/mitra:
+    get:
+      tags: [Mitra]
+      summary: List mitra (perusahaan & UMKM)
+      description: |
+        Menampilkan daftar mitra (perusahaan dan UMKM) sebagai card-card.
+        Mendukung pencarian berdasarkan nama dan filter berdasarkan tipe mitra.
+        Diurutkan berdasarkan aktivitas login terakhir.
+      security: []
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Cari berdasarkan nama mitra (perusahaan atau UMKM)
+          example: binajasa
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [perusahaan, umkm]
+          description: Filter berdasarkan tipe mitra
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+      responses:
+        "200":
+          description: Daftar mitra berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Daftar mitra berhasil diambil.
+                data:
+                  - id: 10
+                    mitra_type: perusahaan
+                    name: PT Mitra Tata Lingkungan Baru
+                    logo_url: https://example.com/storage/logos/pt-mtlb.png
+                    address: "Bogor, Jawa Barat, Indonesia"
+                    industry_sector: Environmental Services
+                    vacancy_count: 4
+                    last_active: 5 jam yang lalu
+                  - id: 23
+                    mitra_type: umkm
+                    name: Susu Sapiloka
+                    logo_url: null
+                    address: "Tangerang, Banten, Indonesia"
+                    industry_sector: Food & Beverages
+                    vacancy_count: 1
+                    last_active: 4 jam yang lalu
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 3
+                    per_page: 12
+                    total: 30
+                    has_more_pages: true
+
+  /public/mitra/{id}:
+    get:
+      tags: [Mitra]
+      summary: Detail mitra
+      description: |
+        Menampilkan detail lengkap sebuah mitra beserta:
+        - Informasi profil (nama, deskripsi, alamat, karyawan, sosmed, galeri)
+        - Daftar lowongan aktif dari mitra tersebut
+        - Hingga 5 mitra serupa (berdasarkan sektor industri, keaktifan, dan ketersediaan loker)
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID user mitra
+          example: 10
+      responses:
+        "200":
+          description: Detail mitra berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Detail mitra berhasil diambil.
+                data:
+                  id: 10
+                  mitra_type: perusahaan
+                  name: PT Mitra Tata Lingkungan Baru
+                  logo_url: https://example.com/storage/logos/pt-mtlb.png
+                  short_description: >
+                    PT Mitra Tata Lingkungan Baru (PT MTLB) adalah perusahaan yang bergerak
+                    di bidang pengolahan limbah Non B3.
+                  address: "Bogor, Jawa Barat, Indonesia"
+                  industry_sector: Environmental Services
+                  employee_total_range: "51 - 200"
+                  website_or_social_url: https://instagram.com/ptmtlb
+                  gallery:
+                    - https://example.com/storage/gallery/img1.jpg
+                    - https://example.com/storage/gallery/img2.jpg
+                  vacancy_count: 4
+                  vacancies:
+                    - id: 5
+                      slug: teknisi-pest-control-abc123
+                      position_name: Teknisi Pest Control
+                      job_type: penuh_waktu
+                      job_type_label: Penuh Waktu
+                      work_policy: kantor
+                      work_policy_label: Kerja di kantor
+                      created_at_human: 2 jam yang lalu
+                      salary_label: Rp 3,5 jt-4,5 jt
+                      mitra_name: PT Mitra Tata Lingkungan Baru
+                      mitra_type: perusahaan
+                      province: Jawa Barat
+                      location: "Bogor, Jawa Barat, Indonesia"
+                      skills: [Pest Control, K3]
+                      benefits: [BPJS Kesehatan, Transport]
+                      mitra_logo_url: https://example.com/storage/logos/pt-mtlb.png
+                  similar_mitra:
+                    - id: 14
+                      mitra_type: perusahaan
+                      name: PT Annisa Surya Kencana
+                      logo_url: null
+                      address: "Bogor, Jawa Barat, Indonesia"
+                      industry_sector: Environmental Services
+                      vacancy_count: 1
+                      last_active: 2 jam yang lalu
+                errors: null
+                meta: null
+        "404":
+          description: Mitra tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

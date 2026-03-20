@@ -1,0 +1,117 @@
+paths:
+  /public/schools:
+    get:
+      tags: [Schools]
+      summary: List sekolah
+      description: Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan). Mendukung pencarian berdasarkan nama sekolah.
+      security: []
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Cari berdasarkan nama sekolah
+          example: SMA Negeri 1
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+      responses:
+        "200":
+          description: Daftar sekolah berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Daftar sekolah berhasil diambil.
+                data:
+                  - id: 5
+                    school_name: SMA Negeri 1 Bogor
+                    address: "Bogor, Jawa Barat, Indonesia"
+                    logo_url: https://example.com/storage/logos/sma-negeri-1-bogor.png
+                    expertise_fields: [IPA, IPS, Bahasa]
+                  - id: 8
+                    school_name: SMA Negeri 2 Jakarta
+                    address: "Jakarta Pusat, DKI Jakarta, Indonesia"
+                    logo_url: null
+                    expertise_fields: [IPA, IPS]
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 2
+                    per_page: 12
+                    total: 18
+                    has_more_pages: true
+
+  /public/schools/{id}:
+    get:
+      tags: [Schools]
+      summary: Detail sekolah
+      description: |
+        Menampilkan detail lengkap sebuah sekolah beserta:
+        - Profil sekolah (nama, lokasi, logo, galeri, deskripsi, akreditasi)
+        - Daftar jurusan
+        - Prestasi siswa sekolah
+        - Daftar siswa dari sekolah tersebut
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID user sekolah
+          example: 5
+      responses:
+        "200":
+          description: Detail sekolah berhasil diambil
+          content:
+            application/json:
+              example:
+                success: true
+                message: Detail sekolah berhasil diambil.
+                data:
+                  id: 5
+                  school_name: SMA Negeri 1 Bogor
+                  address: "Bogor, Jawa Barat, Indonesia"
+                  logo_url: https://example.com/storage/logos/sma-negeri-1-bogor.png
+                  gallery:
+                    - https://example.com/storage/schools/img1.jpg
+                    - https://example.com/storage/schools/img2.jpg
+                  short_description: "SMA Negeri 1 Bogor adalah sekolah menengah atas terkemuka di Bogor dengan fokus pada pendidikan akademik berkualitas tinggi."
+                  accreditation: "A (Amat Memuaskan)"
+                  expertise_fields: [IPA, IPS, Bahasa]
+                  student_achievements:
+                    - title: "Juara 1 Olimpiade Matematika"
+                      description: "Pencapaian pada OSN Tingkat Nasional 2025"
+                    - title: "Juara 2 Kompetisi Debat Bahasa Inggris"
+                      description: "Kompetisi Nasional Bahasa Inggris 2025"
+                  students:
+                    - id: 42
+                      full_name: Budi Santoso
+                      major: IPA
+                      graduation_status: graduated
+                      photo_profile_url: https://example.com/storage/photos/budi.jpg
+                    - id: 43
+                      full_name: Siti Rahayu
+                      major: IPA
+                      graduation_status: active
+                      photo_profile_url: null
+                errors: null
+                meta: null
+        "404":
+          description: Sekolah tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

@@ -100,4 +100,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobVacancy::class, 'mitra_user_id');
     }
+
+    public function featuredVacancy(): HasOne
+    {
+        return $this->hasOne(JobVacancy::class, 'mitra_user_id')
+            ->where('is_published', true)
+            ->latest();
+    }
 }

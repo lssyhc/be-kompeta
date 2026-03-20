@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\CompanyProfile;
 use App\Models\JobVacancy;
+use App\Models\SchoolProfile;
+use App\Models\StudentAchievement;
+use App\Models\StudentProfile;
 use App\Models\UmkmProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -324,5 +327,170 @@ class ExploreDummySeeder extends Seeder
                 $vacancy->benefits()->create(['name' => $benefit]);
             }
         }
+
+        $schoolA = User::query()->updateOrCreate(
+            ['email' => 'school.a@kompeta.test'],
+            [
+                'name' => 'SMA Negeri 1 Bogor',
+                'password' => Hash::make('password123'),
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => 'active',
+                'is_active' => true,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $schoolA->id],
+            [
+                'school_name' => 'SMA Negeri 1 Bogor',
+                'npsn' => '20201234',
+                'accreditation' => 'A (Amat Memuaskan)',
+                'address' => 'Jl. Ahmad Yani No. 1, Bogor, Jawa Barat',
+                'expertise_fields' => json_encode(['IPA', 'IPS', 'Bahasa']),
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMA+Negeri+1',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=SMA+Rumah+Sakit',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=SMA+Kelas+A',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=SMA+Lab',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=SMA+Perpus',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=SMA+Lapang',
+                'short_description' => 'SMA Negeri 1 Bogor adalah sekolah menengah atas terkemuka dengan fokus pada pengembangan akademik berkualitas tinggi dan karakter siswa yang kuat.',
+                'operational_license_path' => 'https://via.placeholder.com/600x800?text=Izin+Operasional',
+            ]
+        );
+
+        $schoolB = User::query()->updateOrCreate(
+            ['email' => 'school.b@kompeta.test'],
+            [
+                'name' => 'SMA Negeri 2 Jakarta',
+                'password' => Hash::make('password123'),
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => 'active',
+                'is_active' => true,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $schoolB->id],
+            [
+                'school_name' => 'SMA Negeri 2 Jakarta',
+                'npsn' => '20205678',
+                'accreditation' => 'A (Amat Memuaskan)',
+                'address' => 'Jl. Sudirman No. 100, Jakarta Pusat, DKI Jakarta',
+                'expertise_fields' => json_encode(['IPA', 'IPS']),
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMA+Negeri+2',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Jakarta+School+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Jakarta+School+2',
+                'image_3_path' => null,
+                'image_4_path' => null,
+                'image_5_path' => null,
+                'short_description' => 'SMA Negeri 2 Jakarta merupakan institusi pendidikan unggulan di Jakarta Pusat dengan standar internasional.',
+                'operational_license_path' => 'https://via.placeholder.com/600x800?text=Izin+Jakarta',
+            ]
+        );
+
+        $studentA1 = StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0001234567'],
+            [
+                'user_id' => User::query()->updateOrCreate(
+                    ['email' => 'student.a1@kompeta.test'],
+                    [
+                        'name' => 'Budi Santoso',
+                        'password' => Hash::make('password123'),
+                        'role' => User::ROLE_SISWA,
+                        'account_status' => 'active',
+                        'is_active' => true,
+                    ]
+                )->id,
+                'school_user_id' => $schoolA->id,
+                'full_name' => 'Budi Santoso',
+                'photo_profile_path' => null,
+                'major' => 'IPA',
+                'school_origin' => 'SMA Negeri 1 Bogor',
+                'graduation_status' => 'graduated',
+                'unique_code' => Str::random(16),
+                'description' => 'Siswa berprestasi dengan fokus di bidang sains',
+                'phone_number' => '082123456789',
+                'address' => 'Bogor, Jawa Barat',
+            ]
+        );
+
+        $studentA2 = StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0001234568'],
+            [
+                'user_id' => User::query()->updateOrCreate(
+                    ['email' => 'student.a2@kompeta.test'],
+                    [
+                        'name' => 'Siti Rahayu',
+                        'password' => Hash::make('password123'),
+                        'role' => User::ROLE_SISWA,
+                        'account_status' => 'active',
+                        'is_active' => true,
+                    ]
+                )->id,
+                'school_user_id' => $schoolA->id,
+                'full_name' => 'Siti Rahayu',
+                'photo_profile_path' => null,
+                'major' => 'IPA',
+                'school_origin' => 'SMA Negeri 1 Bogor',
+                'graduation_status' => 'active',
+                'unique_code' => Str::random(16),
+                'description' => 'Siswa aktif dalam kegiatan akademik',
+                'phone_number' => '081987654321',
+                'address' => 'Bogor, Jawa Barat',
+            ]
+        );
+
+        $studentB1 = StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0002345678'],
+            [
+                'user_id' => User::query()->updateOrCreate(
+                    ['email' => 'student.b1@kompeta.test'],
+                    [
+                        'name' => 'Ahmad Wijaya',
+                        'password' => Hash::make('password123'),
+                        'role' => User::ROLE_SISWA,
+                        'account_status' => 'active',
+                        'is_active' => true,
+                    ]
+                )->id,
+                'school_user_id' => $schoolB->id,
+                'full_name' => 'Ahmad Wijaya',
+                'photo_profile_path' => null,
+                'major' => 'IPS',
+                'school_origin' => 'SMA Negeri 2 Jakarta',
+                'graduation_status' => 'graduated',
+                'unique_code' => Str::random(16),
+                'description' => 'Lulusan terbaik tahun ajaran 2024',
+                'phone_number' => '083456789012',
+                'address' => 'Jakarta, DKI Jakarta',
+            ]
+        );
+
+        StudentAchievement::query()->updateOrCreate(
+            ['student_profile_id' => $studentA1->id, 'title' => 'Juara 1 Olimpiade Matematika'],
+            [
+                'description' => 'OSN Tingkat Nasional 2024',
+                'achievement_date' => now()->subMonths(6),
+                'institution_name' => 'Kementerian Pendidikan',
+            ]
+        );
+
+        StudentAchievement::query()->updateOrCreate(
+            ['student_profile_id' => $studentA2->id, 'title' => 'Juara 2 Kompetisi Debat Bahasa Inggris'],
+            [
+                'description' => 'Kompetisi Nasional Bahasa Inggris 2024',
+                'achievement_date' => now()->subMonths(4),
+                'institution_name' => 'British Council',
+            ]
+        );
+
+        StudentAchievement::query()->updateOrCreate(
+            ['student_profile_id' => $studentB1->id, 'title' => 'Penghargaan Siswa Berprestasi'],
+            [
+                'description' => 'Penghargaan dari sekolah untuk prestasi akademik dan karakter',
+                'achievement_date' => now()->subMonths(3),
+                'institution_name' => 'SMA Negeri 2 Jakarta',
+            ]
+        );
     }
 }

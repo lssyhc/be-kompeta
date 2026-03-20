@@ -1,0 +1,103 @@
+### ============================================================
+### MITRA API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### PRASYARAT DATA DUMMY
+### Jalankan sekali jika belum ada data mitra:
+### php artisan migrate
+### php artisan db:seed
+### ============================================================
+
+### ============================================================
+### 1. LIST MITRA (default — semua tipe, page 1)
+### Endpoint: GET /api/public/mitra
+### ============================================================
+
+# @name mitraListDefault
+GET {{baseUrl}}/public/mitra
+Accept: application/json
+
+###
+
+### ============================================================
+### 2. LIST MITRA - PAGINATION
+### Endpoint: GET /api/public/mitra?page=1&per_page=6
+### ============================================================
+
+# @name mitraListPagination
+GET {{baseUrl}}/public/mitra?page=1&per_page=6
+Accept: application/json
+
+###
+
+### ============================================================
+### 3. FILTER - hanya perusahaan
+### Endpoint: GET /api/public/mitra?type=perusahaan
+### ============================================================
+
+# @name mitraFilterPerusahaan
+GET {{baseUrl}}/public/mitra?type=perusahaan
+Accept: application/json
+
+###
+
+### ============================================================
+### 4. FILTER - hanya UMKM
+### Endpoint: GET /api/public/mitra?type=umkm
+### ============================================================
+
+# @name mitraFilterUmkm
+GET {{baseUrl}}/public/mitra?type=umkm
+Accept: application/json
+
+###
+
+### ============================================================
+### 5. SEARCH - by nama perusahaan
+### Endpoint: GET /api/public/mitra?q=binajasa
+### ============================================================
+
+# @name mitraSearchNama
+GET {{baseUrl}}/public/mitra?q=binajasa
+Accept: application/json
+
+###
+
+### ============================================================
+### 6. SEARCH + FILTER - nama + tipe
+### Endpoint: GET /api/public/mitra?q=jasa&type=perusahaan
+### ============================================================
+
+# @name mitraSearchAndFilter
+GET {{baseUrl}}/public/mitra?q=jasa&type=perusahaan
+Accept: application/json
+
+###
+
+### ============================================================
+### 7. DETAIL MITRA
+### Endpoint: GET /api/public/mitra/{id}
+### Ganti {mitraId} dengan ID user mitra yang valid
+### ============================================================
+
+@mitraId = 2
+
+# @name mitraDetail
+GET {{baseUrl}}/public/mitra/{{mitraId}}
+Accept: application/json
+
+###
+
+### ============================================================
+### 8. DETAIL MITRA - ID tidak ditemukan (404)
+### Endpoint: GET /api/public/mitra/999999
+### ============================================================
+
+# @name mitraDetailNotFound
+GET {{baseUrl}}/public/mitra/999999
+Accept: application/json
+
+###

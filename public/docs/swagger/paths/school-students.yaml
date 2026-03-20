@@ -1,0 +1,405 @@
+paths:
+  /school/students:
+    get:
+      tags: [School Students]
+      summary: List siswa milik sekolah login
+      parameters:
+        - in: query
+          name: class_year
+          schema:
+            type: string
+            example: "2024"
+        - in: query
+          name: graduation_status
+          schema:
+            type: string
+            example: Lulus
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Daftar siswa berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentList"
+              example:
+                success: true
+                message: Daftar siswa berhasil diambil.
+                data:
+                  - id: 1
+                    user_id: 20
+                    school_user_id: 2
+                    full_name: Budi Santoso
+                    nisn: "1234567890"
+                    major: RPL
+                    school_origin: SMK Negeri 1
+                    graduation_status: Belum Lulus
+                    class_year: "2024"
+                    unique_code: X1YZABCD
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                    has_more_pages: false
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat mengakses data siswa.
+                data: null
+                errors: null
+                meta: null
+
+    post:
+      tags: [School Students]
+      summary: Tambah siswa oleh sekolah
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/StoreStudentRequest"
+            example:
+              full_name: Budi Santoso
+              nisn: "1234567890"
+              major: RPL
+              school_origin: SMK Negeri 1
+              graduation_status: Belum Lulus
+              class_year: "2024"
+              phone_number: "081234567890"
+              address: Jl. Siswa No. 5
+      responses:
+        "201":
+          description: Data siswa berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeSchoolStoreStudent"
+              example:
+                success: true
+                message: Data siswa berhasil ditambahkan.
+                data:
+                  user:
+                    id: 20
+                    name: Budi Santoso
+                    role: siswa
+                    account_status: active
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat menambahkan siswa.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  nisn:
+                    - The nisn has already been taken.
+                meta: null
+
+  /school/students/search:
+    get:
+      tags: [School Students]
+      summary: Cari siswa by nama atau NISN
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+      responses:
+        "200":
+          description: Pencarian siswa berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentSearch"
+              example:
+                success: true
+                message: Pencarian siswa berhasil.
+                data:
+                  results:
+                    - id: 1
+                      full_name: Budi Santoso
+                      nisn: "1234567890"
+                errors: null
+                meta:
+                  query: Budi
+                  total: 1
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat mencari data siswa.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  q:
+                    - The q field is required.
+                meta: null
+
+  /school/students/{id}:
+    get:
+      tags: [School Students]
+      summary: Detail siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detail siswa berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentDetail"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat mengakses data siswa.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Data siswa tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Data siswa tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+
+    put:
+      tags: [School Students]
+      summary: Update data siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/UpdateStudentRequest"
+      responses:
+        "200":
+          description: Data siswa berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentDetail"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat mengubah data siswa.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Data siswa tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Data siswa tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  nisn:
+                    - The nisn has already been taken.
+                meta: null
+
+    delete:
+      tags: [School Students]
+      summary: Hapus permanen data siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Data siswa berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Data siswa berhasil dihapus.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat menghapus data siswa.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Data siswa tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Data siswa tidak ditemukan.
+                data: null
+                errors: null
+                meta: null

@@ -1,0 +1,202 @@
+paths:
+  /student/profile:
+    put:
+      tags: [Student Portfolio]
+      summary: Update profil siswa (self service)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/UpdateStudentProfileRequest"
+            example:
+              description: Siswa RPL fokus backend Laravel.
+              phone_number: "081234567890"
+              address: Jakarta Selatan
+      responses:
+        "200":
+          description: Profil siswa berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentProfile"
+              example:
+                success: true
+                message: Profil siswa berhasil diperbarui.
+                data:
+                  profile:
+                    id: 1
+                    full_name: Budi Santoso
+                    nisn: "1234567890"
+                    description: Siswa RPL fokus backend Laravel.
+                    phone_number: "081234567890"
+                    address: Jakarta Selatan
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat mengubah profil siswa.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  description:
+                    - The description field must not be greater than 2000 characters.
+                meta: null
+
+  /student/portfolio-items:
+    post:
+      tags: [Student Portfolio]
+      summary: Tambah item portfolio siswa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/StoreStudentPortfolioItemRequest"
+            examples:
+              skill:
+                summary: Tambah skill
+                value:
+                  type: skill
+                  title: Laravel
+              experience:
+                summary: Tambah experience
+                value:
+                  type: experience
+                  title: Magang Back-end
+                  description: Mengembangkan API Laravel
+                  position: Back-end Intern
+                  company_name: PT Maju Jaya
+                  start_date: "2024-01-01"
+                  end_date: "2024-03-31"
+              achievement:
+                summary: Tambah achievement
+                value:
+                  type: achievement
+                  title: Juara LKS
+                  description: Juara 2 tingkat provinsi
+                  achievement_date: "2024-02-10"
+                  institution_name: Disdik Provinsi
+              application:
+                summary: Tambah riwayat aplikasi
+                value:
+                  type: application
+                  company_name: PT Maju Jaya
+                  role_type: Backend Intern
+                  submitted_at: "2024-03-01"
+                  submit_status: submitted
+      responses:
+        "201":
+          description: Data portfolio berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePortfolioItem"
+              example:
+                success: true
+                message: Data portfolio berhasil ditambahkan.
+                data:
+                  item:
+                    id: 1
+                    student_profile_id: 1
+                    title: Laravel
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat mengelola portfolio.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  type:
+                    - The selected type is invalid.
+                meta: null
+
+  /student/application-reminder:
+    get:
+      tags: [Student Portfolio]
+      summary: Ambil reminder lamaran siswa
+      responses:
+        "200":
+          description: Reminder berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeReminder"
+              example:
+                success: true
+                message: Reminder berhasil diambil.
+                data:
+                  reminder: Selalu cek informasi kontak email/nomor handphone yang anda cantumkan di cv
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null

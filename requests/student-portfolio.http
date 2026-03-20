@@ -1,0 +1,441 @@
+### ============================================================
+### STUDENT PORTFOLIO API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### SETUP: Login Siswa terlebih dahulu untuk mendapatkan token
+###
+###        Isi nilai unique_code yang didapat dari respons
+###        "Tambah Siswa" di school-students.http (#1 atau #2)
+###        Cek di: student_profiles.unique_code
+###
+###        Jalankan request ini PERTAMA sebelum request lainnya
+### ============================================================
+
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "1234567890",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "unique_code": "GANTIDULU",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### CATATAN: Ganti nilai "unique_code" di atas dengan kode unik
+###          yang muncul di respons tambah siswa dari sekolah.
+###          Contoh respons tambah siswa:
+###          {
+###            "user": {
+###              "studentProfile": {
+###                "unique_code": "ABCD1234"
+###              }
+###            }
+###          }
+### ============================================================
+
+### ============================================================
+### CHECK ONBOARDING AWAL (sebelum tambah skill)
+### Endpoint: GET /api/auth/me
+### Ekspektasi jika siswa belum punya skill:
+### - requires_skill_setup: true
+### - next_step: "add_skill"
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 1. UPDATE PROFIL SISWA (bio, kontak)
+###    Endpoint: PUT /api/student/profile
+###    Field yang dapat diisi sendiri oleh siswa:
+###    - description (max 2000 karakter)
+###    - phone_number
+###    - address
+### ============================================================
+
+PUT {{baseUrl}}/student/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "description": "Saya adalah siswa SMK jurusan RPL yang memiliki minat di bidang pengembangan web dan mobile. Berpengalaman dalam JavaScript, PHP, dan Python.",
+  "phone_number": "081234567890",
+  "address": "Jl. Siswa Berprestasi No. 5, Jakarta Selatan"
+}
+
+###
+
+### ============================================================
+### 2. UPDATE PROFIL SISWA - Hanya description saja
+### ============================================================
+
+PUT {{baseUrl}}/student/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "description": "Deskripsi portofolio yang diperbarui. Saya senang belajar teknologi baru."
+}
+
+###
+
+### ============================================================
+### 3. UPDATE PROFIL SISWA - Hanya phone & address
+### ============================================================
+
+PUT {{baseUrl}}/student/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "phone_number": "087812345678",
+  "address": "Jl. Baru No. 99, Bandung"
+}
+
+###
+
+### ============================================================
+### 4. UPDATE PROFIL SISWA - Validasi: description terlalu panjang (422)
+### ============================================================
+
+PUT {{baseUrl}}/student/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "description": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}
+
+###
+
+### ============================================================
+### 5. TAMBAH PORTFOLIO - SKILL (Keahlian)
+###    Endpoint: POST /api/student/portfolio-items
+###    type: "skill"
+###    Field wajib: title
+### ============================================================
+
+# @name tambahSkill
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "Laravel PHP Framework"
+}
+
+###
+
+### ============================================================
+### 6. TAMBAH PORTFOLIO - SKILL (ke-2)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "JavaScript & Vue.js"
+}
+
+###
+
+### ============================================================
+### CHECK ONBOARDING SETELAH TAMBAH SKILL
+### Endpoint: GET /api/auth/me
+### Ekspektasi setelah minimal 1 skill tersimpan:
+### - requires_skill_setup: false
+### - next_step: null
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 7. TAMBAH PORTFOLIO - SKILL ke-3
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "Figma & UI/UX Design"
+}
+
+###
+
+### ============================================================
+### 8. TAMBAH PORTFOLIO - EXPERIENCE (Pengalaman Kerja/Magang)
+###    type: "experience"
+###    Field wajib: title, description, position, company_name, start_date
+###    Field opsional: end_date (null = masih berlangsung)
+### ============================================================
+
+# @name tambahExperience
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience",
+  "title": "Magang Web Developer",
+  "description": "Mengembangkan fitur back-end menggunakan Laravel dan API REST. Berkolaborasi dengan tim front-end menggunakan Vue.js.",
+  "position": "Back-End Developer Intern",
+  "company_name": "PT Maju Jaya Teknologi",
+  "start_date": "2023-07-01",
+  "end_date": "2023-09-30"
+}
+
+###
+
+### ============================================================
+### 9. TAMBAH PORTFOLIO - EXPERIENCE (masih berlangsung, tanpa end_date)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience",
+  "title": "Freelance Web Developer",
+  "description": "Membangun website profil untuk klien UMKM lokal menggunakan WordPress dan custom PHP.",
+  "position": "Freelancer",
+  "company_name": "Self Employed",
+  "start_date": "2024-01-01",
+  "end_date": null
+}
+
+###
+
+### ============================================================
+### 10. TAMBAH PORTFOLIO - EXPERIENCE - Validasi: end_date sebelum start_date (422)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience",
+  "title": "Test Tanggal Salah",
+  "description": "Deskripsi test.",
+  "position": "Tester",
+  "company_name": "Company Test",
+  "start_date": "2024-06-01",
+  "end_date": "2024-01-01"
+}
+
+###
+
+### ============================================================
+### 11. TAMBAH PORTFOLIO - ACHIEVEMENT (Prestasi)
+###     type: "achievement"
+###     Field wajib: title, description, achievement_date, institution_name
+### ============================================================
+
+# @name tambahAchievement
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "achievement",
+  "title": "Juara 2 Lomba Web Design Tingkat Provinsi",
+  "description": "Meraih juara 2 dalam kompetisi desain web antar SMK se-Provinsi DKI Jakarta yang diselenggarakan oleh Dinas Pendidikan.",
+  "achievement_date": "2023-11-15",
+  "institution_name": "Dinas Pendidikan Provinsi DKI Jakarta"
+}
+
+###
+
+### ============================================================
+### 12. TAMBAH PORTFOLIO - ACHIEVEMENT (ke-2)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "achievement",
+  "title": "Sertifikasi Junior Web Developer",
+  "description": "Lulus sertifikasi kompetensi Junior Web Developer dari BNSP dengan nilai memuaskan.",
+  "achievement_date": "2024-03-10",
+  "institution_name": "Badan Nasional Sertifikasi Profesi (BNSP)"
+}
+
+###
+
+### ============================================================
+### 13. TAMBAH PORTFOLIO - APPLICATION (Lamaran Pekerjaan/Magang)
+###     type: "application"
+###     Field wajib: company_name, role_type, submitted_at, submit_status
+### ============================================================
+
+# @name tambahApplication
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "application",
+  "company_name": "PT Maju Jaya Teknologi",
+  "role_type": "Back-End Developer Intern",
+  "submitted_at": "2024-02-01",
+  "submit_status": "submitted"
+}
+
+###
+
+### ============================================================
+### 14. TAMBAH PORTFOLIO - APPLICATION (ke-2, status diterima)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "application",
+  "company_name": "CV Digital Kreatif",
+  "role_type": "Full-Stack Developer Intern",
+  "submitted_at": "2024-03-15",
+  "submit_status": "accepted"
+}
+
+###
+
+### ============================================================
+### 15. TAMBAH PORTFOLIO - APPLICATION (ke-3, status ditolak)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "application",
+  "company_name": "PT Teknologi Nusantara",
+  "role_type": "Mobile Developer Intern",
+  "submitted_at": "2024-01-20",
+  "submit_status": "rejected"
+}
+
+###
+
+### ============================================================
+### 16. TAMBAH PORTFOLIO - Validasi: type tidak valid (422)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "invalid_type",
+  "title": "Test"
+}
+
+###
+
+### ============================================================
+### 17. TAMBAH PORTFOLIO - Validasi: skill tanpa title (422)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill"
+}
+
+###
+
+### ============================================================
+### 18. TAMBAH PORTFOLIO - Validasi: experience tanpa company_name (422)
+### ============================================================
+
+POST {{baseUrl}}/student/portfolio-items
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience",
+  "title": "Magang",
+  "description": "Deskripsi.",
+  "position": "Intern",
+  "start_date": "2024-01-01"
+}
+
+###
+
+### ============================================================
+### 19. APPLICATION REMINDER
+###     Endpoint: GET /api/student/application-reminder
+###     Menampilkan pesan pengingat untuk siswa saat melamar kerja
+### ============================================================
+
+GET {{baseUrl}}/student/application-reminder
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 20. AKSES ENDPOINT STUDENT DENGAN TOKEN SEKOLAH (harus 403)
+###     Memastikan role guard bekerja dengan benar
+### ============================================================
+
+### Ganti token di bawah dengan token dari login sekolah
+### (copy dari auth.http #7 - Login Sekolah)
+@tokenSekolahManual = PASTE_TOKEN_SEKOLAH_DI_SINI
+
+PUT {{baseUrl}}/student/profile
+Accept: application/json
+Authorization: Bearer {{tokenSekolahManual}}
+Content-Type: application/json
+
+{
+  "description": "Ini seharusnya ditolak karena bukan siswa."
+}
+
+###

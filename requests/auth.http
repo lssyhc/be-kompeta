@@ -1,0 +1,579 @@
+### ============================================================
+### AUTH API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### 1. REGISTER SEKOLAH
+###    Endpoint : POST /api/auth/register
+###    Butuh file: requests/sample-files/logo.jpg
+###                requests/sample-files/document.pdf
+###                image_1..image_5 opsional
+### ============================================================
+
+# @name registerSekolah
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="role"
+
+sekolah
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="email"
+
+smk.negeri1@example.com
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password_confirmation"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="school_name"
+
+SMK Negeri 1 Contoh
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="npsn"
+
+12345678
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="accreditation"
+
+A
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="address"
+
+Jl. Pendidikan No. 1, Jakarta Selatan
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="expertise_fields[]"
+
+RPL
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="expertise_fields[]"
+
+TKJ
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="short_description"
+
+SMK unggulan yang berfokus pada teknologi informasi dan komunikasi.
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="logo"; filename="logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_1"; filename="school-image-1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_2"; filename="school-image-2.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="operational_license"; filename="izin-operasional.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/document.pdf
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 2. REGISTER MITRA - PERUSAHAAN (PT/CV)
+###    Endpoint : POST /api/auth/register
+###    Butuh file: requests/sample-files/document.pdf
+###                requests/sample-files/logo.jpg
+### ============================================================
+
+# @name registerMitraPerusahaan
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="role"
+
+mitra
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="mitra_type"
+
+perusahaan
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="email"
+
+corp.majujaya@example.com
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password_confirmation"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="company_name"
+
+PT Maju Jaya Teknologi
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="nib"
+
+1234567890123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="industry_sector"
+
+Teknologi Informasi
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="employee_total_range"
+
+51-200
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="office_address"
+
+Jl. Sudirman No. 10, Jakarta Pusat
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="website_or_social_url"
+
+https://www.majujaya.co.id
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="short_description"
+
+Perusahaan teknologi yang menyediakan solusi software untuk pendidikan dan industri.
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="company_logo"; filename="company-logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_1"; filename="company-image-1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_2"; filename="company-image-2.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="kemenkumham_decree"; filename="sk-kemenkumham.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/document.pdf
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 3. REGISTER MITRA - UMKM
+###    Endpoint : POST /api/auth/register
+###    Butuh file: requests/sample-files/logo.jpg (logo umkm + ktp + image_1..image_5)
+### ============================================================
+
+# @name registerMitraUmkm
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="role"
+
+mitra
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="mitra_type"
+
+umkm
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="email"
+
+umkm.budi@example.com
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password_confirmation"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="business_name"
+
+UMKM Budi Jaya Elektronik
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="owner_nik"
+
+3201234567890001
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="owner_personal_nib"
+
+1234567890
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="business_type"
+
+Elektronik
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="business_address"
+
+Jl. Pasar Baru No. 5, Bandung
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="short_description"
+
+UMKM elektronik rumahan yang fokus pada servis dan penjualan aksesoris.
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="umkm_logo"; filename="umkm-logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="owner_ktp_photo"; filename="ktp.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_1"; filename="umkm-image-1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_2"; filename="umkm-image-2.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_3"; filename="umkm-image-3.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_4"; filename="umkm-image-4.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="image_5"; filename="umkm-image-5.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 4. REGISTER - Validasi: tolak field yang dilarang (perusahaan)
+###    Expect: 422 dengan error pinpoint_map & contact_person
+### ============================================================
+
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="role"
+
+mitra
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="mitra_type"
+
+perusahaan
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="email"
+
+test.tolak@example.com
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="password_confirmation"
+
+password123
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="company_name"
+
+PT Test Tolak
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="nib"
+
+9876543210001
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="industry_sector"
+
+Retail
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="employee_total_range"
+
+1-10
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="office_address"
+
+Jl. Test No. 1
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="pinpoint_map"
+
+-6.2,106.8
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="contact_person"
+
+08123456789
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 5. REGISTER - Validasi: tolak role siswa (harus 422)
+### ============================================================
+
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "email": "siswa@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+
+###
+
+### ============================================================
+### 6. REGISTER - Validasi: tolak role admin (harus 422)
+### ============================================================
+
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "admin",
+  "email": "admin2@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+
+###
+
+### ============================================================
+### 7. LOGIN - Sekolah (email + password)
+###    Jalankan dulu Register Sekolah (#1)
+### ============================================================
+
+# @name loginSekolah
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "smk.negeri1@example.com",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 8. LOGIN - Mitra Perusahaan (email + password)
+###    Jalankan dulu Register Mitra Perusahaan (#2)
+### ============================================================
+
+# @name loginMitraPerusahaan
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "corp.majujaya@example.com",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 9. LOGIN - Mitra UMKM (email + password)
+###    Jalankan dulu Register Mitra UMKM (#3)
+### ============================================================
+
+# @name loginMitraUmkm
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "umkm.budi@example.com",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 10. LOGIN - Admin (seeded via DatabaseSeeder)
+###     Email   : admin@kompeta.test
+###     Password: admin12345
+### ============================================================
+
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "admin",
+  "email": "admin@kompeta.test",
+  "password": "admin12345",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 11. LOGIN - Siswa (NISN + school_origin + unique_code)
+###     Isi nilai unique_code dari respons tambah siswa
+###     di school-students.http (#2)
+###     Response tambahan onboarding:
+###     - requires_skill_setup (true/false)
+###     - next_step (add_skill/null)
+### ============================================================
+
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "1234567890",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "unique_code": "GANTIDULU",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 12. LOGIN - Validasi: kredensial salah (harus 422)
+### ============================================================
+
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "salah@example.com",
+  "password": "passwordsalah",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 13. LOGIN - Validasi: siswa dengan unique_code salah (422)
+### ============================================================
+
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "1234567890",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "unique_code": "SALAHKODE",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 14. ME - Ambil data user yang sedang login (Sekolah)
+###     Token otomatis dari respons Login Sekolah (#7)
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 15. ME - Ambil data user (Mitra Perusahaan)
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 16. ME - Ambil data user (Siswa)
+###     Response juga menyertakan:
+###     - requires_skill_setup (true/false)
+###     - next_step (add_skill/null)
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 17. LOGOUT
+### ============================================================
+
+POST {{baseUrl}}/auth/logout
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 18. ME - Akses setelah logout (harus 401)
+### ============================================================
+
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 19. DOWNLOAD DOKUMEN PRIVATE - SEKOLAH
+###     Tipe: operational_license
+### ============================================================
+
+GET {{baseUrl}}/files/me/operational_license
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 20. DOWNLOAD DOKUMEN PRIVATE - MITRA PERUSAHAAN
+###     Tipe: kemenkumham_decree
+### ============================================================
+
+GET {{baseUrl}}/files/me/kemenkumham_decree
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 21. DOWNLOAD DOKUMEN PRIVATE - MITRA UMKM
+###     Tipe: owner_ktp
+### ============================================================
+
+GET {{baseUrl}}/files/me/owner_ktp
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+###

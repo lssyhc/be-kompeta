@@ -1,0 +1,393 @@
+### ============================================================
+### SCHOOL STUDENT MANAGEMENT API - REST Client Testing
+### ============================================================
+### Base URL — sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### SETUP: Login Sekolah terlebih dahulu untuk mendapatkan token
+###        Jalankan request ini PERTAMA sebelum request lainnya
+### ============================================================
+
+# @name loginSekolah
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "smk.negeri1@example.com",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### CATATAN: Setelah mendapat respons login di atas, semua request
+###          di bawah ini akan otomatis menggunakan token tersebut
+###          melalui: {{loginSekolah.response.body.$.data.token}}
+###
+###          Jika ingin menggunakan token manual, ganti dengan:
+###          Authorization: Bearer <paste-token-di-sini>
+### ============================================================
+
+### ============================================================
+### 1. TAMBAH SISWA (dengan foto profil)
+###    Endpoint : POST /api/school/students
+###    Butuh file: requests/sample-files/logo.jpg
+### ============================================================
+
+# @name tambahSiswa
+POST {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="full_name"
+
+Budi Santoso
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="nisn"
+
+1234567890
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="major"
+
+Rekayasa Perangkat Lunak
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="school_origin"
+
+SMK Negeri 1 Contoh
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="graduation_status"
+
+Belum Lulus
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="class_year"
+
+2024
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="phone_number"
+
+081234567890
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="address"
+
+Jl. Siswa No. 5, Jakarta
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="photo_profile"; filename="student.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 2. TAMBAH SISWA (tanpa foto profil — foto bersifat opsional)
+### ============================================================
+
+# @name tambahSiswa2
+POST {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Andi Pratama",
+  "nisn": "0987654321",
+  "major": "Teknik Komputer dan Jaringan",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "graduation_status": "Lulus",
+  "class_year": "2023",
+  "phone_number": "089876543210",
+  "address": "Jl. Alumni No. 10, Bandung"
+}
+
+###
+
+### ============================================================
+### 3. TAMBAH SISWA (tanpa class_year, phone_number, address)
+###    Semua field nullable tersebut bersifat opsional
+### ============================================================
+
+POST {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Siti Rahma",
+  "nisn": "1122334455",
+  "major": "Akuntansi",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "graduation_status": "Belum Lulus"
+}
+
+###
+
+### ============================================================
+### 4. TAMBAH SISWA - Validasi: NISN duplikat (harus 422)
+### ============================================================
+
+POST {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Siswa Duplikat",
+  "nisn": "1234567890",
+  "major": "RPL",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "graduation_status": "Belum Lulus"
+}
+
+###
+
+### ============================================================
+### 5. TAMBAH SISWA - Validasi: NISN kurang dari 10 digit (422)
+### ============================================================
+
+POST {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Siswa Salah NISN",
+  "nisn": "12345",
+  "major": "RPL",
+  "school_origin": "SMK Negeri 1 Contoh",
+  "graduation_status": "Belum Lulus"
+}
+
+###
+
+### ============================================================
+### 6. DAFTAR SISWA (semua siswa milik sekolah ini)
+###    Endpoint : GET /api/school/students
+###    Hasil    : paginated 20 per halaman
+### ============================================================
+
+GET {{baseUrl}}/school/students
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 7. DAFTAR SISWA - Filter by class_year
+### ============================================================
+
+GET {{baseUrl}}/school/students?class_year=2024
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 8. DAFTAR SISWA - Filter by graduation_status
+### ============================================================
+
+GET {{baseUrl}}/school/students?graduation_status=Lulus
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 9. DAFTAR SISWA - Filter kombinasi class_year + graduation_status
+### ============================================================
+
+GET {{baseUrl}}/school/students?class_year=2023&graduation_status=Lulus
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 10. DAFTAR SISWA - Halaman ke-2
+### ============================================================
+
+GET {{baseUrl}}/school/students?page=2
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 11. CARI SISWA - by nama (partial match)
+###     Endpoint : GET /api/school/students/search?q=
+###     Hasil    : maks 50 data
+### ============================================================
+
+GET {{baseUrl}}/school/students/search?q=Budi
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 12. CARI SISWA - by NISN (partial match)
+### ============================================================
+
+GET {{baseUrl}}/school/students/search?q=1234567890
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 13. CARI SISWA - keyword pendek (min 1 karakter)
+### ============================================================
+
+GET {{baseUrl}}/school/students/search?q=A
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 14. CARI SISWA - Validasi: tanpa parameter q (harus 422)
+### ============================================================
+
+GET {{baseUrl}}/school/students/search
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 15. DETAIL SISWA
+###     Endpoint : GET /api/school/students/{id}
+###     Ganti {id} dengan ID student_profile dari daftar siswa
+###     Response menyertakan: skills, experiences, achievements, applications
+### ============================================================
+
+@studentProfileId = 1
+
+GET {{baseUrl}}/school/students/{{studentProfileId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 16. DETAIL SISWA - ID tidak ditemukan / bukan milik sekolah (404)
+### ============================================================
+
+GET {{baseUrl}}/school/students/99999
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 17. UPDATE DATA SISWA (dengan foto profil baru)
+###     Endpoint : PUT /api/school/students/{id}
+###     Hanya field yang dikirim yang akan diupdate (PATCH-style)
+###     Butuh file: requests/sample-files/logo.jpg
+### ============================================================
+
+PUT {{baseUrl}}/school/students/{{studentProfileId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
+
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="full_name"
+
+Budi Santoso Diupdate
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="graduation_status"
+
+Lulus
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="class_year"
+
+2024
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="phone_number"
+
+082111222333
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="photo_profile"; filename="student-baru.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+--BoundaryKOMPETA--
+
+###
+
+### ============================================================
+### 18. UPDATE DATA SISWA (tanpa file — hanya field teks)
+### ============================================================
+
+PUT {{baseUrl}}/school/students/{{studentProfileId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Budi Santoso Revisi",
+  "major": "Rekayasa Perangkat Lunak (RPL)",
+  "graduation_status": "Lulus",
+  "class_year": "2024"
+}
+
+###
+
+### ============================================================
+### 19. UPDATE DATA SISWA - Validasi: NISN duplikat siswa lain (422)
+### ============================================================
+
+PUT {{baseUrl}}/school/students/{{studentProfileId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "nisn": "0987654321"
+}
+
+###
+
+### ============================================================
+### 20. UPDATE DATA SISWA - ID tidak ditemukan / bukan milik sekolah (404)
+### ============================================================
+
+PUT {{baseUrl}}/school/students/99999
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Tidak Akan Tersimpan"
+}
+
+###
+
+### ============================================================
+### 21. HAPUS SISWA (HARD DELETE)
+###     Endpoint : DELETE /api/school/students/{id}
+###     Data siswa akan dihapus permanen
+### ============================================================
+
+DELETE {{baseUrl}}/school/students/{{studentProfileId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 22. HAPUS SISWA - ID tidak ditemukan / bukan milik sekolah (404)
+### ============================================================
+
+DELETE {{baseUrl}}/school/students/99999
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###

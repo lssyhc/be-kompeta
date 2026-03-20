@@ -1,0 +1,949 @@
+openapi: 3.0.3
+info:
+  title: BE Kompeta API
+  version: 1.0.0
+  description: |
+    Dokumentasi API BE Kompeta.
+    Semua response JSON API mengikuti envelope standar:
+    - success: boolean
+    - message: string
+    - data: object|null
+    - errors: object|null
+    - meta: object|null
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Local
+  - url: http://localhost:8000/api
+    description: Localhost
+
+tags:
+  - name: Auth
+  - name: School Students
+  - name: Student Portfolio
+  - name: Files
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    $ref: "./paths/auth.yaml#/paths/~1auth~1register"
+  /auth/login:
+    $ref: "./paths/auth.yaml#/paths/~1auth~1login"
+  /auth/logout:
+    $ref: "./paths/auth.yaml#/paths/~1auth~1logout"
+  /auth/me:
+    $ref: "./paths/auth.yaml#/paths/~1auth~1me"
+  /user:
+    $ref: "./paths/auth.yaml#/paths/~1user"
+
+  /school/students:
+    $ref: "./paths/school-students.yaml#/paths/~1school~1students"
+  /school/students/search:
+    $ref: "./paths/school-students.yaml#/paths/~1school~1students~1search"
+  /school/students/{id}:
+    $ref: "./paths/school-students.yaml#/paths/~1school~1students~1{id}"
+
+  /student/profile:
+    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1profile"
+  /student/portfolio-items:
+    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items"
+  /student/application-reminder:
+    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1application-reminder"
+
+  /files/me/{type}:
+    $ref: "./paths/files.yaml#/paths/~1files~1me~1{type}"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+
+  schemas:
+    SuccessEnvelopeEmpty:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Logout berhasil.
+        data:
+          nullable: true
+          example: null
+        errors:
+          nullable: true
+          example: null
+        meta:
+          nullable: true
+          example: null
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validasi gagal.
+        data:
+          nullable: true
+          example: null
+        errors:
+          nullable: true
+          oneOf:
+            - type: object
+              additionalProperties: true
+            - type: array
+              items: {}
+          example:
+            email:
+              - The email field is required.
+        meta:
+          nullable: true
+          example: null
+
+    SuccessEnvelopeAuthRegister:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+
+    SuccessEnvelopeAuthLogin:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                token:
+                  type: string
+                token_type:
+                  type: string
+                  example: Bearer
+                user:
+                  $ref: "#/components/schemas/User"
+                requires_skill_setup:
+                  type: boolean
+                next_step:
+                  nullable: true
+                  type: string
+                  example: add_skill
+
+    SuccessEnvelopeAuthMe:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+                requires_skill_setup:
+                  type: boolean
+                next_step:
+                  nullable: true
+                  type: string
+
+    SuccessEnvelopeSchoolStoreStudent:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+
+    SuccessEnvelopeStudentList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentProfile"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeStudentSearch:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                results:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/StudentProfile"
+            meta:
+              type: object
+              properties:
+                query:
+                  type: string
+                total:
+                  type: integer
+
+    SuccessEnvelopeStudentDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                student:
+                  $ref: "#/components/schemas/StudentProfileDetail"
+
+    SuccessEnvelopeStudentProfile:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                profile:
+                  $ref: "#/components/schemas/StudentProfile"
+
+    SuccessEnvelopePortfolioItem:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                item:
+                  oneOf:
+                    - $ref: "#/components/schemas/StudentSkill"
+                    - $ref: "#/components/schemas/StudentExperience"
+                    - $ref: "#/components/schemas/StudentAchievement"
+                    - $ref: "#/components/schemas/StudentApplication"
+
+    SuccessEnvelopeReminder:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                reminder:
+                  type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+        has_more_pages:
+          type: boolean
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          nullable: true
+          type: string
+        role:
+          type: string
+          enum: [admin, sekolah, mitra, siswa]
+        mitra_type:
+          nullable: true
+          type: string
+          enum: [perusahaan, umkm]
+        account_status:
+          type: string
+        is_active:
+          type: boolean
+        last_login_at:
+          nullable: true
+          type: string
+          format: date-time
+        school_profile:
+          nullable: true
+          $ref: "#/components/schemas/SchoolProfile"
+        company_profile:
+          nullable: true
+          $ref: "#/components/schemas/CompanyProfile"
+        umkm_profile:
+          nullable: true
+          $ref: "#/components/schemas/UmkmProfile"
+        student_profile:
+          nullable: true
+          $ref: "#/components/schemas/StudentProfile"
+
+    SchoolProfile:
+      type: object
+      properties:
+        school_name:
+          type: string
+        npsn:
+          type: string
+        accreditation:
+          type: string
+        address:
+          type: string
+        expertise_fields:
+          type: array
+          items:
+            type: string
+        logo_path:
+          type: string
+        logo_url:
+          type: string
+        image_1_path:
+          nullable: true
+          type: string
+        image_1_url:
+          nullable: true
+          type: string
+        image_2_path:
+          nullable: true
+          type: string
+        image_2_url:
+          nullable: true
+          type: string
+        image_3_path:
+          nullable: true
+          type: string
+        image_3_url:
+          nullable: true
+          type: string
+        image_4_path:
+          nullable: true
+          type: string
+        image_4_url:
+          nullable: true
+          type: string
+        image_5_path:
+          nullable: true
+          type: string
+        image_5_url:
+          nullable: true
+          type: string
+        short_description:
+          type: string
+        operational_license_path:
+          type: string
+
+    CompanyProfile:
+      type: object
+      properties:
+        company_name:
+          type: string
+        nib:
+          type: string
+        industry_sector:
+          type: string
+        employee_total_range:
+          type: string
+        office_address:
+          type: string
+        website_or_social_url:
+          nullable: true
+          type: string
+        short_description:
+          type: string
+        company_logo_path:
+          type: string
+        company_logo_url:
+          type: string
+        image_1_path:
+          nullable: true
+          type: string
+        image_1_url:
+          nullable: true
+          type: string
+        image_2_path:
+          nullable: true
+          type: string
+        image_2_url:
+          nullable: true
+          type: string
+        image_3_path:
+          nullable: true
+          type: string
+        image_3_url:
+          nullable: true
+          type: string
+        image_4_path:
+          nullable: true
+          type: string
+        image_4_url:
+          nullable: true
+          type: string
+        image_5_path:
+          nullable: true
+          type: string
+        image_5_url:
+          nullable: true
+          type: string
+        kemenkumham_decree_path:
+          type: string
+
+    UmkmProfile:
+      type: object
+      properties:
+        business_name:
+          type: string
+        owner_nik:
+          type: string
+        owner_personal_nib:
+          nullable: true
+          type: string
+        business_type:
+          type: string
+        business_address:
+          type: string
+        short_description:
+          type: string
+        umkm_logo_path:
+          type: string
+        umkm_logo_url:
+          type: string
+        owner_ktp_photo_path:
+          type: string
+        image_1_path:
+          type: string
+        image_1_url:
+          type: string
+        image_2_path:
+          type: string
+        image_2_url:
+          type: string
+        image_3_path:
+          type: string
+        image_3_url:
+          type: string
+        image_4_path:
+          type: string
+        image_4_url:
+          type: string
+        image_5_path:
+          type: string
+        image_5_url:
+          type: string
+
+    StudentProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        school_user_id:
+          nullable: true
+          type: integer
+        full_name:
+          type: string
+        nisn:
+          type: string
+        photo_profile_path:
+          nullable: true
+          type: string
+        photo_profile_url:
+          nullable: true
+          type: string
+        major:
+          type: string
+        school_origin:
+          type: string
+        graduation_status:
+          type: string
+        class_year:
+          nullable: true
+          type: string
+        unique_code:
+          type: string
+        description:
+          nullable: true
+          type: string
+        phone_number:
+          nullable: true
+          type: string
+        address:
+          nullable: true
+          type: string
+
+    StudentProfileDetail:
+      allOf:
+        - $ref: "#/components/schemas/StudentProfile"
+        - type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/User"
+            skills:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentSkill"
+            experiences:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentExperience"
+            achievements:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentAchievement"
+            applications:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentApplication"
+
+    StudentSkill:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_profile_id:
+          type: integer
+        title:
+          type: string
+
+    StudentExperience:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_profile_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        position:
+          type: string
+        company_name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          nullable: true
+          type: string
+          format: date
+
+    StudentAchievement:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_profile_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        achievement_date:
+          type: string
+          format: date
+        institution_name:
+          type: string
+
+    StudentApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_profile_id:
+          type: integer
+        company_name:
+          type: string
+        role_type:
+          type: string
+        submitted_at:
+          type: string
+          format: date
+        submit_status:
+          type: string
+
+    RegisterSekolahRequest:
+      type: object
+      required:
+        - role
+        - email
+        - password
+        - password_confirmation
+        - school_name
+        - npsn
+        - accreditation
+        - address
+        - expertise_fields
+        - logo
+        - short_description
+        - operational_license
+      properties:
+        role:
+          type: string
+          enum: [sekolah]
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+        password_confirmation:
+          type: string
+        school_name:
+          type: string
+        npsn:
+          type: string
+          minLength: 8
+          maxLength: 8
+        accreditation:
+          type: string
+          enum: [A, B, C, Belum Terakreditasi]
+        address:
+          type: string
+        expertise_fields:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+        logo:
+          type: string
+          format: binary
+        image_1:
+          type: string
+          format: binary
+        image_2:
+          type: string
+          format: binary
+        image_3:
+          type: string
+          format: binary
+        image_4:
+          type: string
+          format: binary
+        image_5:
+          type: string
+          format: binary
+        short_description:
+          type: string
+          maxLength: 1000
+        operational_license:
+          type: string
+          format: binary
+
+    RegisterMitraPerusahaanRequest:
+      type: object
+      required:
+        - role
+        - mitra_type
+        - email
+        - password
+        - password_confirmation
+        - company_name
+        - nib
+        - industry_sector
+        - employee_total_range
+        - office_address
+        - short_description
+        - company_logo
+        - kemenkumham_decree
+      properties:
+        role:
+          type: string
+          enum: [mitra]
+        mitra_type:
+          type: string
+          enum: [perusahaan]
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        password_confirmation:
+          type: string
+        company_name:
+          type: string
+        nib:
+          type: string
+          minLength: 13
+          maxLength: 13
+        industry_sector:
+          type: string
+        employee_total_range:
+          type: string
+        office_address:
+          type: string
+        website_or_social_url:
+          type: string
+          format: uri
+        short_description:
+          type: string
+          maxLength: 1000
+        company_logo:
+          type: string
+          format: binary
+        image_1:
+          type: string
+          format: binary
+        image_2:
+          type: string
+          format: binary
+        image_3:
+          type: string
+          format: binary
+        image_4:
+          type: string
+          format: binary
+        image_5:
+          type: string
+          format: binary
+        kemenkumham_decree:
+          type: string
+          format: binary
+
+    RegisterMitraUmkmRequest:
+      type: object
+      required:
+        - role
+        - mitra_type
+        - email
+        - password
+        - password_confirmation
+        - business_name
+        - owner_nik
+        - business_type
+        - business_address
+        - short_description
+        - umkm_logo
+        - owner_ktp_photo
+        - image_1
+        - image_2
+        - image_3
+        - image_4
+        - image_5
+      properties:
+        role:
+          type: string
+          enum: [mitra]
+        mitra_type:
+          type: string
+          enum: [umkm]
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        password_confirmation:
+          type: string
+        business_name:
+          type: string
+        owner_nik:
+          type: string
+          minLength: 16
+          maxLength: 16
+        owner_personal_nib:
+          type: string
+        business_type:
+          type: string
+        business_address:
+          type: string
+        short_description:
+          type: string
+          maxLength: 1000
+        umkm_logo:
+          type: string
+          format: binary
+        owner_ktp_photo:
+          type: string
+          format: binary
+        image_1:
+          type: string
+          format: binary
+        image_2:
+          type: string
+          format: binary
+        image_3:
+          type: string
+          format: binary
+        image_4:
+          type: string
+          format: binary
+        image_5:
+          type: string
+          format: binary
+
+    LoginNonSiswaRequest:
+      type: object
+      required: [role, email, password]
+      properties:
+        role:
+          type: string
+          enum: [admin, sekolah, mitra]
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        device_name:
+          type: string
+          maxLength: 100
+
+    LoginSiswaRequest:
+      type: object
+      required: [role, nisn, school_origin, unique_code]
+      properties:
+        role:
+          type: string
+          enum: [siswa]
+        nisn:
+          type: string
+          minLength: 10
+          maxLength: 10
+        school_origin:
+          type: string
+        unique_code:
+          type: string
+          maxLength: 16
+        device_name:
+          type: string
+          maxLength: 100
+
+    StoreStudentRequest:
+      type: object
+      required:
+        - full_name
+        - nisn
+        - major
+        - school_origin
+        - graduation_status
+      properties:
+        full_name:
+          type: string
+        nisn:
+          type: string
+          minLength: 10
+          maxLength: 10
+        photo_profile:
+          type: string
+          format: binary
+        major:
+          type: string
+        school_origin:
+          type: string
+        graduation_status:
+          type: string
+        class_year:
+          type: string
+          minLength: 4
+          maxLength: 4
+        phone_number:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+
+    UpdateStudentRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+        nisn:
+          type: string
+          minLength: 10
+          maxLength: 10
+        photo_profile:
+          type: string
+          format: binary
+        major:
+          type: string
+        school_origin:
+          type: string
+        graduation_status:
+          type: string
+        class_year:
+          type: string
+          minLength: 4
+          maxLength: 4
+        phone_number:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+
+    UpdateStudentProfileRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 2000
+        phone_number:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+
+    StoreStudentPortfolioItemRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [skill, experience, achievement, application]
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        position:
+          type: string
+          maxLength: 255
+        company_name:
+          type: string
+          maxLength: 255
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        achievement_date:
+          type: string
+          format: date
+        institution_name:
+          type: string
+          maxLength: 255
+        role_type:
+          type: string
+          maxLength: 255
+        submitted_at:
+          type: string
+          format: date
+        submit_status:
+          type: string
+          maxLength: 100

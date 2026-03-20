@@ -1,0 +1,254 @@
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user sekolah atau mitra
+      description: |
+        Register publik hanya menerima role `sekolah` atau `mitra`.
+        Untuk role `mitra`, wajib mengirim `mitra_type`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              oneOf:
+                - $ref: "../openapi.yaml#/components/schemas/RegisterSekolahRequest"
+                - $ref: "../openapi.yaml#/components/schemas/RegisterMitraPerusahaanRequest"
+                - $ref: "../openapi.yaml#/components/schemas/RegisterMitraUmkmRequest"
+            examples:
+              sekolah:
+                summary: Contoh register sekolah
+                value:
+                  role: sekolah
+                  email: smk@example.com
+                  password: password123
+                  password_confirmation: password123
+                  school_name: SMK Negeri 1
+                  npsn: "12345678"
+                  accreditation: A
+                  address: Jl. Pendidikan No. 1
+                  expertise_fields:
+                    - RPL
+                    - TKJ
+                  short_description: SMK unggulan berfokus pada teknologi.
+              mitra_perusahaan:
+                summary: Contoh register mitra perusahaan
+                value:
+                  role: mitra
+                  mitra_type: perusahaan
+                  email: corp@example.com
+                  password: password123
+                  password_confirmation: password123
+                  company_name: PT Maju Jaya
+                  nib: "1234567890123"
+                  industry_sector: Teknologi Informasi
+                  employee_total_range: 51-200
+                  office_address: Jl. Sudirman No. 10
+                  short_description: Perusahaan software enterprise.
+              mitra_umkm:
+                summary: Contoh register mitra UMKM
+                value:
+                  role: mitra
+                  mitra_type: umkm
+                  email: umkm@example.com
+                  password: password123
+                  password_confirmation: password123
+                  business_name: UMKM Sejahtera
+                  owner_nik: "3201234567890001"
+                  business_type: Kuliner
+                  business_address: Jl. Pasar No. 5
+                  short_description: UMKM kuliner lokal.
+      responses:
+        "201":
+          description: Registrasi berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthRegister"
+              example:
+                success: true
+                message: Registrasi berhasil.
+                data:
+                  user:
+                    id: 10
+                    name: SMK Negeri 1
+                    email: smk@example.com
+                    role: sekolah
+                    mitra_type: null
+                    account_status: active
+                    is_active: true
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  email:
+                    - The email field is required.
+                meta: null
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login berdasarkan role
+      description: |
+        - Role `siswa`: gunakan `nisn`, `school_origin`, `unique_code`
+        - Role lain: gunakan `email`, `password`
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "../openapi.yaml#/components/schemas/LoginNonSiswaRequest"
+                - $ref: "../openapi.yaml#/components/schemas/LoginSiswaRequest"
+            examples:
+              non_siswa:
+                summary: Login sekolah/admin/mitra
+                value:
+                  role: sekolah
+                  email: smk@example.com
+                  password: password123
+                  device_name: web-client
+              siswa:
+                summary: Login siswa
+                value:
+                  role: siswa
+                  nisn: "1234567890"
+                  school_origin: SMK Negeri 1
+                  unique_code: ABC123XY
+                  device_name: mobile-app
+      responses:
+        "200":
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthLogin"
+              example:
+                success: true
+                message: Login berhasil.
+                data:
+                  token: 1|token-sanctum-example
+                  token_type: Bearer
+                  user:
+                    id: 11
+                    name: Andi Pratama
+                    email: null
+                    role: siswa
+                    mitra_type: null
+                    account_status: active
+                    is_active: true
+                  requires_skill_setup: true
+                  next_step: add_skill
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Kredensial tidak valid / validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Kredensial login tidak valid.
+                data: null
+                errors: null
+                meta: null
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout token aktif
+      responses:
+        "200":
+          description: Logout berhasil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Ambil profil user login
+      responses:
+        "200":
+          description: Data user berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthMe"
+              example:
+                success: true
+                message: Data user berhasil diambil.
+                data:
+                  user:
+                    id: 11
+                    name: Andi Pratama
+                    email: null
+                    role: siswa
+                    mitra_type: null
+                    account_status: active
+                    is_active: true
+                  requires_skill_setup: false
+                  next_step: null
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+
+  /user:
+    get:
+      tags: [Auth]
+      summary: Alias endpoint /auth/me
+      responses:
+        "200":
+          description: Data user berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthMe"

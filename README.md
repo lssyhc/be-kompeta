@@ -57,3 +57,20 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## API Documentation (Swagger)
+
+Project ini sudah menyediakan dokumentasi OpenAPI lengkap untuk endpoint API.
+
+- OpenAPI spec: `public/docs/swagger/openapi.yaml`
+- Swagger UI: `public/docs/swagger/index.html`
+
+Cara akses saat local development:
+
+1. Jalankan server: `php artisan serve`
+2. Buka URL: `http://127.0.0.1:8000/docs/swagger/`
+
+Catatan:
+
+- Base URL default pada spec: `http://127.0.0.1:8000/api`
+- Endpoint protected menggunakan Bearer Token (Sanctum)

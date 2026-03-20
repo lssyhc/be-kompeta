@@ -1,0 +1,49 @@
+paths:
+  /files/me/{type}:
+    get:
+      tags: [Files]
+      summary: Download dokumen private milik user login
+      description: |
+        Tipe yang valid:
+        - sekolah: `operational_license`
+        - mitra perusahaan: `kemenkumham_decree`
+        - mitra umkm: `owner_ktp`
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [operational_license, kemenkumham_decree, owner_ktp]
+      responses:
+        "200":
+          description: File stream/download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Dokumen/file tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: Dokumen tidak ditemukan.
+                data: null
+                errors: null
+                meta: null

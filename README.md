@@ -87,9 +87,13 @@ Project ini menggunakan `start.sh` sebagai startup command. Saat container start
 Set di service Render:
 
 - `RUN_DEPLOY_SEED=true` untuk menjalankan seeder saat deploy.
-- `SEED_CLASS=Database\\Seeders\\DatabaseSeeder` untuk memilih class seeder.
+- `SEED_CLASS=Database\Seeders\DatabaseSeeder` untuk memilih class seeder.
 
 Jika `RUN_DEPLOY_SEED` tidak di-set atau bernilai `false`, proses seeder dilewati.
+
+Catatan penting:
+
+- Jika Anda sebelumnya mengisi `SEED_CLASS` dengan backslash ganda berurutan seperti `Database\\Seeders\\DatabaseSeeder`, ubah menjadi nilai literal `Database\Seeders\DatabaseSeeder`.
 
 ### Rekomendasi untuk Neon Production
 

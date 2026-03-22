@@ -611,3 +611,23 @@ GET {{baseUrl}}/files/me/owner_ktp
 Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
 
 ###
+
+### ============================================================
+### 22. USER ALIAS - Endpoint alias dari /auth/me
+### ============================================================
+
+GET {{baseUrl}}/user
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 23. OPENAPI RAW DOCUMENT
+###     Endpoint publik untuk mengambil file spesifikasi OpenAPI
+### ============================================================
+
+GET {{baseUrl}}/docs/openapi
+Accept: application/yaml
+
+###

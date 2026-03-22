@@ -10,6 +10,21 @@ info:
     - data: object|null
     - errors: object|null
     - meta: object|null
+
+    Akun seeded untuk frontend (password default: password123, kecuali admin):
+    - Admin: admin@kompeta.test (password: admin12345)
+    - Sekolah aktif: school.a@kompeta.test, school.b@kompeta.test
+    - Mitra perusahaan aktif: mitra.company.a@kompeta.test, mitra.company.b@kompeta.test
+    - Mitra UMKM aktif: mitra.umkm.a@kompeta.test, mitra.umkm.b@kompeta.test
+    - Siswa aktif (login pakai role siswa):
+      - NISN 0001234567, school_origin SMA Negeri 1 Bogor, unique_code BUDI0001234X9YZ
+      - NISN 0001234568, school_origin SMA Negeri 1 Bogor, unique_code SITI0001234X9YZ
+      - NISN 0002345678, school_origin SMA Negeri 2 Jakarta, unique_code qzPSGd04erQblY8G
+
+    Akun seeded untuk skenario approval admin:
+    - Pending sekolah: school.pending@kompeta.test
+    - Pending mitra: mitra.pending@kompeta.test
+    - Rejected mitra: mitra.rejected@kompeta.test
 servers:
   - url: /api
     description: Current host
@@ -30,11 +45,15 @@ tags:
   - name: Mitra
   - name: Schools
   - name: Blog
+  - name: Docs
 
 security:
   - bearerAuth: []
 
 paths:
+  /docs/openapi:
+    $ref: "./paths/docs.yaml#/paths/~1docs~1openapi"
+
   /auth/register:
     $ref: "./paths/auth.yaml#/paths/~1auth~1register"
   /auth/login:

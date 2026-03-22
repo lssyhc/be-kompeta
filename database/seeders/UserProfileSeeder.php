@@ -1,0 +1,427 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\AdminProfile;
+use App\Models\CompanyProfile;
+use App\Models\SchoolProfile;
+use App\Models\StudentProfile;
+use App\Models\UmkmProfile;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+
+class UserProfileSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->seedAdmin();
+        $this->seedMitra();
+        $this->seedSchools();
+        $this->seedStudents();
+    }
+
+    private function seedAdmin(): void
+    {
+        $admin = User::query()->updateOrCreate(
+            ['email' => 'admin@kompeta.test'],
+            [
+                'name' => 'System Admin',
+                'password' => 'admin12345',
+                'role' => User::ROLE_ADMIN,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        AdminProfile::query()->updateOrCreate(
+            ['user_id' => $admin->id],
+            ['full_name' => $admin->name]
+        );
+    }
+
+    private function seedMitra(): void
+    {
+        $companyA = User::query()->updateOrCreate(
+            ['email' => 'mitra.company.a@kompeta.test'],
+            [
+                'name' => 'PT Binajasa Sumber Sarana',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_PERUSAHAAN,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        CompanyProfile::query()->updateOrCreate(
+            ['user_id' => $companyA->id],
+            [
+                'company_name' => 'PT Binajasa Sumber Sarana',
+                'nib' => '1234567890123',
+                'industry_sector' => 'Outsourcing dan layanan tenaga kerja',
+                'employee_total_range' => '501-1000',
+                'office_address' => 'Jakarta Selatan, DKI Jakarta',
+                'website_or_social_url' => 'https://example.com/binajasa',
+                'short_description' => 'Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.',
+                'company_logo_path' => 'https://via.placeholder.com/200x200?text=Binajasa',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Binajasa+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Binajasa+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=Binajasa+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=Binajasa+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=Binajasa+5',
+                'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/binajasa-sk.pdf', 'SK Kemenkumham Binajasa'),
+            ]
+        );
+
+        $companyB = User::query()->updateOrCreate(
+            ['email' => 'mitra.company.b@kompeta.test'],
+            [
+                'name' => 'PT Surya Data Nusantara',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_PERUSAHAAN,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        CompanyProfile::query()->updateOrCreate(
+            ['user_id' => $companyB->id],
+            [
+                'company_name' => 'PT Surya Data Nusantara',
+                'nib' => '1234567890124',
+                'industry_sector' => 'Teknologi informasi',
+                'employee_total_range' => '201-500',
+                'office_address' => 'Bandung, Jawa Barat',
+                'website_or_social_url' => 'https://example.com/surya-data',
+                'short_description' => 'Mitra digitalisasi operasional dan pengolahan data untuk bisnis menengah.',
+                'company_logo_path' => 'https://via.placeholder.com/200x200?text=Surya',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Surya+Data+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Surya+Data+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=Surya+Data+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=Surya+Data+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=Surya+Data+5',
+                'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/surya-data-sk.pdf', 'SK Kemenkumham Surya Data'),
+            ]
+        );
+
+        $umkmA = User::query()->updateOrCreate(
+            ['email' => 'mitra.umkm.a@kompeta.test'],
+            [
+                'name' => 'Roti Bunda Rasa',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_UMKM,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        UmkmProfile::query()->updateOrCreate(
+            ['user_id' => $umkmA->id],
+            [
+                'business_name' => 'Roti Bunda Rasa',
+                'owner_nik' => '3201234567891111',
+                'owner_personal_nib' => 'NIB-UMKM-001',
+                'business_type' => 'Kuliner',
+                'business_address' => 'Semarang, Jawa Tengah',
+                'umkm_logo_path' => 'https://via.placeholder.com/200x200?text=Roti+Bunda',
+                'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/roti-bunda-ktp.jpg', 'KTP Owner Roti Bunda Rasa'),
+                'short_description' => 'UMKM kuliner rumahan yang fokus pada bakery harian dan pemesanan acara.',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Roti+Bunda+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Roti+Bunda+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=Roti+Bunda+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=Roti+Bunda+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=Roti+Bunda+5',
+            ]
+        );
+
+        $umkmB = User::query()->updateOrCreate(
+            ['email' => 'mitra.umkm.b@kompeta.test'],
+            [
+                'name' => 'Craft Kayu Jogja',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_UMKM,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        UmkmProfile::query()->updateOrCreate(
+            ['user_id' => $umkmB->id],
+            [
+                'business_name' => 'Craft Kayu Jogja',
+                'owner_nik' => '3201234567892222',
+                'owner_personal_nib' => 'NIB-UMKM-002',
+                'business_type' => 'Kerajinan',
+                'business_address' => 'Sleman, DI Yogyakarta',
+                'umkm_logo_path' => 'https://via.placeholder.com/200x200?text=Craft+Kayu',
+                'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/craft-kayu-ktp.jpg', 'KTP Owner Craft Kayu Jogja'),
+                'short_description' => 'UMKM kerajinan kayu untuk kebutuhan dekorasi rumah, hotel, dan kantor.',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Craft+Kayu+Jogja+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Craft+Kayu+Jogja+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=Craft+Kayu+Jogja+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=Craft+Kayu+Jogja+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=Craft+Kayu+Jogja+5',
+            ]
+        );
+
+        $pendingMitra = User::query()->updateOrCreate(
+            ['email' => 'mitra.pending@kompeta.test'],
+            [
+                'name' => 'PT Pending Nusantara',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_PERUSAHAAN,
+                'account_status' => User::STATUS_PENDING,
+                'is_active' => false,
+            ]
+        );
+
+        CompanyProfile::query()->updateOrCreate(
+            ['user_id' => $pendingMitra->id],
+            [
+                'company_name' => 'PT Pending Nusantara',
+                'nib' => '1234567890199',
+                'industry_sector' => 'Distribusi',
+                'employee_total_range' => '11-50',
+                'office_address' => 'Surabaya, Jawa Timur',
+                'website_or_social_url' => 'https://example.com/pending-nusantara',
+                'short_description' => 'Perusahaan distribusi yang menunggu persetujuan verifikasi.',
+                'company_logo_path' => 'https://via.placeholder.com/200x200?text=Pending',
+                'image_1_path' => null,
+                'image_2_path' => null,
+                'image_3_path' => null,
+                'image_4_path' => null,
+                'image_5_path' => null,
+                'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/pending-nusantara-sk.pdf', 'SK Kemenkumham Pending Nusantara'),
+            ]
+        );
+
+        $rejectedMitra = User::query()->updateOrCreate(
+            ['email' => 'mitra.rejected@kompeta.test'],
+            [
+                'name' => 'UMKM Ditolak Jaya',
+                'password' => 'password123',
+                'role' => User::ROLE_MITRA,
+                'mitra_type' => User::MITRA_UMKM,
+                'account_status' => User::STATUS_REJECTED,
+                'is_active' => false,
+            ]
+        );
+
+        UmkmProfile::query()->updateOrCreate(
+            ['user_id' => $rejectedMitra->id],
+            [
+                'business_name' => 'UMKM Ditolak Jaya',
+                'owner_nik' => '3201234567893333',
+                'owner_personal_nib' => null,
+                'business_type' => 'Fashion',
+                'business_address' => 'Depok, Jawa Barat',
+                'umkm_logo_path' => 'https://via.placeholder.com/200x200?text=Rejected',
+                'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/rejected-jaya-ktp.jpg', 'KTP Owner UMKM Ditolak Jaya'),
+                'short_description' => 'Data UMKM contoh untuk status registrasi rejected.',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=Rejected+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=Rejected+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=Rejected+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=Rejected+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=Rejected+5',
+            ]
+        );
+    }
+
+    private function seedSchools(): void
+    {
+        $schoolA = User::query()->updateOrCreate(
+            ['email' => 'school.a@kompeta.test'],
+            [
+                'name' => 'SMA Negeri 1 Bogor',
+                'password' => 'password123',
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $schoolA->id],
+            [
+                'school_name' => 'SMA Negeri 1 Bogor',
+                'npsn' => '20201234',
+                'accreditation' => 'A',
+                'address' => 'Jl. Ahmad Yani No. 1, Bogor, Jawa Barat',
+                'expertise_fields' => ['IPA', 'IPS', 'Bahasa'],
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMA+Negeri+1',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=SMA+Bogor+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=SMA+Bogor+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=SMA+Bogor+3',
+                'image_4_path' => 'https://via.placeholder.com/400x300?text=SMA+Bogor+4',
+                'image_5_path' => 'https://via.placeholder.com/400x300?text=SMA+Bogor+5',
+                'short_description' => 'SMA Negeri 1 Bogor berfokus pada pengembangan akademik, karakter, dan kesiapan karier siswa.',
+                'operational_license_path' => $this->storeLocalFile('profiles/schools/legalities/sman1-bogor-license.pdf', 'Izin Operasional SMA Negeri 1 Bogor'),
+            ]
+        );
+
+        $schoolB = User::query()->updateOrCreate(
+            ['email' => 'school.b@kompeta.test'],
+            [
+                'name' => 'SMA Negeri 2 Jakarta',
+                'password' => 'password123',
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $schoolB->id],
+            [
+                'school_name' => 'SMA Negeri 2 Jakarta',
+                'npsn' => '20205678',
+                'accreditation' => 'A',
+                'address' => 'Jl. Sudirman No. 100, Jakarta Pusat, DKI Jakarta',
+                'expertise_fields' => ['IPA', 'IPS'],
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMA+Negeri+2',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=SMA+Jakarta+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=SMA+Jakarta+2',
+                'image_3_path' => null,
+                'image_4_path' => null,
+                'image_5_path' => null,
+                'short_description' => 'SMA Negeri 2 Jakarta merupakan institusi pendidikan unggulan di Jakarta Pusat.',
+                'operational_license_path' => $this->storeLocalFile('profiles/schools/legalities/sman2-jakarta-license.pdf', 'Izin Operasional SMA Negeri 2 Jakarta'),
+            ]
+        );
+
+        $pendingSchool = User::query()->updateOrCreate(
+            ['email' => 'school.pending@kompeta.test'],
+            [
+                'name' => 'SMK Pending Sejahtera',
+                'password' => 'password123',
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => User::STATUS_PENDING,
+                'is_active' => false,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $pendingSchool->id],
+            [
+                'school_name' => 'SMK Pending Sejahtera',
+                'npsn' => '20209999',
+                'accreditation' => 'B',
+                'address' => 'Malang, Jawa Timur',
+                'expertise_fields' => ['DKV', 'MM'],
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMK+Pending',
+                'image_1_path' => null,
+                'image_2_path' => null,
+                'image_3_path' => null,
+                'image_4_path' => null,
+                'image_5_path' => null,
+                'short_description' => 'Data sekolah contoh untuk status pending approval.',
+                'operational_license_path' => $this->storeLocalFile('profiles/schools/legalities/smk-pending-license.pdf', 'Izin Operasional SMK Pending Sejahtera'),
+            ]
+        );
+    }
+
+    private function seedStudents(): void
+    {
+        $schoolA = User::query()->where('email', 'school.a@kompeta.test')->firstOrFail();
+        $schoolB = User::query()->where('email', 'school.b@kompeta.test')->firstOrFail();
+
+        $studentA1 = User::query()->updateOrCreate(
+            ['email' => 'student.a1@kompeta.test'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => 'password123',
+                'role' => User::ROLE_SISWA,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0001234567'],
+            [
+                'user_id' => $studentA1->id,
+                'school_user_id' => $schoolA->id,
+                'full_name' => 'Budi Santoso',
+                'photo_profile_path' => null,
+                'major' => 'IPA',
+                'school_origin' => 'SMA Negeri 1 Bogor',
+                'graduation_status' => 'graduated',
+                'class_year' => '2024',
+                'unique_code' => 'BUDI0001234X9YZ',
+                'description' => 'Siswa berprestasi dengan fokus bidang sains dan data.',
+                'phone_number' => '082123456789',
+                'address' => 'Bogor, Jawa Barat',
+            ]
+        );
+
+        $studentA2 = User::query()->updateOrCreate(
+            ['email' => 'student.a2@kompeta.test'],
+            [
+                'name' => 'Siti Rahayu',
+                'password' => 'password123',
+                'role' => User::ROLE_SISWA,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0001234568'],
+            [
+                'user_id' => $studentA2->id,
+                'school_user_id' => $schoolA->id,
+                'full_name' => 'Siti Rahayu',
+                'photo_profile_path' => null,
+                'major' => 'IPA',
+                'school_origin' => 'SMA Negeri 1 Bogor',
+                'graduation_status' => 'active',
+                'class_year' => '2025',
+                'unique_code' => 'SITI0001234X9YZ',
+                'description' => 'Siswa aktif dalam kegiatan akademik dan organisasi.',
+                'phone_number' => '081987654321',
+                'address' => 'Bogor, Jawa Barat',
+            ]
+        );
+
+        $studentB1 = User::query()->updateOrCreate(
+            ['email' => 'student.b1@kompeta.test'],
+            [
+                'name' => 'Ahmad Wijaya',
+                'password' => 'password123',
+                'role' => User::ROLE_SISWA,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        StudentProfile::query()->updateOrCreate(
+            ['nisn' => '0002345678'],
+            [
+                'user_id' => $studentB1->id,
+                'school_user_id' => $schoolB->id,
+                'full_name' => 'Ahmad Wijaya',
+                'photo_profile_path' => null,
+                'major' => 'IPS',
+                'school_origin' => 'SMA Negeri 2 Jakarta',
+                'graduation_status' => 'graduated',
+                'class_year' => '2024',
+                'unique_code' => 'qzPSGd04erQblY8G',
+                'description' => 'Lulusan terbaik dengan minat karier operasional bisnis.',
+                'phone_number' => '083456789012',
+                'address' => 'Jakarta, DKI Jakarta',
+            ]
+        );
+    }
+
+    private function storeLocalFile(string $path, string $content): string
+    {
+        Storage::disk('local')->put($path, $content);
+
+        return $path;
+    }
+}

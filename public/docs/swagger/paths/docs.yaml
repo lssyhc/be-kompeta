@@ -1,0 +1,26 @@
+paths:
+  /docs/openapi:
+    get:
+      tags: [Docs]
+      summary: Ambil file spesifikasi OpenAPI mentah
+      security: []
+      responses:
+        "200":
+          description: File OpenAPI berhasil diambil
+          content:
+            application/yaml:
+              schema:
+                type: string
+                example: "openapi: 3.0.3"
+        "404":
+          description: File OpenAPI tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+              example:
+                success: false
+                message: OpenAPI spec tidak ditemukan.
+                data: null
+                errors: null
+                meta: null

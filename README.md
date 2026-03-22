@@ -74,3 +74,25 @@ Catatan:
 
 - Base URL default pada spec: `http://127.0.0.1:8000/api`
 - Endpoint protected menggunakan Bearer Token (Sanctum)
+
+## Deploy Render + Neon (Auto Migration & Seeder)
+
+Project ini menggunakan `start.sh` sebagai startup command. Saat container start:
+
+1. `php artisan migrate --force` selalu dijalankan.
+2. Seeder bisa dijalankan opsional via environment variable.
+
+### Environment Variable di Render
+
+Set di service Render:
+
+- `RUN_DEPLOY_SEED=true` untuk menjalankan seeder saat deploy.
+- `SEED_CLASS=Database\\Seeders\\DatabaseSeeder` untuk memilih class seeder.
+
+Jika `RUN_DEPLOY_SEED` tidak di-set atau bernilai `false`, proses seeder dilewati.
+
+### Rekomendasi untuk Neon Production
+
+- Jalankan seeder hanya untuk data referensi yang memang aman diulang.
+- Untuk data demo/staging, aktifkan `RUN_DEPLOY_SEED=true` di environment staging saja.
+- Untuk production, pertimbangkan `RUN_DEPLOY_SEED=false` setelah bootstrap awal agar data operasional tidak tertimpa.

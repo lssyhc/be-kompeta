@@ -105,6 +105,12 @@ paths:
       description: |
         - Role `siswa`: gunakan `nisn`, `school_origin`, `unique_code`
         - Role lain: gunakan `email`, `password`
+        - Akun seeded siap pakai:
+          - admin: `admin@kompeta.test` / `admin12345`
+          - sekolah: `school.a@kompeta.test` / `password123`
+          - mitra perusahaan: `mitra.company.a@kompeta.test` / `password123`
+          - mitra umkm: `mitra.umkm.a@kompeta.test` / `password123`
+          - siswa: `nisn=0002345678`, `school_origin=SMA Negeri 2 Jakarta`, `unique_code=qzPSGd04erQblY8G`
       security: []
       requestBody:
         required: true

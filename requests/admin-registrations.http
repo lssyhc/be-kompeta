@@ -1,0 +1,89 @@
+### ============================================================
+### ADMIN REGISTRATIONS API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+@adminEmail = admin@kompeta.test
+@adminPassword = admin12345
+@targetRegistrationId = 1
+
+### ============================================================
+### 1. LOGIN ADMIN
+### ============================================================
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "admin",
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}",
+  "device_name": "rest-client"
+}
+
+###
+
+### ============================================================
+### 2. LIST REGISTRASI PENDING (default)
+### ============================================================
+# @name pendingRegistrations
+GET {{baseUrl}}/admin/registrations
+Accept: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 3. LIST REGISTRASI DENGAN FILTER
+### ============================================================
+GET {{baseUrl}}/admin/registrations?status=pending&role=mitra&mitra_type=perusahaan&per_page=10
+Accept: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 4. DETAIL REGISTRASI
+###    Gunakan id dari response pendingRegistrations
+### ============================================================
+GET {{baseUrl}}/admin/registrations/{{targetRegistrationId}}
+Accept: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 5. APPROVE REGISTRASI
+### ============================================================
+PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/approve
+Accept: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 6. REJECT REGISTRASI
+### ============================================================
+PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/reject
+Accept: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 7. AKSES TANPA TOKEN (harus 401)
+### ============================================================
+GET {{baseUrl}}/admin/registrations
+Accept: application/json
+
+###
+
+### ============================================================
+### 8. AKSES DENGAN TOKEN NON-ADMIN (harus 403)
+###    Contoh gunakan token sekolah/mitra dari auth.http
+### ============================================================
+GET {{baseUrl}}/admin/registrations
+Accept: application/json
+Authorization: Bearer GANTI_DENGAN_TOKEN_NON_ADMIN
+
+###

@@ -1,0 +1,230 @@
+paths:
+  /admin/registrations:
+    get:
+      tags: [Admin Registrations]
+      summary: Daftar registrasi mitra dan sekolah
+      description: |
+        Menampilkan daftar registrasi untuk role `sekolah` dan `mitra`.
+        Secara default akan menampilkan status `pending`.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, active, rejected]
+            default: pending
+          description: Filter status registrasi
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [sekolah, mitra]
+          description: Filter berdasarkan role akun
+        - in: query
+          name: mitra_type
+          schema:
+            type: string
+            enum: [perusahaan, umkm]
+          description: Filter tipe mitra
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        "200":
+          description: Daftar registrasi berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAdminRegistrationList"
+              example:
+                success: true
+                message: Daftar registrasi berhasil diambil.
+                data:
+                  - id: 31
+                    no: 1
+                    nama: SMK Approval 1
+                    title: Sekolah
+                    status: pending
+                    detail:
+                      email: approval-school@example.com
+                      school_name: SMK Approval 1
+                      npsn: "90909090"
+                      accreditation: A
+                      address: Jl. Approval No. 1
+                      short_description: Sekolah menunggu approval admin.
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 10
+                    total: 1
+                    has_more_pages: false
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validasi query gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /admin/registrations/{id}:
+    get:
+      tags: [Admin Registrations]
+      summary: Detail registrasi berdasarkan ID user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detail registrasi berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAdminRegistrationItem"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Data registrasi tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /admin/registrations/{id}/approve:
+    patch:
+      tags: [Admin Registrations]
+      summary: Setujui registrasi pending
+      description: Mengubah status user menjadi `active` dan `is_active=true`.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Registrasi berhasil disetujui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAdminRegistrationItem"
+              example:
+                success: true
+                message: Registrasi berhasil disetujui.
+                data:
+                  id: 31
+                  no: 31
+                  nama: SMK Approval 1
+                  title: Sekolah
+                  status: active
+                  detail:
+                    email: approval-school@example.com
+                    school_name: SMK Approval 1
+                    npsn: "90909090"
+                    accreditation: A
+                    address: Jl. Approval No. 1
+                    short_description: Sekolah menunggu approval admin.
+                errors: null
+                meta: null
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Data registrasi tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Data tidak dalam status pending
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /admin/registrations/{id}/reject:
+    patch:
+      tags: [Admin Registrations]
+      summary: Tolak registrasi pending
+      description: Mengubah status user menjadi `rejected` dan `is_active=false`.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Registrasi berhasil ditolak
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAdminRegistrationItem"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Data registrasi tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Data tidak dalam status pending
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

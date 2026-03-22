@@ -46,6 +46,8 @@ class SchoolDetailResource extends JsonResource
             $profile->image_5_url,
         ]));
 
+        $expertiseFields = $profile->getAttribute('expertise_fields');
+
         return [
             'id' => $this->id,
             'school_name' => $profile->school_name,
@@ -54,7 +56,9 @@ class SchoolDetailResource extends JsonResource
             'gallery' => $gallery,
             'short_description' => $profile->short_description,
             'accreditation' => $profile->accreditation,
-            'expertise_fields' => json_decode($profile->expertise_fields, true) ?? [],
+            'expertise_fields' => is_array($expertiseFields)
+                ? $expertiseFields
+                : (json_decode((string) $expertiseFields, true) ?? []),
             'student_achievements' => $this->formatAchievements(),
             'students' => $this->formatStudents(),
             'pengajuan_mitra' => $this->formatPartnershipSubmissions(),

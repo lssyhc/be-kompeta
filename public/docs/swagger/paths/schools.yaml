@@ -3,7 +3,7 @@ paths:
     get:
       tags: [Schools]
       summary: List sekolah
-      description: Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan). Mendukung pencarian berdasarkan nama sekolah.
+      description: Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan). Hanya akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`) yang ditampilkan. Mendukung pencarian berdasarkan nama sekolah.
       security: []
       parameters:
         - in: query
@@ -59,6 +59,7 @@ paths:
       summary: Detail sekolah
       description: |
         Menampilkan detail lengkap sebuah sekolah beserta:
+        Hanya dapat diakses untuk akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`).
         - Profil sekolah (nama, lokasi, logo, galeri, deskripsi, akreditasi)
         - Daftar jurusan
         - Prestasi siswa sekolah

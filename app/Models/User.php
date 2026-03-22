@@ -28,6 +28,12 @@ class User extends Authenticatable
 
     public const MITRA_UMKM = 'umkm';
 
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_ACTIVE = 'active';
+
+    public const STATUS_REJECTED = 'rejected';
+
     /**
      * The attributes that are mass assignable.
      *

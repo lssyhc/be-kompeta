@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AdminProfile;
+use App\Models\CompanyProfile;
 use App\Models\SchoolProfile;
 use App\Models\StudentProfile;
 use App\Models\StudentSkill;
@@ -43,7 +44,8 @@ class AuthApiTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.user.role', User::ROLE_SEKOLAH)
-            ->assertJsonPath('data.user.account_status', 'active')
+            ->assertJsonPath('data.user.account_status', User::STATUS_PENDING)
+            ->assertJsonPath('data.user.is_active', false)
             ->assertJsonPath('data.role_profile.npsn', '12345678');
 
         $this->assertDatabaseHas('users', [
@@ -55,6 +57,179 @@ class AuthApiTest extends TestCase
             'npsn' => '12345678',
             'school_name' => 'SMK Negeri 1',
         ]);
+    }
+
+    public function test_pending_school_cannot_login_before_admin_approval(): void
+    {
+        $school = User::factory()->create([
+            'email' => 'pending-school@example.com',
+            'password' => Hash::make('password123'),
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_PENDING,
+            'is_active' => false,
+        ]);
+
+        $response = $this->postJson('/api/auth/login', [
+            'role' => User::ROLE_SEKOLAH,
+            'email' => 'pending-school@example.com',
+            'password' => 'password123',
+            'device_name' => 'phpunit',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Akun tidak aktif.');
+
+        $this->assertNull($school->fresh()->last_login_at);
+    }
+
+    public function test_admin_can_approve_pending_school_and_get_summary_payload(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => User::STATUS_ACTIVE,
+            'is_active' => true,
+        ]);
+
+        $school = User::factory()->create([
+            'name' => 'SMK Approval 1',
+            'email' => 'approval-school@example.com',
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_PENDING,
+            'is_active' => false,
+        ]);
+
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Approval 1',
+            'npsn' => '90909090',
+            'accreditation' => 'A',
+            'address' => 'Jl. Approval No. 1',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'profiles/schools/logos/logo.jpg',
+            'short_description' => 'Sekolah menunggu approval admin.',
+            'operational_license_path' => 'profiles/schools/legalities/izin.pdf',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->patchJson('/api/admin/registrations/'.$school->id.'/approve');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.id', $school->id)
+            ->assertJsonPath('data.no', $school->id)
+            ->assertJsonPath('data.nama', 'SMK Approval 1')
+            ->assertJsonPath('data.title', 'Sekolah')
+            ->assertJsonPath('data.status', User::STATUS_ACTIVE)
+            ->assertJsonPath('data.detail.school_name', 'SMK Approval 1')
+            ->assertJsonPath('data.detail.npsn', '90909090');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $school->id,
+            'account_status' => User::STATUS_ACTIVE,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_public_mitra_and_school_endpoints_only_show_approved_accounts(): void
+    {
+        $approvedSchool = User::factory()->create([
+            'name' => 'SMK Approved',
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_ACTIVE,
+            'is_active' => true,
+        ]);
+
+        $pendingSchool = User::factory()->create([
+            'name' => 'SMK Pending',
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_PENDING,
+            'is_active' => false,
+        ]);
+
+        SchoolProfile::query()->create([
+            'user_id' => $approvedSchool->id,
+            'school_name' => 'SMK Approved',
+            'npsn' => '10101010',
+            'accreditation' => 'A',
+            'address' => 'Jl. Approved School',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'profiles/schools/logos/approved.jpg',
+            'short_description' => 'Sekolah approved.',
+            'operational_license_path' => 'profiles/schools/legalities/approved.pdf',
+        ]);
+
+        SchoolProfile::query()->create([
+            'user_id' => $pendingSchool->id,
+            'school_name' => 'SMK Pending',
+            'npsn' => '20202020',
+            'accreditation' => 'B',
+            'address' => 'Jl. Pending School',
+            'expertise_fields' => ['TKJ'],
+            'logo_path' => 'profiles/schools/logos/pending.jpg',
+            'short_description' => 'Sekolah pending.',
+            'operational_license_path' => 'profiles/schools/legalities/pending.pdf',
+        ]);
+
+        $approvedMitra = User::factory()->create([
+            'name' => 'PT Approved Mitra',
+            'role' => User::ROLE_MITRA,
+            'mitra_type' => User::MITRA_PERUSAHAAN,
+            'account_status' => User::STATUS_ACTIVE,
+            'is_active' => true,
+        ]);
+
+        $pendingMitra = User::factory()->create([
+            'name' => 'PT Pending Mitra',
+            'role' => User::ROLE_MITRA,
+            'mitra_type' => User::MITRA_PERUSAHAAN,
+            'account_status' => User::STATUS_PENDING,
+            'is_active' => false,
+        ]);
+
+        CompanyProfile::query()->create([
+            'user_id' => $approvedMitra->id,
+            'company_name' => 'PT Approved Mitra',
+            'nib' => '3333333333333',
+            'industry_sector' => 'Teknologi',
+            'employee_total_range' => '51-200',
+            'office_address' => 'Bandung',
+            'website_or_social_url' => null,
+            'short_description' => 'Mitra approved.',
+            'company_logo_path' => 'profiles/companies/logos/approved.jpg',
+            'kemenkumham_decree_path' => 'profiles/companies/legalities/approved.pdf',
+        ]);
+
+        CompanyProfile::query()->create([
+            'user_id' => $pendingMitra->id,
+            'company_name' => 'PT Pending Mitra',
+            'nib' => '4444444444444',
+            'industry_sector' => 'Teknologi',
+            'employee_total_range' => '51-200',
+            'office_address' => 'Jakarta',
+            'website_or_social_url' => null,
+            'short_description' => 'Mitra pending.',
+            'company_logo_path' => 'profiles/companies/logos/pending.jpg',
+            'kemenkumham_decree_path' => 'profiles/companies/legalities/pending.pdf',
+        ]);
+
+        $schoolResponse = $this->getJson('/api/public/schools');
+        $mitraResponse = $this->getJson('/api/public/mitra');
+
+        $schoolResponse->assertStatus(200)
+            ->assertJsonPath('meta.pagination.total', 1)
+            ->assertJsonPath('data.0.id', $approvedSchool->id)
+            ->assertJsonMissing([
+                'id' => $pendingSchool->id,
+            ]);
+
+        $mitraResponse->assertStatus(200)
+            ->assertJsonPath('meta.pagination.total', 1)
+            ->assertJsonPath('data.0.id', $approvedMitra->id)
+            ->assertJsonMissing([
+                'id' => $pendingMitra->id,
+            ]);
     }
 
     public function test_mitra_perusahaan_register_rejects_forbidden_fields(): void

@@ -33,7 +33,7 @@ class AuthController extends Controller
                 'role' => $role,
                 'mitra_type' => $mitraType,
                 'account_status' => $this->resolveInitialStatus($role),
-                'is_active' => true,
+                'is_active' => $this->resolveInitialActiveState($role),
             ]);
 
             if ($role === User::ROLE_SEKOLAH) {
@@ -107,7 +107,7 @@ class AuthController extends Controller
         return $this->successResponse([
             'user' => $this->compactUser($user),
             'role_profile' => $this->resolveRoleProfile($user),
-        ], 'Registrasi berhasil.', 201);
+        ], 'Registrasi berhasil. Akun menunggu persetujuan admin.', 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -127,7 +127,7 @@ class AuthController extends Controller
             return $this->errorResponse('Akun tidak aktif.', 403);
         }
 
-        if ($user->account_status !== 'active') {
+        if ($user->account_status !== User::STATUS_ACTIVE) {
             return $this->errorResponse('Akun belum aktif atau masih menunggu verifikasi.', 403);
         }
 
@@ -198,7 +198,16 @@ class AuthController extends Controller
 
     private function resolveInitialStatus(string $role): string
     {
-        return 'active';
+        if (in_array($role, [User::ROLE_SEKOLAH, User::ROLE_MITRA], true)) {
+            return User::STATUS_PENDING;
+        }
+
+        return User::STATUS_ACTIVE;
+    }
+
+    private function resolveInitialActiveState(string $role): bool
+    {
+        return ! in_array($role, [User::ROLE_SEKOLAH, User::ROLE_MITRA], true);
     }
 
     private function compactUser(User $user): array

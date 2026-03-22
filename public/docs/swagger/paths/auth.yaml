@@ -68,7 +68,7 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthRegister"
               example:
                 success: true
-                message: Registrasi berhasil.
+                message: Registrasi berhasil. Akun menunggu persetujuan admin.
                 data:
                   user:
                     id: 10
@@ -76,8 +76,8 @@ paths:
                     email: smk@example.com
                     role: sekolah
                     mitra_type: null
-                    account_status: active
-                    is_active: true
+                    account_status: pending
+                    is_active: false
                   role_profile:
                     school_name: SMK Negeri 1
                     npsn: "12345678"

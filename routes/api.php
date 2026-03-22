@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminRegistrationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\ExploreController;
@@ -82,6 +83,13 @@ Route::middleware('auth:sanctum')->prefix('files')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('admin/blog')->group(function () {
     Route::post('/articles', [BlogController::class, 'store']);
+});
+
+Route::middleware('auth:sanctum')->prefix('admin/registrations')->group(function () {
+    Route::get('/', [AdminRegistrationController::class, 'index']);
+    Route::get('/{id}', [AdminRegistrationController::class, 'show'])->whereNumber('id');
+    Route::patch('/{id}/approve', [AdminRegistrationController::class, 'approve'])->whereNumber('id');
+    Route::patch('/{id}/reject', [AdminRegistrationController::class, 'reject'])->whereNumber('id');
 });
 
 Route::prefix('public/explore')->group(function () {

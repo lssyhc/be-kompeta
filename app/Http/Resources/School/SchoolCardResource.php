@@ -27,12 +27,16 @@ class SchoolCardResource extends JsonResource
             ];
         }
 
+        $expertiseFields = $profile->getAttribute('expertise_fields');
+
         return [
             'id' => $this->id,
             'school_name' => $profile->school_name,
             'address' => $profile->address,
             'logo_url' => $profile->logo_url,
-            'expertise_fields' => json_decode($profile->expertise_fields, true) ?? [],
+            'expertise_fields' => is_array($expertiseFields)
+                ? $expertiseFields
+                : (json_decode((string) $expertiseFields, true) ?? []),
         ];
     }
 }

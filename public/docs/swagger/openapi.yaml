@@ -18,6 +18,7 @@ servers:
 
 tags:
   - name: Auth
+  - name: Admin Registrations
   - name: Profile
   - name: School Students
   - name: Student Portfolio
@@ -100,6 +101,14 @@ paths:
 
   /admin/blog/articles:
     $ref: "./paths/blog.yaml#/paths/~1admin~1blog~1articles"
+  /admin/registrations:
+    $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations"
+  /admin/registrations/{id}:
+    $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}"
+  /admin/registrations/{id}/approve:
+    $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}~1approve"
+  /admin/registrations/{id}/reject:
+    $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}~1reject"
   /public/blog/content-types:
     $ref: "./paths/blog.yaml#/paths/~1public~1blog~1content-types"
   /public/blog/articles:
@@ -477,6 +486,48 @@ components:
             data:
               $ref: "#/components/schemas/ArticleDetail"
 
+    RegistrationItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        no:
+          type: integer
+        nama:
+          type: string
+        title:
+          type: string
+          example: Sekolah
+        status:
+          type: string
+          enum: [pending, active, rejected]
+        detail:
+          type: object
+          additionalProperties: true
+
+    SuccessEnvelopeAdminRegistrationList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/RegistrationItem"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeAdminRegistrationItem:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RegistrationItem"
+
     PaginationMeta:
       type: object
       properties:
@@ -510,6 +561,7 @@ components:
           enum: [perusahaan, umkm]
         account_status:
           type: string
+          enum: [pending, active, rejected]
         is_active:
           type: boolean
         last_login_at:

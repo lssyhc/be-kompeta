@@ -4,6 +4,10 @@
 ### Base URL — sesuaikan jika port berbeda
 @baseUrl = http://localhost:8000/api
 
+### Catatan alur terbaru:
+### - Register sekolah/mitra akan menghasilkan account_status=pending dan is_active=false.
+### - Admin harus approve dulu via requests/admin-registrations.http sebelum login sekolah/mitra berhasil.
+
 ### ============================================================
 ### 1. REGISTER SEKOLAH
 ###    Endpoint : POST /api/auth/register
@@ -359,8 +363,8 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 7. LOGIN - Sekolah (email + password)
-###    Jalankan dulu Register Sekolah (#1)
+### 7. LOGIN - Sekolah (email + password) sebelum approval admin
+###    Jalankan Register Sekolah (#1), lalu coba login ini (expected 403)
 ### ============================================================
 
 # @name loginSekolah
@@ -378,8 +382,8 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 8. LOGIN - Mitra Perusahaan (email + password)
-###    Jalankan dulu Register Mitra Perusahaan (#2)
+### 8. LOGIN - Mitra Perusahaan (email + password) sebelum approval admin
+###    Jalankan Register Mitra Perusahaan (#2), lalu coba login ini (expected 403)
 ### ============================================================
 
 # @name loginMitraPerusahaan
@@ -397,8 +401,8 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 9. LOGIN - Mitra UMKM (email + password)
-###    Jalankan dulu Register Mitra UMKM (#3)
+### 9. LOGIN - Mitra UMKM (email + password) sebelum approval admin
+###    Jalankan Register Mitra UMKM (#3), lalu coba login ini (expected 403)
 ### ============================================================
 
 # @name loginMitraUmkm
@@ -432,6 +436,36 @@ Content-Type: application/json
   "password": "admin12345",
   "device_name": "rest-client"
 }
+
+###
+
+### ============================================================
+### 10a. APPROVE REGISTER SEKOLAH (setelah #1, pakai token admin)
+### ============================================================
+
+PATCH {{baseUrl}}/admin/registrations/{{registerSekolah.response.body.$.data.user.id}}/approve
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 10b. APPROVE REGISTER MITRA PERUSAHAAN (setelah #2)
+### ============================================================
+
+PATCH {{baseUrl}}/admin/registrations/{{registerMitraPerusahaan.response.body.$.data.user.id}}/approve
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 10c. APPROVE REGISTER MITRA UMKM (setelah #3)
+### ============================================================
+
+PATCH {{baseUrl}}/admin/registrations/{{registerMitraUmkm.response.body.$.data.user.id}}/approve
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 
 ###
 

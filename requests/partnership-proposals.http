@@ -1,0 +1,81 @@
+### ============================================================
+### PARTNERSHIP PROPOSALS API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### Login sekolah / mitra terlebih dulu
+# @name loginSekolah
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "school.b@kompeta.test",
+  "password": "password123",
+  "device_name": "rest-client"
+}
+
+###
+
+### 1) CREATE DRAFT PROPOSAL
+POST {{baseUrl}}/partnership-proposals
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="target_user_id"
+
+2
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Pengajuan kemitraan magang siswa kelas XII.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="proposal_pdf"; filename="proposal.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/proposal.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="signature_file"; filename="signature.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/signature.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 2) LIST SENT PROPOSALS
+GET {{baseUrl}}/partnership-proposals?scope=sent
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### 3) SHOW PROPOSAL DETAIL
+@proposalId = 1
+GET {{baseUrl}}/partnership-proposals/{{proposalId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### 4) UPDATE DRAFT PROPOSAL
+PUT {{baseUrl}}/partnership-proposals/{{proposalId}}
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Revisi proposal batch 2.
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 5) SUBMIT PROPOSAL
+POST {{baseUrl}}/partnership-proposals/{{proposalId}}/submit
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}

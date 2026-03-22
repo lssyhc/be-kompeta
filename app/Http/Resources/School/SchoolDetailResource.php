@@ -2,9 +2,12 @@
 
 namespace App\Http\Resources\School;
 
+use App\Models\CompanyProfile;
+use App\Models\PartnershipProposal;
 use App\Models\SchoolProfile;
 use App\Models\StudentAchievement;
 use App\Models\StudentProfile;
+use App\Models\UmkmProfile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -31,6 +34,7 @@ class SchoolDetailResource extends JsonResource
                 'expertise_fields' => [],
                 'student_achievements' => [],
                 'students' => [],
+                'pengajuan_mitra' => [],
             ];
         }
 
@@ -53,7 +57,56 @@ class SchoolDetailResource extends JsonResource
             'expertise_fields' => json_decode($profile->expertise_fields, true) ?? [],
             'student_achievements' => $this->formatAchievements(),
             'students' => $this->formatStudents(),
+            'pengajuan_mitra' => $this->formatPartnershipSubmissions(),
         ];
+    }
+
+    private function formatPartnershipSubmissions(): array
+    {
+        /** @var iterable<PartnershipProposal> $submissions */
+        $submissions = $this->schoolPartnershipProposals ?? [];
+
+        return collect($submissions)
+            ->map(function (PartnershipProposal $proposal): array {
+                $mitraUser = $proposal->mitraUser;
+                $mitraName = null;
+                $sectorOrType = null;
+
+                if ($mitraUser instanceof User) {
+                    if ($mitraUser->mitra_type === User::MITRA_PERUSAHAAN) {
+                        $companyProfile = $mitraUser->companyProfile;
+
+                        if ($companyProfile instanceof CompanyProfile) {
+                            $mitraName = $companyProfile->company_name;
+                            $sectorOrType = $companyProfile->industry_sector;
+                        }
+                    }
+
+                    if ($mitraUser->mitra_type === User::MITRA_UMKM) {
+                        $umkmProfile = $mitraUser->umkmProfile;
+
+                        if ($umkmProfile instanceof UmkmProfile) {
+                            $mitraName = $umkmProfile->business_name;
+                            $sectorOrType = $umkmProfile->business_type;
+                        }
+                    }
+
+                    if (! is_string($mitraName) || $mitraName === '') {
+                        $mitraName = $mitraUser->name;
+                    }
+                }
+
+                return [
+                    'mitra_user_id' => $proposal->mitra_user_id,
+                    'nama_mitra' => $mitraName,
+                    'sektor_atau_tipe' => $sectorOrType,
+                    'mitra_tipe' => $mitraUser instanceof User ? $mitraUser->mitra_type : null,
+                    'tanggal_submit' => $proposal->submitted_at?->toIso8601String(),
+                    'status_submit' => $proposal->status,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function formatAchievements(): array

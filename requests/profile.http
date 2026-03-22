@@ -234,6 +234,7 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 
 ### ============================================================
 ### 10. GET PROFILE SISWA
+### Cek field baru role_profile.job_applications
 ### ============================================================
 
 GET {{baseUrl}}/profile
@@ -277,3 +278,18 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
     "class_year": "2026"
   }
 }
+
+###
+
+### ============================================================
+### 13. GET PROFILE SISWA (VALIDASI JOB APPLICATIONS)
+### Pastikan role_profile.job_applications berisi:
+### - company_name
+### - role_type
+### - submitted_at
+### - status
+### ============================================================
+
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}

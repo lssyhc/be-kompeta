@@ -21,6 +21,8 @@ tags:
   - name: Profile
   - name: School Students
   - name: Student Portfolio
+  - name: Student Job Applications
+  - name: Partnership Proposals
   - name: Files
   - name: Explore
   - name: For You
@@ -56,6 +58,17 @@ paths:
     $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items"
   /student/application-reminder:
     $ref: "./paths/student-portfolio.yaml#/paths/~1student~1application-reminder"
+  /student/job-applications:
+    $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications"
+  /student/job-applications/{id}:
+    $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}"
+
+  /partnership-proposals:
+    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals"
+  /partnership-proposals/{id}:
+    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}"
+  /partnership-proposals/{id}/submit:
+    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1submit"
 
   /files/me/{type}:
     $ref: "./paths/files.yaml#/paths/~1files~1me~1{type}"
@@ -311,6 +324,52 @@ components:
               properties:
                 reminder:
                   type: string
+
+    SuccessEnvelopePartnershipProposal:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/PartnershipProposal"
+
+    SuccessEnvelopePartnershipProposalList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/PartnershipProposal"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeStudentJobApplication:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/StudentJobApplication"
+
+    SuccessEnvelopeStudentJobApplicationList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentJobApplication"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
 
     PaginationMeta:
       type: object
@@ -584,6 +643,10 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StudentApplication"
+            job_applications:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentJobApplicationSummary"
 
     StudentSkill:
       type: object
@@ -651,6 +714,115 @@ components:
           format: date
         submit_status:
           type: string
+        job_vacancy_id:
+          nullable: true
+          type: integer
+        mitra_user_id:
+          nullable: true
+          type: integer
+        status:
+          type: string
+        applied_at:
+          nullable: true
+          type: string
+          format: date-time
+        cover_letter:
+          nullable: true
+          type: string
+        cv_path:
+          nullable: true
+          type: string
+
+    StudentJobApplicationSummary:
+      type: object
+      properties:
+        company_name:
+          type: string
+        role_type:
+          type: string
+        submitted_at:
+          nullable: true
+          type: string
+          format: date
+        status:
+          nullable: true
+          type: string
+
+    StudentJobApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_profile_id:
+          type: integer
+        job_vacancy_id:
+          type: integer
+        job_slug:
+          nullable: true
+          type: string
+        mitra_user_id:
+          type: integer
+        company_name:
+          type: string
+        role_type:
+          type: string
+        status_submit:
+          type: string
+        submitted_at:
+          nullable: true
+          type: string
+          format: date
+        applied_at:
+          nullable: true
+          type: string
+          format: date-time
+        cover_letter:
+          nullable: true
+          type: string
+        has_cv_file:
+          type: boolean
+
+    PartnershipProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+        proposer_user_id:
+          type: integer
+        target_user_id:
+          type: integer
+        school_user_id:
+          type: integer
+        mitra_user_id:
+          type: integer
+        nama_mitra:
+          nullable: true
+          type: string
+        mitra_tipe:
+          nullable: true
+          type: string
+          enum: [perusahaan, umkm]
+        sektor_atau_tipe:
+          nullable: true
+          type: string
+        notes:
+          nullable: true
+          type: string
+        status_submit:
+          type: string
+          enum: [draft, submitted]
+        tanggal_submit:
+          nullable: true
+          type: string
+          format: date-time
+        created_at:
+          nullable: true
+          type: string
+          format: date-time
+        updated_at:
+          nullable: true
+          type: string
+          format: date-time
 
     RegisterSekolahRequest:
       type: object
@@ -1001,3 +1173,49 @@ components:
         submit_status:
           type: string
           maxLength: 100
+
+    StoreStudentJobApplicationRequest:
+      type: object
+      required: [job_vacancy_id, cv]
+      properties:
+        job_vacancy_id:
+          type: integer
+        cv:
+          type: string
+          format: binary
+        cover_letter:
+          type: string
+          maxLength: 2000
+
+    StorePartnershipProposalRequest:
+      type: object
+      required: [target_user_id, proposal_pdf, signature_file]
+      properties:
+        target_user_id:
+          type: integer
+        proposal_pdf:
+          type: string
+          format: binary
+          description: File PDF proposal (maks 5 MB)
+        signature_file:
+          type: string
+          format: binary
+          description: File PDF tanda tangan/surat kuasa (maks 2 MB, hanya PDF)
+        notes:
+          type: string
+          maxLength: 2000
+
+    UpdatePartnershipProposalRequest:
+      type: object
+      properties:
+        proposal_pdf:
+          type: string
+          format: binary
+          description: File PDF proposal pengganti (maks 5 MB)
+        signature_file:
+          type: string
+          format: binary
+          description: File PDF tanda tangan pengganti (maks 2 MB, hanya PDF)
+        notes:
+          type: string
+          maxLength: 2000

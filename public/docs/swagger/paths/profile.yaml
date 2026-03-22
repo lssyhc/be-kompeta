@@ -10,7 +10,7 @@ paths:
         - sekolah -> school_profiles
         - mitra perusahaan -> company_profiles
         - mitra umkm -> umkm_profiles
-        - siswa -> student_profiles (+ portfolio terkait)
+        - siswa -> student_profiles (+ portfolio terkait + job_applications)
       responses:
         "200":
           description: Profil berhasil diambil
@@ -206,6 +206,11 @@ paths:
                         description: Siswa RPL fokus backend Laravel.
                         phone_number: "081234567890"
                         address: Jakarta Selatan
+                        job_applications:
+                          - company_name: PT Bina Jasa
+                            role_type: Backend Intern
+                            submitted_at: "2026-03-22"
+                            status: applied
                     errors: null
                     meta: null
         "401":

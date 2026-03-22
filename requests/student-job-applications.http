@@ -1,0 +1,56 @@
+### ============================================================
+### STUDENT JOB APPLICATIONS API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### Login siswa dulu
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "0002345678",
+  "school_origin": "SMA Negeri 2 Jakarta",
+  "unique_code": "qzPSGd04erQblY8G",
+  "device_name": "rest-client"
+}
+
+###
+
+### 1) APPLY JOB (UPLOAD CV)
+POST {{baseUrl}}/student/job-applications
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="job_vacancy_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cover_letter"
+
+Saya tertarik melamar posisi ini dan siap mengikuti proses seleksi.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cv"; filename="cv.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/cv.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 2) LIST MY APPLICATIONS
+GET {{baseUrl}}/student/job-applications
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 3) SHOW MY APPLICATION DETAIL
+@applicationId = 1
+GET {{baseUrl}}/student/job-applications/{{applicationId}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}

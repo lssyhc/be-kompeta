@@ -4,10 +4,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
+use App\Http\Controllers\Api\PartnershipProposalController;
 use App\Http\Controllers\Api\PrivateFileController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
+use App\Http\Controllers\Api\StudentJobApplicationController;
 use App\Http\Controllers\Api\StudentPortfolioController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +62,17 @@ Route::middleware('auth:sanctum')->prefix('school')->group(function () {
 Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::post('/portfolio-items', [StudentPortfolioController::class, 'storePortfolioItem']);
     Route::get('/application-reminder', [StudentPortfolioController::class, 'applicationReminder']);
+    Route::get('/job-applications', [StudentJobApplicationController::class, 'index']);
+    Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
+    Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');
+});
+
+Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(function () {
+    Route::get('/', [PartnershipProposalController::class, 'index']);
+    Route::post('/', [PartnershipProposalController::class, 'store']);
+    Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
+    Route::put('/{id}', [PartnershipProposalController::class, 'update'])->whereNumber('id');
+    Route::post('/{id}/submit', [PartnershipProposalController::class, 'submit'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('files')->group(function () {

@@ -107,6 +107,13 @@ paths:
                       major: IPA
                       graduation_status: active
                       photo_profile_url: null
+                  pengajuan_mitra:
+                    - mitra_user_id: 2
+                      nama_mitra: PT Bina Jasa
+                      sektor_atau_tipe: Outsourcing
+                      mitra_tipe: perusahaan
+                      tanggal_submit: "2026-03-22T08:30:00+07:00"
+                      status_submit: submitted
                 errors: null
                 meta: null
         "404":

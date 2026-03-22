@@ -7,9 +7,11 @@ use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Models\AdminProfile;
 use App\Models\CompanyProfile;
 use App\Models\SchoolProfile;
+use App\Models\StudentApplication;
 use App\Models\StudentProfile;
 use App\Models\UmkmProfile;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -91,10 +93,31 @@ class ProfileController extends Controller
     private function resolveRoleProfile(User $user): mixed
     {
         if ($user->role === User::ROLE_SISWA) {
-            return StudentProfile::query()
+            $studentProfile = StudentProfile::query()
                 ->where('user_id', $user->id)
-                ->with(['skills', 'experiences', 'achievements', 'applications'])
+                ->with(['skills', 'experiences', 'achievements', 'applications.jobVacancy'])
                 ->first();
+
+            if (! $studentProfile instanceof StudentProfile) {
+                return null;
+            }
+
+            $profilePayload = $studentProfile->toArray();
+            /** @var Collection<int, StudentApplication> $applications */
+            $applications = $studentProfile->applications;
+            $profilePayload['job_applications'] = $applications
+                ->map(function (StudentApplication $application): array {
+                    return [
+                        'company_name' => $application->company_name,
+                        'role_type' => $application->role_type,
+                        'submitted_at' => $application->submitted_at?->toDateString(),
+                        'status' => $application->status ?: $application->submit_status,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            return $profilePayload;
         }
 
         if ($user->role === User::ROLE_SEKOLAH) {

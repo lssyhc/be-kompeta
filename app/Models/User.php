@@ -112,4 +112,19 @@ class User extends Authenticatable
             ->where('is_published', true)
             ->latest();
     }
+
+    public function proposedPartnershipProposals(): HasMany
+    {
+        return $this->hasMany(PartnershipProposal::class, 'proposer_user_id');
+    }
+
+    public function receivedPartnershipProposals(): HasMany
+    {
+        return $this->hasMany(PartnershipProposal::class, 'target_user_id');
+    }
+
+    public function schoolPartnershipProposals(): HasMany
+    {
+        return $this->hasMany(PartnershipProposal::class, 'school_user_id');
+    }
 }

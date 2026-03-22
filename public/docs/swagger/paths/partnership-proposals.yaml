@@ -1,0 +1,179 @@
+paths:
+  /partnership-proposals:
+    get:
+      tags: [Partnership Proposals]
+      summary: Daftar pengajuan kemitraan
+      parameters:
+        - in: query
+          name: scope
+          schema:
+            type: string
+            enum: [sent, received]
+            default: sent
+          description: Filter daftar proposal berdasarkan pengirim atau penerima.
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+      responses:
+        "200":
+          description: Daftar pengajuan kemitraan berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposalList"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+    post:
+      tags: [Partnership Proposals]
+      summary: Buat draft pengajuan kemitraan
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/StorePartnershipProposalRequest"
+      responses:
+        "201":
+          description: Draft pengajuan kemitraan berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan sekolah/mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /partnership-proposals/{id}:
+    get:
+      tags: [Partnership Proposals]
+      summary: Detail pengajuan kemitraan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detail pengajuan kemitraan berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Pengajuan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+    put:
+      tags: [Partnership Proposals]
+      summary: Update draft pengajuan kemitraan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/UpdatePartnershipProposalRequest"
+      responses:
+        "200":
+          description: Draft pengajuan kemitraan berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Draft tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Pengajuan tidak dapat diubah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /partnership-proposals/{id}/submit:
+    post:
+      tags: [Partnership Proposals]
+      summary: Submit draft pengajuan kemitraan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pengajuan kemitraan berhasil dikirim
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Draft tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Sudah pernah disubmit
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

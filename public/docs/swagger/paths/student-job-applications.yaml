@@ -1,0 +1,114 @@
+paths:
+  /student/job-applications:
+    get:
+      tags: [Student Job Applications]
+      summary: Riwayat lamaran kerja siswa
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+      responses:
+        "200":
+          description: Riwayat lamaran berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplicationList"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+    post:
+      tags: [Student Job Applications]
+      summary: Kirim lamaran kerja ke lowongan mitra
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/StoreStudentJobApplicationRequest"
+      responses:
+        "201":
+          description: Lamaran pekerjaan berhasil dikirim
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Lowongan tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validasi gagal atau lamaran duplikat
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /student/job-applications/{id}:
+    get:
+      tags: [Student Job Applications]
+      summary: Detail lamaran kerja siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detail lamaran berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Lamaran tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

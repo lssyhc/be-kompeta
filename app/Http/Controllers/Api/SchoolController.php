@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\School\SchoolCardResource;
 use App\Http\Resources\School\SchoolDetailResource;
+use App\Models\PartnershipProposal;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -46,6 +47,11 @@ class SchoolController extends Controller
             ->with([
                 'schoolProfile',
                 'managedStudents.achievements',
+                'schoolPartnershipProposals' => fn ($query) => $query
+                    ->where('status', PartnershipProposal::STATUS_SUBMITTED)
+                    ->with(['mitraUser.companyProfile', 'mitraUser.umkmProfile'])
+                    ->orderByDesc('submitted_at')
+                    ->orderByDesc('created_at'),
             ])
             ->first();
 

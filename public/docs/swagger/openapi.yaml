@@ -28,6 +28,7 @@ tags:
   - name: For You
   - name: Mitra
   - name: Schools
+  - name: Blog
 
 security:
   - bearerAuth: []
@@ -96,6 +97,17 @@ paths:
     $ref: "./paths/schools.yaml#/paths/~1public~1schools"
   /public/schools/{id}:
     $ref: "./paths/schools.yaml#/paths/~1public~1schools~1{id}"
+
+  /admin/blog/articles:
+    $ref: "./paths/blog.yaml#/paths/~1admin~1blog~1articles"
+  /public/blog/content-types:
+    $ref: "./paths/blog.yaml#/paths/~1public~1blog~1content-types"
+  /public/blog/articles:
+    $ref: "./paths/blog.yaml#/paths/~1public~1blog~1articles"
+  /public/blog/articles/most-read:
+    $ref: "./paths/blog.yaml#/paths/~1public~1blog~1articles~1most-read"
+  /public/blog/articles/{slug}:
+    $ref: "./paths/blog.yaml#/paths/~1public~1blog~1articles~1{slug}"
 
 components:
   securitySchemes:
@@ -370,6 +382,100 @@ components:
               properties:
                 pagination:
                   $ref: "#/components/schemas/PaginationMeta"
+
+    ContentTypeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+
+    ArticleCard:
+      type: object
+      properties:
+        id:
+          type: integer
+        content_type:
+          $ref: "#/components/schemas/ContentTypeItem"
+        title:
+          type: string
+        slug:
+          type: string
+        view_count:
+          type: integer
+        thumbnail_url:
+          nullable: true
+          type: string
+        published_at:
+          nullable: true
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    ArticleDetail:
+      allOf:
+        - $ref: "#/components/schemas/ArticleCard"
+        - type: object
+          properties:
+            body:
+              type: string
+            is_published:
+              type: boolean
+            created_by:
+              type: integer
+            created_by_name:
+              type: string
+            updated_at:
+              type: string
+              format: date-time
+
+    SuccessEnvelopeContentTypeList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContentTypeItem"
+
+    SuccessEnvelopeArticleList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ArticleCard"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeArticleListNoPagination:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ArticleCard"
+
+    SuccessEnvelopeArticleDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/ArticleDetail"
 
     PaginationMeta:
       type: object

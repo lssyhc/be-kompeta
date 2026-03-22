@@ -1,0 +1,264 @@
+paths:
+  /admin/blog/articles:
+    post:
+      tags: [Blog]
+      summary: Buat artikel blog (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [content_type_id, title, thumbnail, body]
+              properties:
+                content_type_id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: Artikel Perdana Kompeta
+                thumbnail:
+                  type: string
+                  format: binary
+                body:
+                  type: string
+                  example: Isi konten artikel lengkap.
+                is_published:
+                  type: boolean
+                  default: true
+                published_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        "201":
+          description: Artikel berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeArticleDetail"
+              example:
+                success: true
+                message: Artikel berhasil dibuat.
+                data:
+                  id: 1
+                  content_type:
+                    id: 1
+                    name: News
+                    slug: news
+                  title: Artikel Perdana Kompeta
+                  slug: artikel-perdana-kompeta
+                  body: Isi konten artikel lengkap.
+                  view_count: 0
+                  thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
+                  is_published: true
+                  published_at: "2026-03-22T02:08:14Z"
+                  created_by: 1
+                  created_by_name: System Admin Kompeta
+                  created_at: "2026-03-22T02:08:14Z"
+                  updated_at: "2026-03-22T02:08:14Z"
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau tidak ada
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/blog/content-types:
+    get:
+      tags: [Blog]
+      summary: Daftar tipe konten blog aktif
+      security: []
+      responses:
+        "200":
+          description: Daftar tipe konten berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeContentTypeList"
+              example:
+                success: true
+                message: Daftar tipe konten berhasil diambil.
+                data:
+                  - id: 1
+                    name: News
+                    slug: news
+                  - id: 2
+                    name: Tips
+                    slug: tips
+                errors: null
+                meta: null
+
+  /public/blog/articles:
+    get:
+      tags: [Blog]
+      summary: Daftar artikel blog (dengan search dan filter)
+      security: []
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Kata kunci pencarian di title/body
+        - in: query
+          name: content_type_id
+          schema:
+            type: integer
+        - in: query
+          name: content_type_slug
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [latest, most_read]
+            default: latest
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Daftar artikel berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeArticleList"
+              example:
+                success: true
+                message: Daftar artikel berhasil diambil.
+                data:
+                  - id: 1
+                    content_type:
+                      id: 1
+                      name: News
+                      slug: news
+                    title: Artikel Perdana Kompeta
+                    slug: artikel-perdana-kompeta
+                    view_count: 25
+                    thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
+                    published_at: "2026-03-22T02:08:14Z"
+                    created_at: "2026-03-22T02:08:14Z"
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /public/blog/articles/most-read:
+    get:
+      tags: [Blog]
+      summary: Daftar artikel paling banyak dibaca
+      security: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 6
+      responses:
+        "200":
+          description: Daftar artikel paling banyak dibaca berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeArticleListNoPagination"
+              example:
+                success: true
+                message: Daftar artikel paling banyak dibaca berhasil diambil.
+                data:
+                  - id: 1
+                    content_type:
+                      id: 1
+                      name: News
+                      slug: news
+                    title: Artikel Perdana Kompeta
+                    slug: artikel-perdana-kompeta
+                    view_count: 25
+                    thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
+                    published_at: "2026-03-22T02:08:14Z"
+                    created_at: "2026-03-22T02:08:14Z"
+                errors: null
+                meta: null
+
+  /public/blog/articles/{slug}:
+    get:
+      tags: [Blog]
+      summary: Detail artikel blog (sekaligus tambah view_count)
+      security: []
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detail artikel berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeArticleDetail"
+              example:
+                success: true
+                message: Detail artikel berhasil diambil.
+                data:
+                  id: 1
+                  content_type:
+                    id: 1
+                    name: News
+                    slug: news
+                  title: Artikel Perdana Kompeta
+                  slug: artikel-perdana-kompeta
+                  body: Isi konten artikel lengkap.
+                  view_count: 26
+                  thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
+                  is_published: true
+                  published_at: "2026-03-22T02:08:14Z"
+                  created_by: 1
+                  created_by_name: System Admin Kompeta
+                  created_at: "2026-03-22T02:08:14Z"
+                  updated_at: "2026-03-22T02:08:14Z"
+                errors: null
+                meta: null
+        "404":
+          description: Artikel tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"

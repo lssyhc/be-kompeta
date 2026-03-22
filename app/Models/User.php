@@ -127,4 +127,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(PartnershipProposal::class, 'school_user_id');
     }
+
+    public function createdArticles(): HasMany
+    {
+        return $this->hasMany(Article::class, 'created_by');
+    }
+
+    public function updatedArticles(): HasMany
+    {
+        return $this->hasMany(Article::class, 'updated_by');
+    }
 }

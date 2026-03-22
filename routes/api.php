@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
@@ -79,10 +80,21 @@ Route::middleware('auth:sanctum')->prefix('files')->group(function () {
     Route::get('/me/{type}', [PrivateFileController::class, 'downloadMyDocument']);
 });
 
+Route::middleware('auth:sanctum')->prefix('admin/blog')->group(function () {
+    Route::post('/articles', [BlogController::class, 'store']);
+});
+
 Route::prefix('public/explore')->group(function () {
     Route::get('/jobs', [ExploreController::class, 'index']);
     Route::get('/jobs/{slug}', [ExploreController::class, 'show']);
     Route::get('/filters', [ExploreController::class, 'filterOptions']);
+});
+
+Route::prefix('public/blog')->group(function () {
+    Route::get('/content-types', [BlogController::class, 'contentTypes']);
+    Route::get('/articles/most-read', [BlogController::class, 'mostRead']);
+    Route::get('/articles', [BlogController::class, 'index']);
+    Route::get('/articles/{slug}', [BlogController::class, 'show']);
 });
 
 Route::prefix('public/for-you')->group(function () {

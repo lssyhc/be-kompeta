@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ['full_name' => $admin->name]
         );
 
+        $this->call(ContentTypeSeeder::class);
         $this->call(ExploreDummySeeder::class);
     }
 }

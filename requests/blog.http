@@ -1,0 +1,145 @@
+### ============================================================
+### BLOG API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+@adminEmail = admin@kompeta.test
+@adminPassword = admin12345
+@deviceName = rest-client
+@accessToken =
+
+### ============================================================
+### 1. LOGIN ADMIN (ambil token)
+### ============================================================
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+role=admin&email={{adminEmail}}&password={{adminPassword}}&device_name={{deviceName}}
+
+###
+
+### ============================================================
+### 2. SET TOKEN MANUAL
+### Copy token dari response adminLogin ke variable @accessToken
+### ============================================================
+
+### ============================================================
+### 3. GET ALL CONTENT TYPES
+### ============================================================
+# @name blogContentTypes
+GET {{baseUrl}}/public/blog/content-types
+Accept: application/json
+
+###
+
+### ============================================================
+### 4. GET ALL ARTICLES (default)
+### ============================================================
+# @name blogListDefault
+GET {{baseUrl}}/public/blog/articles
+Accept: application/json
+
+###
+
+### ============================================================
+### 5. GET ALL ARTICLES + SEARCH
+### ============================================================
+# @name blogSearch
+GET {{baseUrl}}/public/blog/articles?q=perdana
+Accept: application/json
+
+###
+
+### ============================================================
+### 6. GET ALL ARTICLES + FILTER TYPE + SORT MOST READ
+### ============================================================
+# @name blogFilterAndSort
+GET {{baseUrl}}/public/blog/articles?content_type_slug=news&sort=most_read&per_page=6
+Accept: application/json
+
+###
+
+### ============================================================
+### 7. GET MOST READ ARTICLES
+### ============================================================
+# @name blogMostRead
+GET {{baseUrl}}/public/blog/articles/most-read?limit=5
+Accept: application/json
+
+###
+
+### ============================================================
+### 8. GET ARTICLE DETAIL
+### Ganti slug sesuai data Anda
+### ============================================================
+# @name blogDetail
+GET {{baseUrl}}/public/blog/articles/artikel-perdana-kompeta
+Accept: application/json
+
+###
+
+### ============================================================
+### 9. CREATE ARTICLE (ADMIN ONLY)
+### Prasyarat:
+### - Jalankan adminLogin
+### - Tempel token ke @accessToken
+### - Pastikan file thumbnail tersedia
+### ============================================================
+# @name blogCreateByAdmin
+POST {{baseUrl}}/admin/blog/articles
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="content_type_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+Artikel dari REST Client
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="body"
+
+Konten artikel panjang dari Rest Client.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="is_published"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="thumbnail"; filename="logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### ============================================================
+### 10. CREATE ARTICLE TANPA TOKEN (harus 401)
+### ============================================================
+# @name blogCreateUnauthorized
+POST {{baseUrl}}/admin/blog/articles
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="content_type_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+Unauthorized Article
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="body"
+
+Body
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="thumbnail"; filename="logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

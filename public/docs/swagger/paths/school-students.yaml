@@ -3,22 +3,35 @@ paths:
     get:
       tags: [School Students]
       summary: List siswa milik sekolah login
+      description: |
+        Menampilkan daftar siswa yang terdaftar di bawah akun sekolah yang sedang login.
+        Hanya user dengan role `sekolah` yang dapat mengakses.
+
+        **Filter opsional:**
+        - `class_year`: Filter berdasarkan tahun kelas (exact match, 4 digit)
+        - `graduation_status`: Filter berdasarkan status kelulusan (exact match)
+
+        Diurutkan berdasarkan `created_at` terbaru. Paginasi default 20 per halaman.
       parameters:
         - in: query
           name: class_year
           schema:
             type: string
-            example: "2024"
+          description: "Filter berdasarkan tahun kelas (4 digit, contoh: 2024)"
+          example: "2024"
         - in: query
           name: graduation_status
           schema:
             type: string
-            example: Lulus
+          description: "Filter berdasarkan status kelulusan (contoh: Belum Lulus, Lulus)"
+          example: Lulus
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
       responses:
         "200":
           description: Daftar siswa berhasil diambil
@@ -31,15 +44,15 @@ paths:
                 message: Daftar siswa berhasil diambil.
                 data:
                   - id: 1
-                    user_id: 20
-                    school_user_id: 2
+                    user_id: 11
+                    school_user_id: 8
                     full_name: Budi Santoso
-                    nisn: "1234567890"
-                    major: RPL
-                    school_origin: SMK Negeri 1
-                    graduation_status: Belum Lulus
+                    nisn: "0001234567"
+                    major: IPA
+                    school_origin: SMA Negeri 1 Bogor
+                    graduation_status: graduated
                     class_year: "2024"
-                    unique_code: X1YZABCD
+                    unique_code: BUDI0001234X9YZ
                 errors: null
                 meta:
                   pagination:
@@ -49,11 +62,11 @@ paths:
                     total: 1
                     has_more_pages: false
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -61,21 +74,40 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat mengakses data siswa.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
     post:
       tags: [School Students]
       summary: Tambah siswa oleh sekolah
+      description: |
+        Menambahkan siswa baru ke akun sekolah yang sedang login.
+        Otomatis membuat akun `User` dengan role `siswa` dan `StudentProfile` terkait.
+
+        **Proses internal:**
+        1. Buat `User` dengan `role=siswa`, `account_status=active`, `is_active=true`
+        2. Buat `StudentProfile` dengan `school_user_id` dari sekolah login
+        3. Generate `unique_code` 8 karakter acak untuk login siswa
+
+        **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`
+        **Field opsional:** `class_year`, `phone_number`, `address`, `photo_profile` (file gambar)
+
+        NISN harus unik secara global.
       requestBody:
         required: true
         content:
@@ -84,13 +116,13 @@ paths:
               $ref: "../openapi.yaml#/components/schemas/StoreStudentRequest"
             example:
               full_name: Budi Santoso
-              nisn: "1234567890"
-              major: RPL
-              school_origin: SMK Negeri 1
-              graduation_status: Belum Lulus
+              nisn: "0001234567"
+              major: IPA
+              school_origin: SMA Negeri 1 Bogor
+              graduation_status: graduated
               class_year: "2024"
-              phone_number: "081234567890"
-              address: Jl. Siswa No. 5
+              phone_number: "082123456789"
+              address: Bogor, Jawa Barat
       responses:
         "201":
           description: Data siswa berhasil ditambahkan
@@ -103,18 +135,18 @@ paths:
                 message: Data siswa berhasil ditambahkan.
                 data:
                   user:
-                    id: 20
+                    id: 11
                     name: Budi Santoso
                     role: siswa
                     account_status: active
                 errors: null
                 meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -122,11 +154,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat menambahkan siswa.
@@ -134,11 +166,11 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (NISN duplikat, field wajib kosong, dll.)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
@@ -147,11 +179,23 @@ paths:
                   nisn:
                     - The nisn has already been taken.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /school/students/search:
     get:
       tags: [School Students]
-      summary: Cari siswa by nama atau NISN
+      summary: Cari siswa berdasarkan nama atau NISN
+      description: |
+        Mencari siswa milik sekolah yang sedang login berdasarkan keyword.
+        Pencarian dilakukan pada field `full_name` dan `nisn` (case-insensitive, partial match / LIKE).
+        Hanya mengembalikan siswa milik sekolah login (`school_user_id`).
+
+        Tidak menggunakan paginasi — mengembalikan semua hasil yang cocok (di-limit oleh `take(50)`).
       parameters:
         - in: query
           name: q
@@ -160,6 +204,8 @@ paths:
             type: string
             minLength: 1
             maxLength: 100
+          description: Kata kunci pencarian (nama atau NISN, case-insensitive partial match)
+          example: Budi
       responses:
         "200":
           description: Pencarian siswa berhasil
@@ -174,17 +220,17 @@ paths:
                   results:
                     - id: 1
                       full_name: Budi Santoso
-                      nisn: "1234567890"
+                      nisn: "0001234567"
                 errors: null
                 meta:
                   query: Budi
                   total: 1
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -192,11 +238,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat mencari data siswa.
@@ -204,11 +250,11 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal
+          description: Parameter pencarian tidak valid
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
@@ -217,17 +263,30 @@ paths:
                   q:
                     - The q field is required.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /school/students/{id}:
     get:
       tags: [School Students]
       summary: Detail siswa
+      description: |
+        Menampilkan detail lengkap seorang siswa milik sekolah login.
+        Termasuk data profil, skills, experiences, achievements, dan job applications.
+
+        `id` di sini adalah `StudentProfile.id`, bukan `User.id`.
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+          description: ID student profile
+          example: 1
       responses:
         "200":
           description: Detail siswa berhasil diambil
@@ -235,12 +294,32 @@ paths:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentDetail"
+              example:
+                success: true
+                message: Detail siswa berhasil diambil.
+                data:
+                  student:
+                    id: 1
+                    user_id: 11
+                    school_user_id: 8
+                    full_name: Budi Santoso
+                    nisn: "0001234567"
+                    major: IPA
+                    school_origin: SMA Negeri 1 Bogor
+                    graduation_status: graduated
+                    class_year: "2024"
+                    unique_code: BUDI0001234X9YZ
+                    description: Siswa berprestasi dengan fokus bidang sains dan data.
+                    phone_number: "082123456789"
+                    address: Bogor, Jawa Barat
+                errors: null
+                meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -248,11 +327,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat mengakses data siswa.
@@ -260,29 +339,43 @@ paths:
                 errors: null
                 meta: null
         "404":
-          description: Data siswa tidak ditemukan
+          description: Data siswa tidak ditemukan (bukan milik sekolah login atau tidak ada)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
               example:
                 success: false
                 message: Data siswa tidak ditemukan.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
     put:
       tags: [School Students]
       summary: Update data siswa
+      description: |
+        Memperbarui data profil siswa milik sekolah login.
+        Semua field bersifat opsional — hanya field yang dikirim yang akan diperbarui.
+
+        Jika `full_name` diubah, `User.name` juga akan terupdate secara otomatis.
+        Field `photo_profile` menerima file gambar (jpg/png, max 2MB).
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+          description: ID student profile
+          example: 1
       requestBody:
-        required: true
+        required: false
         content:
           multipart/form-data:
             schema:
@@ -294,12 +387,32 @@ paths:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentDetail"
+              example:
+                success: true
+                message: Data siswa berhasil diperbarui.
+                data:
+                  student:
+                    id: 1
+                    user_id: 11
+                    school_user_id: 8
+                    full_name: Budi Santoso
+                    nisn: "0001234567"
+                    major: IPA
+                    school_origin: SMA Negeri 1 Bogor
+                    graduation_status: graduated
+                    class_year: "2025"
+                    unique_code: BUDI0001234X9YZ
+                    description: Siswa berprestasi dengan fokus bidang sains dan data.
+                    phone_number: "082123456789"
+                    address: Jakarta Selatan
+                errors: null
+                meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -307,11 +420,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat mengubah data siswa.
@@ -323,7 +436,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
               example:
                 success: false
                 message: Data siswa tidak ditemukan.
@@ -331,11 +444,11 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (NISN duplikat, format salah, dll.)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
@@ -344,16 +457,29 @@ paths:
                   nisn:
                     - The nisn has already been taken.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
     delete:
       tags: [School Students]
       summary: Hapus permanen data siswa
+      description: |
+        Menghapus data siswa secara permanen (hard delete).
+        Menghapus `StudentProfile` dan `User` terkait beserta semua access token-nya.
+
+        **⚠️ Operasi ini tidak dapat dibatalkan.**
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+          description: ID student profile
+          example: 1
       responses:
         "200":
           description: Data siswa berhasil dihapus
@@ -368,11 +494,11 @@ paths:
                 errors: null
                 meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -380,11 +506,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role sekolah
+          description: User bukan role sekolah
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user sekolah yang dapat menghapus data siswa.
@@ -396,10 +522,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
               example:
                 success: false
                 message: Data siswa tidak ditemukan.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

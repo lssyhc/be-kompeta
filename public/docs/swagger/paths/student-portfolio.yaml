@@ -3,6 +3,19 @@ paths:
     post:
       tags: [Student Portfolio]
       summary: Tambah item portfolio siswa
+      description: |
+        Menambahkan item portfolio baru untuk siswa yang sedang login.
+        Tipe item ditentukan oleh field `type`.
+
+        **Tipe yang didukung:**
+        | type | Model | Field wajib | Field opsional |
+        |------|-------|-------------|----------------|
+        | `skill` | StudentSkill | `title` | — |
+        | `experience` | StudentExperience | `title`, `description`, `position`, `company_name`, `start_date` | `end_date` |
+        | `achievement` | StudentAchievement | `title`, `description`, `achievement_date`, `institution_name` | — |
+        | `application` | StudentApplication | `company_name`, `role_type`, `submitted_at`, `submit_status` | — |
+
+        Item yang dibuat dikembalikan dalam `data.item`.
       requestBody:
         required: true
         content:
@@ -59,11 +72,11 @@ paths:
                 errors: null
                 meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -71,11 +84,11 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Bukan role siswa
+          description: User bukan role siswa
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               example:
                 success: false
                 message: Hanya user siswa yang dapat mengelola portfolio.
@@ -83,11 +96,11 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (tipe tidak valid, field wajib kosong, dll.)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
@@ -96,11 +109,20 @@ paths:
                   type:
                     - The selected type is invalid.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /student/application-reminder:
     get:
       tags: [Student Portfolio]
       summary: Ambil reminder lamaran siswa
+      description: |
+        Mengembalikan teks reminder statis untuk siswa terkait lamaran kerja.
+        Pesan reminder bersifat hardcoded di server.
       responses:
         "200":
           description: Reminder berhasil diambil
@@ -116,14 +138,20 @@ paths:
                 errors: null
                 meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

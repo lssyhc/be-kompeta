@@ -138,7 +138,7 @@ class AuthController extends Controller
         ])->save();
 
         $token = $user->createToken(
-            $validated['device_name'] ?? 'api-client',
+            'api-client',
             [$user->role]
         )->plainTextToken;
 

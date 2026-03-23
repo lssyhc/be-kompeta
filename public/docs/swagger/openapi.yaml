@@ -76,6 +76,7 @@ paths:
     $ref: "./paths/auth.yaml#/paths/~1auth~1me"
   /user:
     $ref: "./paths/auth.yaml#/paths/~1user"
+    # DEPRECATED: alias /auth/me — gunakan /auth/me
 
   /profile:
     $ref: "./paths/profile.yaml#/paths/~1profile"
@@ -167,7 +168,7 @@ components:
           example: true
         message:
           type: string
-          example: Logout berhasil.
+          example: Success.
         data:
           nullable: true
           example: null
@@ -217,11 +218,9 @@ components:
                 role_profile:
                   nullable: true
                   oneOf:
-                    - $ref: "#/components/schemas/AdminProfile"
                     - $ref: "#/components/schemas/SchoolProfile"
                     - $ref: "#/components/schemas/CompanyProfile"
                     - $ref: "#/components/schemas/UmkmProfile"
-                    - $ref: "#/components/schemas/StudentProfileDetail"
 
     SuccessEnvelopeAuthLogin:
       allOf:
@@ -245,7 +244,7 @@ components:
                     - $ref: "#/components/schemas/SchoolProfile"
                     - $ref: "#/components/schemas/CompanyProfile"
                     - $ref: "#/components/schemas/UmkmProfile"
-                    - $ref: "#/components/schemas/StudentProfileDetail"
+                    - $ref: "#/components/schemas/StudentProfile"
                 requires_skill_setup:
                   type: boolean
                 next_step:
@@ -270,7 +269,7 @@ components:
                     - $ref: "#/components/schemas/SchoolProfile"
                     - $ref: "#/components/schemas/CompanyProfile"
                     - $ref: "#/components/schemas/UmkmProfile"
-                    - $ref: "#/components/schemas/StudentProfileDetail"
+                    - $ref: "#/components/schemas/StudentProfile"
                 requires_skill_setup:
                   type: boolean
                 next_step:
@@ -294,7 +293,7 @@ components:
                     - $ref: "#/components/schemas/SchoolProfile"
                     - $ref: "#/components/schemas/CompanyProfile"
                     - $ref: "#/components/schemas/UmkmProfile"
-                    - $ref: "#/components/schemas/StudentProfileDetail"
+                    - $ref: "#/components/schemas/StudentProfileRoleProfile"
 
     SuccessEnvelopeSchoolStoreStudent:
       allOf:
@@ -305,7 +304,12 @@ components:
               type: object
               properties:
                 user:
-                  $ref: "#/components/schemas/User"
+                  allOf:
+                    - $ref: "#/components/schemas/User"
+                    - type: object
+                      properties:
+                        student_profile:
+                          $ref: "#/components/schemas/StudentProfile"
 
     SuccessEnvelopeStudentList:
       allOf:
@@ -563,38 +567,71 @@ components:
 
     PaginationMeta:
       type: object
+      description: Metadata pagination standar Laravel.
       properties:
         current_page:
           type: integer
+          description: Halaman saat ini
+          example: 1
         last_page:
           type: integer
+          description: Halaman terakhir
+          example: 5
         per_page:
           type: integer
+          description: Jumlah item per halaman
+          example: 12
         total:
           type: integer
+          description: Total item di seluruh halaman
+          example: 55
         has_more_pages:
           type: boolean
+          description: Apakah masih ada halaman berikutnya
+          example: true
 
     User:
       type: object
+      description: Objek user dasar yang ada di setiap response autentikasi.
       properties:
         id:
           type: integer
+          description: ID unik user
+          example: 11
         name:
           type: string
+          description: Nama tampilan user
+          example: Budi Santoso
         email:
           nullable: true
           type: string
+          description: Email user (null untuk siswa)
+          example: budi@example.com
         role:
           type: string
+          description: |
+            Role user:
+            - admin: Administrator sistem
+            - sekolah: Akun sekolah
+            - mitra: Akun mitra (perusahaan/UMKM)
+            - siswa: Akun siswa
           enum: [admin, sekolah, mitra, siswa]
+          example: siswa
         mitra_type:
           nullable: true
           type: string
+          description: Tipe mitra (hanya jika role=mitra)
           enum: [perusahaan, umkm]
+          example: null
         account_status:
           type: string
+          description: |
+            Status akun:
+            - pending: Menunggu persetujuan admin
+            - active: Akun aktif
+            - rejected: Ditolak admin
           enum: [pending, active, rejected]
+          example: active
         is_active:
           type: boolean
         last_login_at:
@@ -839,6 +876,32 @@ components:
               items:
                 $ref: "#/components/schemas/StudentJobApplicationSummary"
 
+    StudentProfileRoleProfile:
+      allOf:
+        - $ref: "#/components/schemas/StudentProfile"
+        - type: object
+          properties:
+            skills:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentSkill"
+            experiences:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentExperience"
+            achievements:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentAchievement"
+            applications:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentApplication"
+            job_applications:
+              type: array
+              items:
+                $ref: "#/components/schemas/StudentJobApplicationSummary"
+
     StudentSkill:
       type: object
       properties:
@@ -1035,55 +1098,73 @@ components:
         role:
           type: string
           enum: [sekolah]
+          example: sekolah
         email:
           type: string
           format: email
+          example: smk@example.com
         password:
           type: string
           minLength: 8
           maxLength: 100
+          example: password123
         password_confirmation:
           type: string
+          example: password123
         school_name:
           type: string
+          maxLength: 255
+          example: SMK Negeri 1
         npsn:
           type: string
           minLength: 8
           maxLength: 8
+          example: "12345678"
         accreditation:
           type: string
           enum: [A, B, C, Belum Terakreditasi]
+          example: A
         address:
           type: string
+          example: Jl. Pendidikan No. 1
         expertise_fields:
           type: array
           items:
             type: string
             maxLength: 100
+          example: ["RPL", "TKJ"]
         logo:
           type: string
           format: binary
+          description: "Logo sekolah (file gambar wajib, maks 2 MB)"
         image_1:
           type: string
           format: binary
+          description: "Foto tambahan 1 (opsional, maks 2 MB)"
         image_2:
           type: string
           format: binary
+          description: "Foto tambahan 2 (opsional, maks 2 MB)"
         image_3:
           type: string
           format: binary
+          description: "Foto tambahan 3 (opsional, maks 2 MB)"
         image_4:
           type: string
           format: binary
+          description: "Foto tambahan 4 (opsional, maks 2 MB)"
         image_5:
           type: string
           format: binary
+          description: "Foto tambahan 5 (opsional, maks 2 MB)"
         short_description:
           type: string
           maxLength: 1000
+          example: SMK unggulan berfokus pada teknologi.
         operational_license:
           type: string
           format: binary
+          description: "Izin operasional sekolah (file PDF wajib, maks 4 MB)"
 
     RegisterMitraPerusahaanRequest:
       type: object
@@ -1105,56 +1186,79 @@ components:
         role:
           type: string
           enum: [mitra]
+          example: mitra
         mitra_type:
           type: string
           enum: [perusahaan]
+          example: perusahaan
         email:
           type: string
           format: email
+          example: corp@example.com
         password:
           type: string
           minLength: 8
+          maxLength: 100
+          example: password123
         password_confirmation:
           type: string
+          example: password123
         company_name:
           type: string
+          maxLength: 255
+          example: PT Maju Jaya
         nib:
           type: string
           minLength: 13
           maxLength: 13
+          example: "1234567890123"
         industry_sector:
           type: string
+          maxLength: 100
+          example: Teknologi Informasi
         employee_total_range:
           type: string
+          maxLength: 50
+          example: 51-200
         office_address:
           type: string
+          example: Jl. Sudirman No. 10
         website_or_social_url:
           type: string
           format: uri
+          example: https://example.com
         short_description:
           type: string
           maxLength: 1000
+          example: Perusahaan software enterprise.
         company_logo:
           type: string
           format: binary
+          description: "Logo perusahaan (file gambar wajib, maks 2 MB)"
         image_1:
           type: string
           format: binary
+          description: "Foto tambahan 1 (opsional, maks 2 MB)"
         image_2:
           type: string
           format: binary
+          description: "Foto tambahan 2 (opsional, maks 2 MB)"
         image_3:
           type: string
           format: binary
+          description: "Foto tambahan 3 (opsional, maks 2 MB)"
         image_4:
           type: string
           format: binary
+          description: "Foto tambahan 4 (opsional, maks 2 MB)"
         image_5:
           type: string
           format: binary
+          description: "Foto tambahan 5 (opsional, maks 2 MB)"
         kemenkumham_decree:
           type: string
           format: binary
+          description: "SK Kemenkumham (file PDF wajib, maks 4 MB)"
 
     RegisterMitraUmkmRequest:
       type: object
@@ -1180,53 +1284,74 @@ components:
         role:
           type: string
           enum: [mitra]
+          example: mitra
         mitra_type:
           type: string
           enum: [umkm]
+          example: umkm
         email:
           type: string
           format: email
+          example: umkm@example.com
         password:
           type: string
           minLength: 8
+          maxLength: 100
+          example: password123
         password_confirmation:
           type: string
+          example: password123
         business_name:
           type: string
+          maxLength: 255
+          example: UMKM Sejahtera
         owner_nik:
           type: string
           minLength: 16
           maxLength: 16
+          example: "3201234567890001"
         owner_personal_nib:
           type: string
+          example: "9876543210"
         business_type:
           type: string
+          maxLength: 100
+          example: Kuliner
         business_address:
           type: string
+          example: Jl. Pasar No. 5
         short_description:
           type: string
           maxLength: 1000
+          example: UMKM kuliner lokal.
         umkm_logo:
           type: string
           format: binary
+          description: "Logo UMKM (file gambar wajib, maks 2 MB)"
         owner_ktp_photo:
           type: string
           format: binary
+          description: "Foto KTP pemilik (file gambar wajib, maks 2 MB)"
         image_1:
           type: string
           format: binary
+          description: "Foto produk/usaha 1 (wajib, maks 2 MB)"
         image_2:
           type: string
           format: binary
+          description: "Foto produk/usaha 2 (wajib, maks 2 MB)"
         image_3:
           type: string
           format: binary
+          description: "Foto produk/usaha 3 (wajib, maks 2 MB)"
         image_4:
           type: string
           format: binary
+          description: "Foto produk/usaha 4 (wajib, maks 2 MB)"
         image_5:
           type: string
           format: binary
+          description: "Foto produk/usaha 5 (wajib, maks 2 MB)"
 
     LoginNonSiswaRequest:
       type: object
@@ -1235,14 +1360,14 @@ components:
         role:
           type: string
           enum: [admin, sekolah, mitra]
+          example: sekolah
         email:
           type: string
           format: email
+          example: school.a@kompeta.test
         password:
           type: string
-        device_name:
-          type: string
-          maxLength: 100
+          example: password123
 
     LoginSiswaRequest:
       type: object
@@ -1251,18 +1376,20 @@ components:
         role:
           type: string
           enum: [siswa]
+          example: siswa
         nisn:
           type: string
           minLength: 10
           maxLength: 10
+          example: "0002345678"
         school_origin:
           type: string
+          maxLength: 255
+          example: SMA Negeri 2 Jakarta
         unique_code:
           type: string
           maxLength: 16
-        device_name:
-          type: string
-          maxLength: 100
+          example: qzPSGd04erQblY8G
 
     StoreStudentRequest:
       type: object
@@ -1275,56 +1402,82 @@ components:
       properties:
         full_name:
           type: string
+          maxLength: 255
+          example: Budi Santoso
         nisn:
           type: string
           minLength: 10
           maxLength: 10
+          example: "0001234567"
         photo_profile:
           type: string
           format: binary
+          description: "Foto profil siswa (opsional, file gambar, maks 2 MB)"
         major:
           type: string
+          maxLength: 100
+          example: IPA
         school_origin:
           type: string
+          maxLength: 255
+          example: SMA Negeri 1 Bogor
         graduation_status:
           type: string
+          maxLength: 100
+          example: graduated
         class_year:
           type: string
           minLength: 4
           maxLength: 4
+          example: "2024"
         phone_number:
           type: string
           maxLength: 30
+          example: "082123456789"
         address:
           type: string
+          example: Bogor, Jawa Barat
 
     UpdateStudentRequest:
       type: object
       properties:
         full_name:
           type: string
+          maxLength: 255
+          example: Budi Santoso
         nisn:
           type: string
           minLength: 10
           maxLength: 10
+          example: "0001234567"
         photo_profile:
           type: string
           format: binary
+          description: "Foto profil siswa (opsional, file gambar, maks 2 MB)"
         major:
           type: string
+          maxLength: 100
+          example: IPA
         school_origin:
           type: string
+          maxLength: 255
+          example: SMA Negeri 1 Bogor
         graduation_status:
           type: string
+          maxLength: 100
+          example: graduated
         class_year:
           type: string
           minLength: 4
           maxLength: 4
+          example: "2025"
         phone_number:
           type: string
           maxLength: 30
+          example: "082123456789"
         address:
           type: string
+          example: Jakarta Selatan
 
     StoreStudentPortfolioItemRequest:
       type: object
@@ -1333,38 +1486,62 @@ components:
         type:
           type: string
           enum: [skill, experience, achievement, application]
+          description: "Tipe item portfolio"
+          example: skill
         title:
           type: string
           maxLength: 255
+          description: "Judul item (wajib untuk skill/experience/achievement)"
+          example: Laravel
         description:
           type: string
+          description: "Deskripsi item (wajib untuk experience/achievement)"
+          example: Mengembangkan API Laravel
         position:
           type: string
           maxLength: 255
+          description: "Posisi/jabatan (wajib untuk experience)"
+          example: Back-end Intern
         company_name:
           type: string
           maxLength: 255
+          description: "Nama perusahaan (wajib untuk experience/application)"
+          example: PT Maju Jaya
         start_date:
           type: string
           format: date
+          description: "Tanggal mulai (wajib untuk experience)"
+          example: "2024-01-01"
         end_date:
           type: string
           format: date
+          description: "Tanggal selesai (opsional untuk experience)"
+          example: "2024-03-31"
         achievement_date:
           type: string
           format: date
+          description: "Tanggal pencapaian (wajib untuk achievement)"
+          example: "2024-02-10"
         institution_name:
           type: string
           maxLength: 255
+          description: "Nama institusi pemberi (wajib untuk achievement)"
+          example: Disdik Provinsi
         role_type:
           type: string
           maxLength: 255
+          description: "Jenis posisi yang dilamar (wajib untuk application)"
+          example: Backend Intern
         submitted_at:
           type: string
           format: date
+          description: "Tanggal pengajuan lamaran (wajib untuk application)"
+          example: "2024-03-01"
         submit_status:
           type: string
           maxLength: 100
+          description: "Status pengajuan lamaran (wajib untuk application)"
+          example: submitted
 
     StoreStudentJobApplicationRequest:
       type: object
@@ -1372,12 +1549,17 @@ components:
       properties:
         job_vacancy_id:
           type: integer
+          example: 1
+          description: "ID lowongan kerja target (wajib)"
         cv:
           type: string
           format: binary
+          description: "File CV (wajib, PDF/DOC/DOCX, maks 4 MB)"
         cover_letter:
           type: string
           maxLength: 2000
+          example: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
+          description: "Surat lamaran teks (opsional, maks 2000 karakter)"
 
     UpdateStudentJobApplicationRequest:
       type: object
@@ -1385,9 +1567,12 @@ components:
         cv:
           type: string
           format: binary
+          description: "File CV pengganti (opsional, PDF/DOC/DOCX, maks 4 MB)"
         cover_letter:
           type: string
           maxLength: 2000
+          example: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
+          description: "Surat lamaran teks pengganti (opsional, maks 2000 karakter)"
 
     StorePartnershipProposalRequest:
       type: object
@@ -1395,17 +1580,21 @@ components:
       properties:
         target_user_id:
           type: integer
+          example: 2
+          description: "ID user target kemitraan (wajib)"
         proposal_pdf:
           type: string
           format: binary
-          description: File PDF proposal (maks 5 MB)
+          description: "File PDF proposal (wajib, maks 5 MB)"
         signature_file:
           type: string
           format: binary
-          description: File PDF tanda tangan/surat kuasa (maks 2 MB, hanya PDF)
+          description: "File PDF tanda tangan/surat kuasa (wajib, maks 2 MB)"
         notes:
           type: string
           maxLength: 2000
+          example: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
+          description: "Catatan tambahan (opsional, maks 2000 karakter)"
 
     UpdatePartnershipProposalRequest:
       type: object
@@ -1413,11 +1602,864 @@ components:
         proposal_pdf:
           type: string
           format: binary
-          description: File PDF proposal pengganti (maks 5 MB)
+          description: "File PDF proposal pengganti (opsional, maks 5 MB)"
         signature_file:
           type: string
           format: binary
-          description: File PDF tanda tangan pengganti (maks 2 MB, hanya PDF)
+          description: "File PDF tanda tangan pengganti (opsional, maks 2 MB)"
         notes:
           type: string
           maxLength: 2000
+          example: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
+          description: "Catatan tambahan pengganti (opsional, maks 2000 karakter)"
+
+    # ──────────────────────────────────────────────
+    # Schema: Explore / For You / Mitra / Schools
+    # ──────────────────────────────────────────────
+
+    ExploreJobCard:
+      type: object
+      description: Card lowongan pada halaman explore dan for-you.
+      properties:
+        id:
+          type: integer
+          description: ID lowongan
+          example: 1
+        slug:
+          type: string
+          description: Slug unik lowongan untuk URL
+          example: accounting-staff-abc123
+        position_name:
+          type: string
+          description: Nama posisi/jabatan lowongan
+          example: Accounting Staff
+        job_type:
+          type: string
+          description: Kode tipe pekerjaan
+          enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+          example: penuh_waktu
+        job_type_label:
+          type: string
+          description: Label tipe pekerjaan yang aman ditampilkan ke user
+          example: Penuh Waktu
+        work_policy:
+          type: string
+          description: Kode kebijakan kerja
+          enum: [kantor, hybrid, remote]
+          example: kantor
+        work_policy_label:
+          type: string
+          description: Label kebijakan kerja yang aman ditampilkan ke user
+          example: Kerja di kantor
+        created_at_human:
+          type: string
+          description: Waktu pembuatan dalam format relatif (bahasa Indonesia)
+          example: 5 jam yang lalu
+        salary_label:
+          type: string
+          description: Label gaji yang sudah diformat (atau "Gaji tidak ditampilkan")
+          example: Rp 5,7 jt-5,8 jt
+        mitra_name:
+          type: string
+          description: Nama mitra pemilik lowongan
+          example: PT Binajasa Sumber Sarana
+        mitra_type:
+          type: string
+          nullable: true
+          description: Tipe mitra pemilik lowongan
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        province:
+          type: string
+          nullable: true
+          description: Provinsi lokasi lowongan
+          example: DKI Jakarta
+        location:
+          type: string
+          nullable: true
+          description: Alamat lengkap mitra atau fallback ke provinsi
+          example: Jakarta Selatan, DKI Jakarta
+        skills:
+          type: array
+          description: Daftar nama skill yang dibutuhkan
+          items:
+            type: string
+          example: [MYOB, Excel]
+        benefits:
+          type: array
+          description: Daftar benefit/tunjangan lowongan
+          items:
+            type: string
+          example: [BPJS Kesehatan]
+        mitra_logo_url:
+          type: string
+          nullable: true
+          description: URL logo mitra
+          example: https://example.com/storage/logos/pt-binajasa.png
+
+    AboutCompany:
+      type: object
+      description: Informasi ringkas tentang perusahaan/mitra pemilik lowongan.
+      properties:
+        name:
+          type: string
+          description: Nama perusahaan/mitra
+          example: PT Binajasa Sumber Sarana
+        industry_sector:
+          type: string
+          nullable: true
+          description: Sektor industri
+          example: Outsourcing
+        employee_total_range:
+          type: string
+          nullable: true
+          description: Rentang jumlah karyawan
+          example: 501-1000
+        description:
+          type: string
+          nullable: true
+          description: Deskripsi singkat mitra
+          example: Perusahaan outsourcing terkemuka di Indonesia.
+        address:
+          type: string
+          nullable: true
+          description: Alamat kantor
+          example: Jakarta Selatan, DKI Jakarta
+        website_or_social_url:
+          type: string
+          nullable: true
+          description: URL website atau sosial media
+          example: https://instagram.com/binajasa
+        logo_url:
+          type: string
+          nullable: true
+          description: URL logo mitra
+          example: https://example.com/storage/logos/pt-binajasa.png
+        category_label:
+          type: string
+          description: Label kategori mitra (Perusahaan atau UMKM)
+          enum: [Perusahaan, UMKM]
+          example: Perusahaan
+
+    ExploreJobDetail:
+      type: object
+      description: Detail lengkap lowongan pada halaman explore.
+      properties:
+        id:
+          type: integer
+          example: 1
+        slug:
+          type: string
+          example: accounting-staff-abc123
+        position_name:
+          type: string
+          example: Accounting Staff
+        mitra_name:
+          type: string
+          example: PT Binajasa Sumber Sarana
+        mitra_type:
+          type: string
+          nullable: true
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        salary_label:
+          type: string
+          example: Rp 5,7 jt-5,8 jt
+        salary_min:
+          type: integer
+          nullable: true
+          description: Gaji minimum (dalam Rupiah)
+          example: 5700000
+        salary_max:
+          type: integer
+          nullable: true
+          description: Gaji maksimum (dalam Rupiah)
+          example: 5800000
+        is_salary_hidden:
+          type: boolean
+          description: Apakah gaji disembunyikan
+          example: false
+        category:
+          type: string
+          nullable: true
+          description: Kategori lowongan
+          example: Keuangan
+        job_type:
+          type: string
+          enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+          example: penuh_waktu
+        job_type_label:
+          type: string
+          example: Penuh Waktu
+        work_policy:
+          type: string
+          enum: [kantor, hybrid, remote]
+          example: kantor
+        work_policy_label:
+          type: string
+          example: Kerja di kantor
+        experience_level:
+          type: string
+          nullable: true
+          description: Kode level pengalaman
+          enum: [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+          example: fresh_graduate
+        experience_level_label:
+          type: string
+          nullable: true
+          description: Label level pengalaman
+          example: Fresh Graduate
+        created_at:
+          type: string
+          format: date-time
+          description: Waktu pembuatan dalam format ISO 8601
+          example: "2026-03-20T08:00:00+07:00"
+        created_at_human:
+          type: string
+          example: 3 hari yang lalu
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-03-22T10:00:00+07:00"
+        updated_at_human:
+          type: string
+          nullable: true
+          example: 1 hari yang lalu
+        share_link:
+          type: string
+          description: Link share ke frontend
+          example: https://kompeta.test/explore/accounting-staff-abc123
+        requirements:
+          type: string
+          nullable: true
+          description: Persyaratan lowongan (teks bebas)
+          example: Minimal Sarjana (S1) Akuntansi.
+        skills:
+          type: array
+          items:
+            type: string
+          example: [MYOB, Excel]
+        work_benefits:
+          type: array
+          items:
+            type: string
+          example: [BPJS Kesehatan]
+        managed_by:
+          type: string
+          description: Nama perusahaan pengelola lowongan
+          example: PT Binajasa Sumber Sarana
+        job_description:
+          type: string
+          nullable: true
+          description: Deskripsi lengkap pekerjaan
+          example: Mengelola laporan keuangan harian dan bulanan.
+        location:
+          type: string
+          nullable: true
+          example: Jakarta Selatan, DKI Jakarta
+        province:
+          type: string
+          nullable: true
+          example: DKI Jakarta
+        about_company:
+          $ref: "#/components/schemas/AboutCompany"
+
+    ForYouJobDetail:
+      type: object
+      description: Detail lowongan pada halaman for-you (mirip ExploreJobDetail tanpa salary detail).
+      properties:
+        id:
+          type: integer
+          example: 4
+        slug:
+          type: string
+          example: junior-qa-tester-abc123
+        position_name:
+          type: string
+          example: Junior QA Tester
+        mitra_name:
+          type: string
+          example: PT Surya Data Nusantara
+        mitra_type:
+          type: string
+          nullable: true
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        mitra_logo_url:
+          type: string
+          nullable: true
+          example: https://example.com/storage/logo.png
+        job_type:
+          type: string
+          enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+          example: penuh_waktu
+        job_type_label:
+          type: string
+          example: Penuh Waktu
+        work_policy:
+          type: string
+          enum: [kantor, hybrid, remote]
+          example: remote
+        work_policy_label:
+          type: string
+          example: Kerja remote/dari rumah
+        created_at_human:
+          type: string
+          example: 4 hari yang lalu
+        updated_at_human:
+          type: string
+          nullable: true
+          example: 1 hari yang lalu
+        share_link:
+          type: string
+          example: https://kompeta.test/for-you/junior-qa-tester-abc123
+        requirements:
+          type: string
+          nullable: true
+          example: Mengerti dasar software testing.
+        skills:
+          type: array
+          items:
+            type: string
+          example: [Manual Testing, Postman]
+        work_benefits:
+          type: array
+          items:
+            type: string
+          example: [Remote Allowance, Learning Budget]
+        managed_by:
+          type: string
+          example: PT Surya Data Nusantara
+        job_description:
+          type: string
+          nullable: true
+          example: Menguji fitur aplikasi web dan mobile serta menuliskan bug report.
+        location:
+          type: string
+          nullable: true
+          example: Bandung, Jawa Barat
+        province:
+          type: string
+          nullable: true
+          example: Jawa Barat
+        about_company:
+          $ref: "#/components/schemas/AboutCompany"
+
+    FilterOptionItem:
+      type: object
+      description: Item opsi filter (value + label).
+      properties:
+        value:
+          type: string
+          description: Nilai filter (dikirim sebagai query parameter)
+          example: penuh_waktu
+        label:
+          type: string
+          description: Label yang ditampilkan di UI
+          example: Penuh Waktu
+
+    ExploreFilterOptions:
+      type: object
+      description: Opsi-opsi filter yang tersedia pada halaman explore.
+      properties:
+        job_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterOptionItem"
+        work_policies:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterOptionItem"
+        provinces:
+          type: array
+          description: Daftar nama provinsi
+          items:
+            type: string
+          example: [DKI Jakarta, Jawa Barat, Jawa Tengah]
+        experience_levels:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterOptionItem"
+        updated_within:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterOptionItem"
+
+    ForYouSortOptions:
+      type: object
+      description: Opsi urutan pada halaman for-you.
+      properties:
+        sort_by:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterOptionItem"
+
+    FeaturedVacancy:
+      type: object
+      nullable: true
+      description: Lowongan unggulan milik mitra (opsional, ditampilkan di card mitra).
+      properties:
+        slug:
+          type: string
+          example: teknisi-pest-control-abc123
+        position_name:
+          type: string
+          example: Teknisi Pest Control
+        salary_label:
+          type: string
+          example: Rp 3,5 jt-4,5 jt
+        job_type_label:
+          type: string
+          example: Penuh Waktu
+        experience_level_label:
+          type: string
+          nullable: true
+          example: Fresh Graduate
+        skills:
+          type: array
+          items:
+            type: string
+          example: [Pest Control, K3]
+
+    MitraCard:
+      type: object
+      description: Card mitra pada halaman daftar mitra.
+      properties:
+        id:
+          type: integer
+          description: ID user mitra
+          example: 10
+        mitra_type:
+          type: string
+          description: Tipe mitra
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        name:
+          type: string
+          description: Nama mitra (company_name atau business_name)
+          example: PT Mitra Tata Lingkungan Baru
+        logo_url:
+          type: string
+          nullable: true
+          description: URL logo mitra
+          example: https://example.com/storage/logos/pt-mtlb.png
+        address:
+          type: string
+          nullable: true
+          description: Alamat mitra
+          example: "Bogor, Jawa Barat, Indonesia"
+        industry_sector:
+          type: string
+          nullable: true
+          description: Sektor industri atau tipe bisnis
+          example: Environmental Services
+        vacancy_count:
+          type: integer
+          description: Jumlah lowongan aktif (published)
+          example: 4
+        last_active:
+          type: string
+          nullable: true
+          description: Waktu aktivitas terakhir dalam format relatif
+          example: 5 jam yang lalu
+        featured_vacancy:
+          nullable: true
+          $ref: "#/components/schemas/FeaturedVacancy"
+
+    MitraDetail:
+      type: object
+      description: Detail lengkap mitra beserta lowongan dan mitra serupa.
+      properties:
+        id:
+          type: integer
+          example: 10
+        mitra_type:
+          type: string
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        name:
+          type: string
+          example: PT Mitra Tata Lingkungan Baru
+        logo_url:
+          type: string
+          nullable: true
+          example: https://example.com/storage/logos/pt-mtlb.png
+        short_description:
+          type: string
+          nullable: true
+          description: Deskripsi singkat mitra
+          example: Perusahaan yang bergerak di bidang pengolahan limbah Non B3.
+        address:
+          type: string
+          nullable: true
+          example: "Bogor, Jawa Barat, Indonesia"
+        industry_sector:
+          type: string
+          nullable: true
+          example: Environmental Services
+        employee_total_range:
+          type: string
+          nullable: true
+          description: Rentang jumlah karyawan (hanya perusahaan)
+          example: "51 - 200"
+        website_or_social_url:
+          type: string
+          nullable: true
+          example: https://instagram.com/ptmtlb
+        gallery:
+          type: array
+          description: URL gambar galeri (maks 5)
+          items:
+            type: string
+          example:
+            - https://example.com/storage/gallery/img1.jpg
+            - https://example.com/storage/gallery/img2.jpg
+        vacancy_count:
+          type: integer
+          example: 4
+        vacancies:
+          type: array
+          description: Daftar semua lowongan aktif mitra
+          items:
+            $ref: "#/components/schemas/ExploreJobCard"
+        similar_mitra:
+          type: array
+          description: Hingga 5 mitra serupa berdasarkan sektor industri
+          items:
+            $ref: "#/components/schemas/MitraCard"
+
+    SchoolCard:
+      type: object
+      description: Card sekolah pada halaman daftar sekolah.
+      properties:
+        id:
+          type: integer
+          description: ID user sekolah
+          example: 5
+        school_name:
+          type: string
+          description: Nama sekolah
+          example: SMA Negeri 1 Bogor
+        address:
+          type: string
+          nullable: true
+          description: Alamat sekolah
+          example: "Bogor, Jawa Barat, Indonesia"
+        logo_url:
+          type: string
+          nullable: true
+          description: URL logo sekolah
+          example: https://example.com/storage/logos/sma-negeri-1-bogor.png
+        expertise_fields:
+          type: array
+          description: Daftar jurusan/kompetensi keahlian
+          items:
+            type: string
+          example: [IPA, IPS, Bahasa]
+
+    SchoolStudentSummary:
+      type: object
+      description: Ringkasan data siswa ditampilkan di detail sekolah.
+      properties:
+        id:
+          type: integer
+          example: 42
+        full_name:
+          type: string
+          example: Budi Santoso
+        major:
+          type: string
+          example: IPA
+        graduation_status:
+          type: string
+          description: "graduated = Siswa telah lulus, active = Siswa masih aktif"
+          enum: [graduated, active]
+          example: graduated
+        photo_profile_url:
+          type: string
+          nullable: true
+          example: https://example.com/storage/photos/budi.jpg
+
+    SchoolAchievementSummary:
+      type: object
+      description: Prestasi siswa sekolah.
+      properties:
+        title:
+          type: string
+          example: Juara 1 Olimpiade Matematika
+        description:
+          type: string
+          nullable: true
+          example: Pencapaian pada OSN Tingkat Nasional 2025
+
+    SchoolPartnershipSummary:
+      type: object
+      description: Ringkasan pengajuan kemitraan pada detail sekolah.
+      properties:
+        mitra_user_id:
+          type: integer
+          example: 2
+        nama_mitra:
+          type: string
+          nullable: true
+          example: PT Bina Jasa
+        sektor_atau_tipe:
+          type: string
+          nullable: true
+          example: Outsourcing
+        mitra_tipe:
+          type: string
+          nullable: true
+          enum: [perusahaan, umkm]
+          example: perusahaan
+        tanggal_submit:
+          type: string
+          nullable: true
+          format: date-time
+          description: Tanggal submit proposal (ISO 8601)
+          example: "2026-03-22T08:30:00+07:00"
+        status_submit:
+          type: string
+          enum: [draft, submitted]
+          example: submitted
+
+    SchoolDetail:
+      type: object
+      description: Detail lengkap sekolah beserta siswa, prestasi, dan pengajuan mitra.
+      properties:
+        id:
+          type: integer
+          example: 5
+        school_name:
+          type: string
+          example: SMA Negeri 1 Bogor
+        address:
+          type: string
+          nullable: true
+          example: "Bogor, Jawa Barat, Indonesia"
+        logo_url:
+          type: string
+          nullable: true
+          example: https://example.com/storage/logos/sma-negeri-1-bogor.png
+        gallery:
+          type: array
+          items:
+            type: string
+          example:
+            - https://example.com/storage/schools/img1.jpg
+            - https://example.com/storage/schools/img2.jpg
+        short_description:
+          type: string
+          nullable: true
+          example: SMA Negeri 1 Bogor adalah sekolah menengah atas terkemuka di Bogor.
+        accreditation:
+          type: string
+          nullable: true
+          description: "Nilai akreditasi: A, B, C, atau Belum Terakreditasi"
+          example: A
+        expertise_fields:
+          type: array
+          items:
+            type: string
+          example: [IPA, IPS, Bahasa]
+        student_achievements:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchoolAchievementSummary"
+        students:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchoolStudentSummary"
+        pengajuan_mitra:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchoolPartnershipSummary"
+
+    # ──────────────────────────────────────────────
+    # Envelope schemas untuk Explore/ForYou/Mitra/Schools
+    # ──────────────────────────────────────────────
+
+    SuccessEnvelopeExploreJobList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ExploreJobCard"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeExploreJobDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                job:
+                  $ref: "#/components/schemas/ExploreJobDetail"
+                recommendations:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ExploreJobCard"
+
+    SuccessEnvelopeExploreFilters:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/ExploreFilterOptions"
+
+    SuccessEnvelopeForYouJobList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ExploreJobCard"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeForYouJobDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                job:
+                  $ref: "#/components/schemas/ForYouJobDetail"
+
+    SuccessEnvelopeForYouSortOptions:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/ForYouSortOptions"
+
+    SuccessEnvelopeMitraList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/MitraCard"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeMitraDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/MitraDetail"
+
+    SuccessEnvelopeSchoolList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/SchoolCard"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
+
+    SuccessEnvelopeSchoolDetail:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/SchoolDetail"
+
+    # ──────────────────────────────────────────────
+    # Global Error Responses
+    # ──────────────────────────────────────────────
+
+    ErrorEnvelope401:
+      allOf:
+        - $ref: "#/components/schemas/ErrorEnvelope"
+      example:
+        success: false
+        message: Unauthenticated.
+        data: null
+        errors: null
+        meta: null
+
+    ErrorEnvelope403:
+      allOf:
+        - $ref: "#/components/schemas/ErrorEnvelope"
+      example:
+        success: false
+        message: Anda tidak memiliki akses ke resource ini.
+        data: null
+        errors: null
+        meta: null
+
+    ErrorEnvelope404:
+      allOf:
+        - $ref: "#/components/schemas/ErrorEnvelope"
+      example:
+        success: false
+        message: Data tidak ditemukan.
+        data: null
+        errors: null
+        meta: null
+
+    ErrorEnvelope422:
+      allOf:
+        - $ref: "#/components/schemas/ErrorEnvelope"
+      example:
+        success: false
+        message: Validasi gagal.
+        data: null
+        errors:
+          field_name:
+            - The field name is required.
+        meta: null
+
+    ErrorEnvelope500:
+      type: object
+      description: Terjadi kesalahan internal pada server.
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Terjadi kesalahan server.
+        data:
+          nullable: true
+          example: null
+        errors:
+          nullable: true
+          example: null
+        meta:
+          nullable: true
+          example: null

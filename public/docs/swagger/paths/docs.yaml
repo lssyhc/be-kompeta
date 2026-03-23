@@ -3,6 +3,10 @@ paths:
     get:
       tags: [Docs]
       summary: Ambil file spesifikasi OpenAPI mentah
+      description: |
+        Mengembalikan file spesifikasi OpenAPI 3.0.3 dalam format YAML mentah.
+        Endpoint publik, tidak memerlukan autentikasi.
+        Berguna untuk tool Swagger UI atau generator code klien.
       security: []
       responses:
         "200":
@@ -13,14 +17,20 @@ paths:
                 type: string
                 example: "openapi: 3.0.3"
         "404":
-          description: File OpenAPI tidak ditemukan
+          description: File OpenAPI tidak ditemukan di server
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
               example:
                 success: false
                 message: OpenAPI spec tidak ditemukan.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

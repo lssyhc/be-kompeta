@@ -17,8 +17,7 @@ Content-Type: application/json
 {
   "role": "admin",
   "email": "{{adminEmail}}",
-  "password": "{{adminPassword}}",
-  "device_name": "rest-client"
+  "password": "{{adminPassword}}"
 }
 
 ###

@@ -6,11 +6,13 @@ paths:
       description: |
         Endpoint profile universal untuk semua role.
         Field `role_profile` diisi dari tabel profile sesuai role user:
-        - admin -> admin_profiles
-        - sekolah -> school_profiles
-        - mitra perusahaan -> company_profiles
-        - mitra umkm -> umkm_profiles
-        - siswa -> student_profiles (+ portfolio terkait + job_applications)
+        - **admin** → `admin_profiles` (`full_name`, `avatar_path`, `avatar_url`)
+        - **sekolah** → `school_profiles` (`school_name`, `npsn`, `address`, `accreditation`, `expertise_fields`, `short_description`, dll.)
+        - **mitra perusahaan** → `company_profiles` (`company_name`, `nib`, `industry_sector`, `employee_total_range`, `office_address`, `short_description`, dll.)
+        - **mitra umkm** → `umkm_profiles` (`business_name`, `owner_nik`, `business_type`, `business_address`, `short_description`, dll.)
+        - **siswa** → `student_profiles` + `job_applications` (`full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`, `description`, `phone_number`, `address`, dll.)
+
+        Untuk siswa, `role_profile` juga menyertakan `job_applications` — daftar lamaran kerja aktif.
       responses:
         "200":
           description: Profil berhasil diambil
@@ -18,38 +20,82 @@ paths:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeProfile"
-              example:
-                success: true
-                message: Profil berhasil diambil.
-                data:
-                  user:
-                    id: 1
-                    name: System Admin
-                    email: admin@kompeta.test
-                    role: admin
-                    mitra_type: null
-                    account_status: active
-                    is_active: true
-                  role_profile:
-                    id: 1
-                    user_id: 1
-                    full_name: System Admin
-                    avatar_path: null
-                    avatar_url: null
-                errors: null
-                meta: null
+              examples:
+                admin:
+                  summary: Response profile admin
+                  value:
+                    success: true
+                    message: Profil berhasil diambil.
+                    data:
+                      user:
+                        id: 1
+                        name: System Admin
+                        email: admin@kompeta.test
+                        role: admin
+                        mitra_type: null
+                        account_status: active
+                        is_active: true
+                        last_login_at: "2026-06-01T10:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 1
+                        full_name: System Admin
+                        avatar_path: null
+                        avatar_url: null
+                    errors: null
+                    meta: null
+                siswa:
+                  summary: Response profile siswa (termasuk job_applications)
+                  value:
+                    success: true
+                    message: Profil berhasil diambil.
+                    data:
+                      user:
+                        id: 11
+                        name: Budi Santoso
+                        email: student.a1@kompeta.test
+                        role: siswa
+                        mitra_type: null
+                        account_status: active
+                        is_active: true
+                        last_login_at: "2026-06-01T09:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 11
+                        full_name: Budi Santoso
+                        nisn: "0001234567"
+                        major: IPA
+                        school_origin: SMA Negeri 1 Bogor
+                        graduation_status: graduated
+                        class_year: "2024"
+                        description: Siswa berprestasi dengan fokus bidang sains dan data.
+                        phone_number: "082123456789"
+                        address: Bogor, Jawa Barat
+                        job_applications:
+                          - company_name: PT Binajasa Sumber Sarana
+                            role_type: Accounting Staff
+                            submitted_at: "2026-03-19"
+                            status: submitted
+                    errors: null
+                    meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
     put:
       tags: [Profile]
@@ -60,20 +106,29 @@ paths:
         - `user` (opsional): data umum user (contoh: `name`)
         - `profile` (opsional): data profile spesifik role
 
-        Contoh field `profile` per role:
-        - admin: `full_name`
-        - sekolah: `short_description`, `address`, `accreditation`, `expertise_fields`
-        - mitra perusahaan: `short_description`, `office_address`, `website_or_social_url`, `industry_sector`, `employee_total_range`
-        - mitra umkm: `short_description`, `business_address`, `business_type`, `owner_personal_nib`
-        - siswa: `description`, `phone_number`, `address`, `class_year`
+        **Field `profile` per role:**
+        | Role                | Field yang diterima |
+        |---------------------|---------------------|
+        | admin               | `full_name` |
+        | sekolah             | `short_description`, `address`, `accreditation`, `expertise_fields` |
+        | mitra perusahaan    | `short_description`, `office_address`, `website_or_social_url`, `industry_sector`, `employee_total_range` |
+        | mitra umkm          | `short_description`, `business_address`, `business_type`, `owner_personal_nib` |
+        | siswa               | `description`, `phone_number`, `address`, `class_year` |
 
-        Kompatibilitas siswa:
-        - Selain format `profile.{field}`, siswa juga bisa kirim format lama (`description`, `phone_number`, `address`, `class_year`) di level root.
+        **Kompatibilitas siswa (legacy format):**
+        Selain format nested `profile.{field}`, siswa juga bisa mengirim field di level root:
+        ```json
+        {
+          "description": "...",
+          "phone_number": "...",
+          "address": "...",
+          "class_year": "2026"
+        }
+        ```
+        Kedua format valid dan menghasilkan response yang sama.
 
-        Response sukses untuk semua role seragam:
-        - `message`: `Profil berhasil diperbarui.`
-        - `data.user`
-        - `data.role_profile`
+        **Response sukses:**
+        Response identik dengan `GET /profile` — mengembalikan `user` dan `role_profile` yang sudah diperbarui.
       requestBody:
         required: false
         content:
@@ -83,29 +138,36 @@ paths:
               properties:
                 user:
                   type: object
+                  description: Data umum user yang ingin diperbarui
                   properties:
                     name:
                       type: string
                       maxLength: 255
+                      description: Nama tampilan user
                 profile:
                   type: object
+                  description: Data profile spesifik role (lihat tabel di atas)
                   additionalProperties: true
                 description:
                   type: string
                   nullable: true
                   maxLength: 2000
+                  description: "[Siswa legacy format] Deskripsi diri siswa"
                 phone_number:
                   type: string
                   nullable: true
                   maxLength: 30
+                  description: "[Siswa legacy format] Nomor telepon siswa"
                 address:
                   type: string
                   nullable: true
+                  description: "[Siswa legacy format] Alamat siswa"
                 class_year:
                   type: string
                   nullable: true
                   minLength: 4
                   maxLength: 4
+                  description: "[Siswa legacy format] Tahun kelas siswa (4 digit, contoh: 2026)"
             examples:
               admin:
                 summary: Update profile admin
@@ -135,15 +197,23 @@ paths:
                     website_or_social_url: https://example.com
                     industry_sector: Teknologi Informasi
                     employee_total_range: 51-200
+              mitra_umkm:
+                summary: Update profile mitra UMKM
+                value:
+                  profile:
+                    short_description: UMKM kuliner lokal yang berkembang.
+                    business_address: Jl. Pasar No. 5
+                    business_type: Kuliner
+                    owner_personal_nib: "9876543210"
               siswa:
-                summary: Update profile siswa
+                summary: Update profile siswa (legacy format)
                 value:
                   description: Siswa RPL fokus backend Laravel.
                   phone_number: "081234567890"
                   address: Jakarta Selatan
                   class_year: "2026"
               siswa_nested:
-                summary: Update profile siswa (format nested)
+                summary: Update profile siswa (nested format)
                 value:
                   profile:
                     description: Siswa RPL fokus backend Laravel.
@@ -159,7 +229,7 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeProfile"
               examples:
                 admin:
-                  summary: Update profile admin
+                  summary: Response update profile admin
                   value:
                     success: true
                     message: Profil berhasil diperbarui.
@@ -172,6 +242,7 @@ paths:
                         mitra_type: null
                         account_status: active
                         is_active: true
+                        last_login_at: "2026-06-01T10:00:00.000000Z"
                       role_profile:
                         id: 1
                         user_id: 1
@@ -181,44 +252,45 @@ paths:
                     errors: null
                     meta: null
                 siswa:
-                  summary: Update profile siswa
+                  summary: Response update profile siswa
                   value:
                     success: true
                     message: Profil berhasil diperbarui.
                     data:
                       user:
-                        id: 20
-                        name: Siswa Uji
-                        email: null
+                        id: 11
+                        name: Budi Santoso
+                        email: student.a1@kompeta.test
                         role: siswa
                         mitra_type: null
                         account_status: active
                         is_active: true
+                        last_login_at: "2026-06-01T09:00:00.000000Z"
                       role_profile:
-                        id: 10
-                        user_id: 20
-                        full_name: Siswa Uji
-                        nisn: "1112223334"
-                        major: RPL
-                        school_origin: SMK Negeri 1
-                        graduation_status: Belum Lulus
-                        class_year: "2026"
-                        description: Siswa RPL fokus backend Laravel.
-                        phone_number: "081234567890"
-                        address: Jakarta Selatan
+                        id: 1
+                        user_id: 11
+                        full_name: Budi Santoso
+                        nisn: "0001234567"
+                        major: IPA
+                        school_origin: SMA Negeri 1 Bogor
+                        graduation_status: graduated
+                        class_year: "2024"
+                        description: Siswa berprestasi dengan fokus bidang sains dan data.
+                        phone_number: "082123456789"
+                        address: Bogor, Jawa Barat
                         job_applications:
-                          - company_name: PT Bina Jasa
-                            role_type: Backend Intern
-                            submitted_at: "2026-03-22"
-                            status: applied
+                          - company_name: PT Binajasa Sumber Sarana
+                            role_type: Accounting Staff
+                            submitted_at: "2026-03-19"
+                            status: submitted
                     errors: null
                     meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
@@ -230,7 +302,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
@@ -239,3 +311,9 @@ paths:
                   profile.full_name:
                     - The profile.full name field must be a string.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

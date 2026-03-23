@@ -314,8 +314,7 @@ Content-Type: application/json
 {
   "role": "sekolah",
   "email": "smk.negeri1@example.com",
-  "password": "password123",
-  "device_name": "rest-client"
+  "password": "password123"
 }
 
 ###
@@ -333,8 +332,7 @@ Content-Type: application/json
 {
   "role": "mitra",
   "email": "corp.majujaya@example.com",
-  "password": "password123",
-  "device_name": "rest-client"
+  "password": "password123"
 }
 
 ###
@@ -352,8 +350,7 @@ Content-Type: application/json
 {
   "role": "mitra",
   "email": "umkm.budi@example.com",
-  "password": "password123",
-  "device_name": "rest-client"
+  "password": "password123"
 }
 
 ###
@@ -372,8 +369,7 @@ Content-Type: application/json
 {
   "role": "admin",
   "email": "admin@kompeta.test",
-  "password": "admin12345",
-  "device_name": "rest-client"
+  "password": "admin12345"
 }
 
 ###
@@ -426,8 +422,7 @@ Content-Type: application/json
   "role": "siswa",
   "nisn": "1234567890",
   "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "GANTIDULU",
-  "device_name": "rest-client"
+  "unique_code": "GANTIDULU"
 }
 
 ###
@@ -443,8 +438,7 @@ Content-Type: application/json
 {
   "role": "sekolah",
   "email": "salah@example.com",
-  "password": "passwordsalah",
-  "device_name": "rest-client"
+  "password": "passwordsalah"
 }
 
 ###
@@ -461,8 +455,7 @@ Content-Type: application/json
   "role": "siswa",
   "nisn": "1234567890",
   "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "SALAHKODE",
-  "device_name": "rest-client"
+  "unique_code": "SALAHKODE"
 }
 
 ###

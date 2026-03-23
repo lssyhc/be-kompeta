@@ -12,8 +12,7 @@ Content-Type: application/json
 {
   "role": "sekolah",
   "email": "school.b@kompeta.test",
-  "password": "password123",
-  "device_name": "rest-client"
+  "password": "password123"
 }
 
 ###

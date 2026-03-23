@@ -3,6 +3,20 @@ paths:
     get:
       tags: [For You]
       summary: List rekomendasi lowongan untuk halaman for you
+      description: |
+        Menampilkan daftar lowongan yang direkomendasikan berdasarkan preferensi user.
+        Endpoint ini bersifat publik — tidak memerlukan token.
+        Namun jika user mengirim Bearer token siswa yang valid, sistem akan otomatis
+        menambahkan skill dari profil siswa ke dalam scoring rekomendasi.
+
+        Algoritma scoring mempertimbangkan:
+        1. Kecocokan skill (dari query `preferred_skills[]` + profil siswa jika login)
+        2. Kecocokan work policy
+        3. Kecocokan job type
+        4. Kecocokan provinsi
+      security:
+        - {}
+        - bearerAuth: []
       parameters:
         - in: query
           name: sort_by
@@ -11,13 +25,21 @@ paths:
             enum:
               [paling_relevan, baru_ditambahkan, remote_wfh, hybrid, part_time]
             default: paling_relevan
+          description: |
+            Urutan tampilan lowongan:
+            - paling_relevan: Berdasarkan skor kecocokan preferensi (default)
+            - baru_ditambahkan: Terbaru berdasarkan created_at
+            - remote_wfh: Prioritaskan remote lalu hybrid
+            - hybrid: Prioritaskan hybrid lalu remote
+            - part_time: Prioritaskan paruh_waktu lalu freelance
         - in: query
           name: preferred_skills[]
           schema:
             type: array
             items:
               type: string
-          description: Preferensi skill (opsional, untuk mode publik tanpa login)
+          description: Preferensi skill (opsional, untuk mode publik tanpa login). Jika login sebagai siswa, skill profil otomatis ditambahkan.
+          example: [Laravel, React]
         - in: query
           name: preferred_work_policies[]
           schema:
@@ -25,6 +47,7 @@ paths:
             items:
               type: string
               enum: [kantor, hybrid, remote]
+          description: Preferensi kebijakan kerja (multi-select)
         - in: query
           name: preferred_job_types[]
           schema:
@@ -32,32 +55,41 @@ paths:
             items:
               type: string
               enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+          description: Preferensi tipe pekerjaan (multi-select)
         - in: query
           name: preferred_province
           schema:
             type: string
+          description: Preferensi provinsi (satu nilai)
+          example: Jawa Barat
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
         - in: query
           name: per_page
           schema:
             type: integer
             minimum: 1
             maximum: 50
+            default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
       responses:
         "200":
           description: Daftar rekomendasi lowongan berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeForYouJobList"
               example:
                 success: true
                 message: Daftar rekomendasi lowongan berhasil diambil.
                 data:
                   - id: 4
-                    slug: junior-qa-tester-abc123
+                    slug: junior-qa-tester-remote
                     position_name: Junior QA Tester
                     job_type: penuh_waktu
                     job_type_label: Penuh Waktu
@@ -69,8 +101,9 @@ paths:
                     mitra_type: perusahaan
                     province: Jawa Barat
                     location: Bandung, Jawa Barat
-                    skills: [Manual Testing, Postman]
-                    benefits: [Learning Budget]
+                    skills: [Manual Testing, Test Case Writing, Postman]
+                    benefits: [Remote Allowance, Learning Budget]
+                    mitra_logo_url: https://via.placeholder.com/200x200?text=Surya
                 errors: null
                 meta:
                   pagination:
@@ -80,50 +113,72 @@ paths:
                     total: 1
                     has_more_pages: false
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (parameter query tidak valid)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  sort_by:
+                    - The selected sort by is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/for-you/jobs/{slug}:
     get:
       tags: [For You]
-      summary: Detail lowongan halaman for you (ringkas)
+      summary: Detail lowongan halaman for you
+      description: |
+        Menampilkan detail lengkap sebuah lowongan berdasarkan slug
+        dengan format response khusus halaman for-you (termasuk mitra_logo_url, tanpa salary detail mentah).
+      security: []
       parameters:
         - in: path
           name: slug
           required: true
           schema:
             type: string
+          description: Slug unik lowongan
+          example: junior-qa-tester-remote
       responses:
         "200":
           description: Detail rekomendasi lowongan berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeForYouJobDetail"
               example:
                 success: true
                 message: Detail rekomendasi lowongan berhasil diambil.
                 data:
                   job:
                     id: 4
-                    slug: junior-qa-tester-abc123
+                    slug: junior-qa-tester-remote
                     position_name: Junior QA Tester
                     mitra_name: PT Surya Data Nusantara
                     mitra_type: perusahaan
-                    mitra_logo_url: https://example.com/storage/logo.png
+                    mitra_logo_url: https://via.placeholder.com/200x200?text=Surya
                     job_type: penuh_waktu
                     job_type_label: Penuh Waktu
                     work_policy: remote
                     work_policy_label: Kerja remote/dari rumah
-                    created_at_human: 8 hari yang lalu
+                    created_at_human: 4 hari yang lalu
                     updated_at_human: 4 hari yang lalu
-                    share_link: https://example.test/for-you/junior-qa-tester-abc123
-                    requirements: Mengerti dasar software testing.
+                    share_link: https://kompeta.test/for-you/junior-qa-tester-remote
+                    requirements: "Mengerti dasar-dasar QA manual.\nBisa menulis test case.\nMenguasai Postman."
                     skills: [Manual Testing, Test Case Writing, Postman]
                     work_benefits: [Remote Allowance, Learning Budget]
                     managed_by: PT Surya Data Nusantara
-                    job_description: Menguji fitur aplikasi web dan mobile serta menuliskan bug report.
+                    job_description: Menguji fitur aplikasi web dan mobile, menulis test case dan bug report.
                     location: Bandung, Jawa Barat
                     province: Jawa Barat
                     about_company:
@@ -133,7 +188,7 @@ paths:
                       description: Mitra digitalisasi operasional dan pengolahan data untuk bisnis menengah.
                       address: Bandung, Jawa Barat
                       website_or_social_url: https://example.com/surya-data
-                      logo_url: https://example.com/storage/profiles/companies/logos/surya-data.png
+                      logo_url: https://via.placeholder.com/200x200?text=Surya
                       category_label: Perusahaan
                 errors: null
                 meta: null
@@ -142,17 +197,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/for-you/sort-options:
     get:
       tags: [For You]
       summary: Opsi urutan pada halaman for you
+      description: |
+        Mengembalikan daftar opsi pengurutan yang tersedia pada halaman for-you.
+        Digunakan frontend untuk merender dropdown sort.
+      security: []
       responses:
         "200":
           description: Opsi urutan for you berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeForYouSortOptions"
               example:
                 success: true
                 message: Opsi urutan for you berhasil diambil.
@@ -170,3 +243,9 @@ paths:
                       label: Part-time
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

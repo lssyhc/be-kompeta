@@ -22,7 +22,6 @@ class LoginRequest extends FormRequest
                 User::ROLE_MITRA,
                 User::ROLE_SISWA,
             ])],
-            'device_name' => ['nullable', 'string', 'max:100'],
         ];
 
         if ($this->input('role') === User::ROLE_SISWA) {

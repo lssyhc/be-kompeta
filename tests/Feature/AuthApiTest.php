@@ -73,7 +73,6 @@ class AuthApiTest extends TestCase
             'role' => User::ROLE_SEKOLAH,
             'email' => 'pending-school@example.com',
             'password' => 'password123',
-            'device_name' => 'phpunit',
         ]);
 
         $response->assertStatus(403)
@@ -481,7 +480,6 @@ class AuthApiTest extends TestCase
             'nisn' => '1234567890',
             'school_origin' => 'SMK Negeri 1',
             'unique_code' => 'ABC123XY',
-            'device_name' => 'phpunit',
         ]);
 
         $response->assertStatus(200)
@@ -531,7 +529,6 @@ class AuthApiTest extends TestCase
             'nisn' => '5556667778',
             'school_origin' => 'SMK Negeri 2',
             'unique_code' => 'ZXCV1234',
-            'device_name' => 'phpunit',
         ]);
 
         $response->assertStatus(200)
@@ -554,7 +551,6 @@ class AuthApiTest extends TestCase
             'role' => User::ROLE_SEKOLAH,
             'email' => 'school@example.com',
             'password' => 'password123',
-            'device_name' => 'phpunit',
         ]);
 
         $response->assertStatus(200)

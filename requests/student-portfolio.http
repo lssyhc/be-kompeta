@@ -23,8 +23,7 @@ Content-Type: application/json
   "role": "siswa",
   "nisn": "1234567890",
   "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "GANTIDULU",
-  "device_name": "rest-client"
+  "unique_code": "GANTIDULU"
 }
 
 ###

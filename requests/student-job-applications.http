@@ -13,8 +13,7 @@ Content-Type: application/json
   "role": "siswa",
   "nisn": "0001234567",
   "school_origin": "SMA Negeri 1 Bogor",
-  "unique_code": "BUDI0001234X9YZ",
-  "device_name": "rest-client"
+  "unique_code": "BUDI0001234X9YZ"
 }
 
 ###

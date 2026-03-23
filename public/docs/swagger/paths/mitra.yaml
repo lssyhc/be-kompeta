@@ -7,27 +7,31 @@ paths:
         Menampilkan daftar mitra (perusahaan dan UMKM) sebagai card-card.
         Hanya akun mitra yang sudah disetujui admin (status `active` dan `is_active=true`) yang akan tampil.
         Mendukung pencarian berdasarkan nama dan filter berdasarkan tipe mitra.
-        Diurutkan berdasarkan aktivitas login terakhir.
+        Diurutkan berdasarkan aktivitas login terakhir (`last_login_at` DESC).
       security: []
       parameters:
         - in: query
           name: q
           schema:
             type: string
-          description: Cari berdasarkan nama mitra (perusahaan atau UMKM)
+          description: Cari berdasarkan nama mitra — company_name (perusahaan) atau business_name (UMKM). Case-insensitive, partial match.
           example: binajasa
         - in: query
           name: type
           schema:
             type: string
             enum: [perusahaan, umkm]
-          description: Filter berdasarkan tipe mitra
+          description: |
+            Filter berdasarkan tipe mitra:
+            - perusahaan: Mitra tipe perusahaan (PT, CV, dll)
+            - umkm: Mitra tipe UMKM
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
             default: 1
+          description: Nomor halaman (dimulai dari 1)
         - in: query
           name: per_page
           schema:
@@ -35,39 +39,62 @@ paths:
             minimum: 1
             maximum: 50
             default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
       responses:
         "200":
           description: Daftar mitra berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraList"
               example:
                 success: true
                 message: Daftar mitra berhasil diambil.
                 data:
-                  - id: 10
+                  - id: 2
                     mitra_type: perusahaan
-                    name: PT Mitra Tata Lingkungan Baru
-                    logo_url: https://example.com/storage/logos/pt-mtlb.png
-                    address: "Bogor, Jawa Barat, Indonesia"
-                    industry_sector: Environmental Services
-                    vacancy_count: 4
+                    name: PT Binajasa Sumber Sarana
+                    logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                    address: Jakarta Selatan, DKI Jakarta
+                    industry_sector: Outsourcing dan layanan tenaga kerja
+                    vacancy_count: 2
                     last_active: 5 jam yang lalu
-                  - id: 23
+                    featured_vacancy:
+                      slug: accounting-staff-1602be
+                      position_name: Accounting Staff
+                      salary_label: Rp 5,7 jt-5,8 jt
+                      job_type_label: Penuh Waktu
+                      experience_level_label: Kurang dari Setahun
+                      skills: [MYOB, Excel, Akuntansi Dasar]
+                  - id: 4
                     mitra_type: umkm
-                    name: Susu Sapiloka
-                    logo_url: null
-                    address: "Tangerang, Banten, Indonesia"
-                    industry_sector: Food & Beverages
-                    vacancy_count: 1
+                    name: Roti Bunda Rasa
+                    logo_url: https://via.placeholder.com/200x200?text=Roti+Bunda
+                    address: Semarang, Jawa Tengah
+                    industry_sector: Kuliner
+                    vacancy_count: 2
                     last_active: 4 jam yang lalu
+                    featured_vacancy:
+                      slug: baker-assistant-semarang
+                      position_name: Baker Assistant
+                      salary_label: Rp 3 jt-3,5 jt
+                      job_type_label: Penuh Waktu
+                      experience_level_label: Fresh Graduate
+                      skills: [Baking, Kebersihan Dapur]
                 errors: null
                 meta:
                   pagination:
                     current_page: 1
-                    last_page: 3
+                    last_page: 1
                     per_page: 12
-                    total: 30
-                    has_more_pages: true
+                    total: 4
+                    has_more_pages: false
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/mitra/{id}:
     get:
@@ -75,10 +102,11 @@ paths:
       summary: Detail mitra
       description: |
         Menampilkan detail lengkap sebuah mitra beserta:
-        Hanya dapat diakses untuk akun mitra yang sudah disetujui admin (status `active` dan `is_active=true`).
-        - Informasi profil (nama, deskripsi, alamat, karyawan, sosmed, galeri)
-        - Daftar lowongan aktif dari mitra tersebut
+        - Informasi profil (nama, deskripsi, alamat, jumlah karyawan, sosmed, galeri)
+        - Daftar semua lowongan aktif (published) dari mitra tersebut
         - Hingga 5 mitra serupa (berdasarkan sektor industri, keaktifan, dan ketersediaan loker)
+
+        Hanya dapat diakses untuk akun mitra yang sudah disetujui admin (status `active` dan `is_active=true`).
       security: []
       parameters:
         - in: path
@@ -87,57 +115,84 @@ paths:
           schema:
             type: integer
           description: ID user mitra
-          example: 10
+          example: 2
       responses:
         "200":
           description: Detail mitra berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraDetail"
               example:
                 success: true
                 message: Detail mitra berhasil diambil.
                 data:
-                  id: 10
+                  id: 2
                   mitra_type: perusahaan
-                  name: PT Mitra Tata Lingkungan Baru
-                  logo_url: https://example.com/storage/logos/pt-mtlb.png
-                  short_description: >
-                    PT Mitra Tata Lingkungan Baru (PT MTLB) adalah perusahaan yang bergerak
-                    di bidang pengolahan limbah Non B3.
-                  address: "Bogor, Jawa Barat, Indonesia"
-                  industry_sector: Environmental Services
-                  employee_total_range: "51 - 200"
-                  website_or_social_url: https://instagram.com/ptmtlb
+                  name: PT Binajasa Sumber Sarana
+                  logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                  short_description: Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.
+                  address: Jakarta Selatan, DKI Jakarta
+                  industry_sector: Outsourcing dan layanan tenaga kerja
+                  employee_total_range: 501-1000
+                  website_or_social_url: https://example.com/binajasa
                   gallery:
-                    - https://example.com/storage/gallery/img1.jpg
-                    - https://example.com/storage/gallery/img2.jpg
-                  vacancy_count: 4
+                    - https://via.placeholder.com/400x300?text=Binajasa+1
+                    - https://via.placeholder.com/400x300?text=Binajasa+2
+                    - https://via.placeholder.com/400x300?text=Binajasa+3
+                    - https://via.placeholder.com/400x300?text=Binajasa+4
+                    - https://via.placeholder.com/400x300?text=Binajasa+5
+                  vacancy_count: 2
                   vacancies:
-                    - id: 5
-                      slug: teknisi-pest-control-abc123
-                      position_name: Teknisi Pest Control
+                    - id: 1
+                      slug: accounting-staff-1602be
+                      position_name: Accounting Staff
                       job_type: penuh_waktu
                       job_type_label: Penuh Waktu
                       work_policy: kantor
                       work_policy_label: Kerja di kantor
-                      created_at_human: 2 jam yang lalu
-                      salary_label: Rp 3,5 jt-4,5 jt
-                      mitra_name: PT Mitra Tata Lingkungan Baru
+                      created_at_human: 5 jam yang lalu
+                      salary_label: Rp 5,7 jt-5,8 jt
+                      mitra_name: PT Binajasa Sumber Sarana
                       mitra_type: perusahaan
-                      province: Jawa Barat
-                      location: "Bogor, Jawa Barat, Indonesia"
-                      skills: [Pest Control, K3]
-                      benefits: [BPJS Kesehatan, Transport]
-                      mitra_logo_url: https://example.com/storage/logos/pt-mtlb.png
+                      province: DKI Jakarta
+                      location: Jakarta Selatan, DKI Jakarta
+                      skills: [MYOB, Excel, Akuntansi Dasar]
+                      benefits:
+                        [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
+                      mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                    - id: 2
+                      slug: security-freelance-jakarta
+                      position_name: Security Freelance
+                      job_type: freelance
+                      job_type_label: Freelance
+                      work_policy: kantor
+                      work_policy_label: Kerja di kantor
+                      created_at_human: 1 hari yang lalu
+                      salary_label: Gaji tidak ditampilkan
+                      mitra_name: PT Binajasa Sumber Sarana
+                      mitra_type: perusahaan
+                      province: DKI Jakarta
+                      location: Jakarta Selatan, DKI Jakarta
+                      skills: [Office Security, Hotel Security]
+                      benefits: [Uang Makan, Seragam Kerja]
+                      mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
                   similar_mitra:
-                    - id: 14
+                    - id: 3
                       mitra_type: perusahaan
-                      name: PT Annisa Surya Kencana
-                      logo_url: null
-                      address: "Bogor, Jawa Barat, Indonesia"
-                      industry_sector: Environmental Services
-                      vacancy_count: 1
+                      name: PT Surya Data Nusantara
+                      logo_url: https://via.placeholder.com/200x200?text=Surya
+                      address: Bandung, Jawa Barat
+                      industry_sector: Teknologi informasi
+                      vacancy_count: 3
                       last_active: 2 jam yang lalu
+                      featured_vacancy:
+                        slug: data-entry-operator-bandung
+                        position_name: Data Entry Operator
+                        salary_label: Rp 4,2 jt-4,5 jt
+                        job_type_label: Penuh Waktu
+                        experience_level_label: Fresh Graduate
+                        skills: [Microsoft Excel, Teliti, Data Entry]
                 errors: null
                 meta: null
         "404":
@@ -145,4 +200,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Mitra tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

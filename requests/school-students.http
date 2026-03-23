@@ -17,8 +17,7 @@ Content-Type: application/json
 {
   "role": "sekolah",
   "email": "smk.negeri1@example.com",
-  "password": "password123",
-  "device_name": "rest-client"
+  "password": "password123"
 }
 
 ###

@@ -3,14 +3,18 @@ paths:
     get:
       tags: [Schools]
       summary: List sekolah
-      description: Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan). Hanya akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`) yang ditampilkan. Mendukung pencarian berdasarkan nama sekolah.
+      description: |
+        Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan).
+        Hanya akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`) yang ditampilkan.
+        Mendukung pencarian berdasarkan nama sekolah (case-insensitive, partial match).
+        Diurutkan berdasarkan `created_at` terbaru.
       security: []
       parameters:
         - in: query
           name: q
           schema:
             type: string
-          description: Cari berdasarkan nama sekolah
+          description: Cari berdasarkan nama sekolah (case-insensitive, partial match)
           example: SMA Negeri 1
         - in: query
           name: page
@@ -18,6 +22,7 @@ paths:
             type: integer
             minimum: 1
             default: 1
+          description: Nomor halaman (dimulai dari 1)
         - in: query
           name: per_page
           schema:
@@ -25,33 +30,42 @@ paths:
             minimum: 1
             maximum: 50
             default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
       responses:
         "200":
           description: Daftar sekolah berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeSchoolList"
               example:
                 success: true
                 message: Daftar sekolah berhasil diambil.
                 data:
-                  - id: 5
-                    school_name: SMA Negeri 1 Bogor
-                    address: "Bogor, Jawa Barat, Indonesia"
-                    logo_url: https://example.com/storage/logos/sma-negeri-1-bogor.png
-                    expertise_fields: [IPA, IPS, Bahasa]
                   - id: 8
+                    school_name: SMA Negeri 1 Bogor
+                    address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
+                    logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+1
+                    expertise_fields: [IPA, IPS, Bahasa]
+                  - id: 9
                     school_name: SMA Negeri 2 Jakarta
-                    address: "Jakarta Pusat, DKI Jakarta, Indonesia"
-                    logo_url: null
+                    address: Jl. Sudirman No. 100, Jakarta Pusat, DKI Jakarta
+                    logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+2
                     expertise_fields: [IPA, IPS]
                 errors: null
                 meta:
                   pagination:
                     current_page: 1
-                    last_page: 2
+                    last_page: 1
                     per_page: 12
-                    total: 18
-                    has_more_pages: true
+                    total: 2
+                    has_more_pages: false
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/schools/{id}:
     get:
@@ -59,11 +73,13 @@ paths:
       summary: Detail sekolah
       description: |
         Menampilkan detail lengkap sebuah sekolah beserta:
-        Hanya dapat diakses untuk akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`).
         - Profil sekolah (nama, lokasi, logo, galeri, deskripsi, akreditasi)
-        - Daftar jurusan
-        - Prestasi siswa sekolah
+        - Daftar jurusan (expertise_fields)
+        - Prestasi siswa sekolah (dari tabel student_achievements)
         - Daftar siswa dari sekolah tersebut
+        - Pengajuan kemitraan yang sudah disubmit (status submitted)
+
+        Hanya dapat diakses untuk akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`).
       security: []
       parameters:
         - in: path
@@ -72,49 +88,48 @@ paths:
           schema:
             type: integer
           description: ID user sekolah
-          example: 5
+          example: 8
       responses:
         "200":
           description: Detail sekolah berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeSchoolDetail"
               example:
                 success: true
                 message: Detail sekolah berhasil diambil.
                 data:
-                  id: 5
+                  id: 8
                   school_name: SMA Negeri 1 Bogor
-                  address: "Bogor, Jawa Barat, Indonesia"
-                  logo_url: https://example.com/storage/logos/sma-negeri-1-bogor.png
+                  address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
+                  logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+1
                   gallery:
-                    - https://example.com/storage/schools/img1.jpg
-                    - https://example.com/storage/schools/img2.jpg
-                  short_description: "SMA Negeri 1 Bogor adalah sekolah menengah atas terkemuka di Bogor dengan fokus pada pendidikan akademik berkualitas tinggi."
-                  accreditation: "A (Amat Memuaskan)"
+                    - https://via.placeholder.com/400x300?text=SMA+Bogor+1
+                    - https://via.placeholder.com/400x300?text=SMA+Bogor+2
+                    - https://via.placeholder.com/400x300?text=SMA+Bogor+3
+                    - https://via.placeholder.com/400x300?text=SMA+Bogor+4
+                    - https://via.placeholder.com/400x300?text=SMA+Bogor+5
+                  short_description: SMA Negeri 1 Bogor berfokus pada pengembangan akademik, karakter, dan kesiapan karier siswa.
+                  accreditation: A
                   expertise_fields: [IPA, IPS, Bahasa]
                   student_achievements:
-                    - title: "Juara 1 Olimpiade Matematika"
-                      description: "Pencapaian pada OSN Tingkat Nasional 2025"
-                    - title: "Juara 2 Kompetisi Debat Bahasa Inggris"
-                      description: "Kompetisi Nasional Bahasa Inggris 2025"
+                    - title: Juara 1 Olimpiade Matematika
+                      description: Pencapaian pada OSN Tingkat Nasional 2025
+                    - title: Juara 2 Debat Bahasa Inggris
+                      description: Kompetisi Nasional Bahasa Inggris 2025
                   students:
-                    - id: 42
+                    - id: 1
                       full_name: Budi Santoso
                       major: IPA
                       graduation_status: graduated
-                      photo_profile_url: https://example.com/storage/photos/budi.jpg
-                    - id: 43
+                      photo_profile_url: https://via.placeholder.com/200x200?text=Budi
+                    - id: 2
                       full_name: Siti Rahayu
                       major: IPA
                       graduation_status: active
-                      photo_profile_url: null
-                  pengajuan_mitra:
-                    - mitra_user_id: 2
-                      nama_mitra: PT Bina Jasa
-                      sektor_atau_tipe: Outsourcing
-                      mitra_tipe: perusahaan
-                      tanggal_submit: "2026-03-22T08:30:00+07:00"
-                      status_submit: submitted
+                      photo_profile_url: https://via.placeholder.com/200x200?text=Siti
+                  pengajuan_mitra: []
                 errors: null
                 meta: null
         "404":
@@ -122,4 +137,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Sekolah tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

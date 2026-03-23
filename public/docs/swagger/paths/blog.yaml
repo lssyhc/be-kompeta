@@ -3,6 +3,20 @@ paths:
     post:
       tags: [Blog]
       summary: Buat artikel blog (admin only)
+      description: |
+        Membuat artikel blog baru. Hanya user dengan role `admin` yang dapat mengakses.
+
+        **Field wajib:**
+        - `content_type_id`: ID tipe konten (harus merujuk ke tipe yang aktif)
+        - `title`: Judul artikel
+        - `thumbnail`: Gambar thumbnail (file upload, format gambar)
+        - `body`: Isi konten artikel
+
+        **Field opsional:**
+        - `is_published`: Apakah langsung dipublikasi (default: `true`)
+        - `published_at`: Tanggal publikasi kustom (default: saat ini jika `is_published=true`)
+
+        Slug artikel di-generate otomatis dari `title`.
       security:
         - bearerAuth: []
       requestBody:
@@ -15,23 +29,30 @@ paths:
               properties:
                 content_type_id:
                   type: integer
+                  description: ID tipe konten blog (harus aktif)
                   example: 1
                 title:
                   type: string
+                  maxLength: 255
+                  description: Judul artikel
                   example: Artikel Perdana Kompeta
                 thumbnail:
                   type: string
                   format: binary
+                  description: Gambar thumbnail artikel (file upload)
                 body:
                   type: string
+                  description: Isi konten artikel (HTML atau teks)
                   example: Isi konten artikel lengkap.
                 is_published:
                   type: boolean
                   default: true
+                  description: Apakah artikel langsung dipublikasi
                 published_at:
                   type: string
                   format: date-time
                   nullable: true
+                  description: Tanggal publikasi kustom (ISO 8601)
       responses:
         "201":
           description: Artikel berhasil dibuat
@@ -56,34 +77,65 @@ paths:
                   is_published: true
                   published_at: "2026-03-22T02:08:14Z"
                   created_by: 1
-                  created_by_name: System Admin Kompeta
+                  created_by_name: System Admin
                   created_at: "2026-03-22T02:08:14Z"
                   updated_at: "2026-03-22T02:08:14Z"
                 errors: null
                 meta: null
         "401":
-          description: Token tidak valid atau tidak ada
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
         "403":
-          description: Bukan admin
+          description: User bukan role admin
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya admin yang dapat membuat artikel.
+                data: null
+                errors: null
+                meta: null
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (field wajib kosong, format salah, dll.)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  title:
+                    - The title field is required.
+                  thumbnail:
+                    - The thumbnail field is required.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/blog/content-types:
     get:
       tags: [Blog]
       summary: Daftar tipe konten blog aktif
+      description: |
+        Mengembalikan semua tipe konten blog yang berstatus aktif (`is_active=true`).
+        Endpoint publik, tidak memerlukan autentikasi.
       security: []
       responses:
         "200":
@@ -102,45 +154,78 @@ paths:
                   - id: 2
                     name: Tips
                     slug: tips
+                  - id: 3
+                    name: Career Insight
+                    slug: career-insight
+                  - id: 4
+                    name: Success Story
+                    slug: success-story
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/blog/articles:
     get:
       tags: [Blog]
       summary: Daftar artikel blog (dengan search dan filter)
+      description: |
+        Menampilkan daftar artikel blog yang sudah dipublikasi secara paginated.
+        Mendukung pencarian di title/body dan filter berdasarkan tipe konten.
+
+        **Sorting:**
+        - `latest` (default): Berdasarkan `published_at` terbaru
+        - `most_read`: Berdasarkan `view_count` tertinggi
       security: []
       parameters:
         - in: query
           name: q
           schema:
             type: string
-          description: Kata kunci pencarian di title/body
+            maxLength: 100
+          description: Kata kunci pencarian di title/body (case-insensitive, partial match)
+          example: kompeta
         - in: query
           name: content_type_id
           schema:
             type: integer
+          description: Filter berdasarkan ID tipe konten
+          example: 1
         - in: query
           name: content_type_slug
           schema:
             type: string
+          description: Filter berdasarkan slug tipe konten
+          example: news
         - in: query
           name: sort
           schema:
             type: string
             enum: [latest, most_read]
             default: latest
+          description: |
+            Urutan hasil:
+            - `latest`: Terbaru berdasarkan `published_at`
+            - `most_read`: Paling banyak dibaca berdasarkan `view_count`
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
         - in: query
           name: per_page
           schema:
             type: integer
             minimum: 1
             maximum: 50
+            default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
       responses:
         "200":
           description: Daftar artikel berhasil diambil
@@ -159,7 +244,7 @@ paths:
                       slug: news
                     title: Artikel Perdana Kompeta
                     slug: artikel-perdana-kompeta
-                    view_count: 25
+                    view_count: 120
                     thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
                     published_at: "2026-03-22T02:08:14Z"
                     created_at: "2026-03-22T02:08:14Z"
@@ -172,16 +257,33 @@ paths:
                     total: 1
                     has_more_pages: false
         "422":
-          description: Validasi gagal
+          description: Validasi query gagal
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  sort:
+                    - The selected sort is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/blog/articles/most-read:
     get:
       tags: [Blog]
       summary: Daftar artikel paling banyak dibaca
+      description: |
+        Mengembalikan daftar artikel yang paling banyak dibaca (berdasarkan `view_count`).
+        Tanpa paginasi — langsung mengembalikan array dengan jumlah sesuai `limit`.
       security: []
       parameters:
         - in: query
@@ -191,6 +293,7 @@ paths:
             minimum: 1
             maximum: 20
             default: 6
+          description: Jumlah artikel yang dikembalikan (default 6, maks 20)
       responses:
         "200":
           description: Daftar artikel paling banyak dibaca berhasil diambil
@@ -209,17 +312,26 @@ paths:
                       slug: news
                     title: Artikel Perdana Kompeta
                     slug: artikel-perdana-kompeta
-                    view_count: 25
+                    view_count: 120
                     thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
                     published_at: "2026-03-22T02:08:14Z"
                     created_at: "2026-03-22T02:08:14Z"
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/blog/articles/{slug}:
     get:
       tags: [Blog]
       summary: Detail artikel blog (sekaligus tambah view_count)
+      description: |
+        Menampilkan detail lengkap artikel blog berdasarkan slug.
+        Setiap kali endpoint ini dipanggil, `view_count` akan bertambah 1 secara otomatis.
       security: []
       parameters:
         - in: path
@@ -227,6 +339,8 @@ paths:
           required: true
           schema:
             type: string
+          description: Slug unik artikel (auto-generated dari title)
+          example: artikel-perdana-kompeta
       responses:
         "200":
           description: Detail artikel berhasil diambil
@@ -246,12 +360,12 @@ paths:
                   title: Artikel Perdana Kompeta
                   slug: artikel-perdana-kompeta
                   body: Isi konten artikel lengkap.
-                  view_count: 26
+                  view_count: 121
                   thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
                   is_published: true
                   published_at: "2026-03-22T02:08:14Z"
                   created_by: 1
-                  created_by_name: System Admin Kompeta
+                  created_by_name: System Admin
                   created_at: "2026-03-22T02:08:14Z"
                   updated_at: "2026-03-22T02:08:14Z"
                 errors: null
@@ -261,4 +375,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Artikel tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

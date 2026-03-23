@@ -5,7 +5,22 @@ paths:
       summary: Register user sekolah atau mitra
       description: |
         Register publik hanya menerima role `sekolah` atau `mitra`.
-        Untuk role `mitra`, wajib mengirim `mitra_type`.
+        Untuk role `mitra`, wajib mengirim `mitra_type` (`perusahaan` atau `umkm`).
+
+        **Alur setelah registrasi:**
+        - Akun sekolah dan mitra dibuat dengan `account_status=pending` dan `is_active=false`.
+        - Akun harus menunggu persetujuan admin melalui endpoint `/admin/registrations/{id}/approve`.
+
+        **⚠️ Endpoint ini memerlukan `multipart/form-data` karena mengandung file upload.**
+        Jika Swagger UI menampilkan text editor (bukan form), gunakan Postman/curl untuk mengirim file.
+
+        **File wajib per role:**
+        - **Sekolah:** `logo` (gambar, maks 2 MB), `operational_license` (PDF, maks 4 MB)
+        - **Mitra perusahaan:** `company_logo` (gambar, maks 2 MB), `kemenkumham_decree` (PDF, maks 4 MB)
+        - **Mitra UMKM:** `umkm_logo` (gambar, maks 2 MB), `owner_ktp_photo` (gambar, maks 2 MB), `image_1`–`image_5` (gambar, masing-masing maks 2 MB)
+
+        **File opsional (semua role kecuali UMKM):**
+        - `image_1`–`image_5`: Foto tambahan (gambar, masing-masing maks 2 MB)
       security: []
       requestBody:
         required: true
@@ -18,7 +33,7 @@ paths:
                 - $ref: "../openapi.yaml#/components/schemas/RegisterMitraUmkmRequest"
             examples:
               sekolah:
-                summary: Contoh register sekolah
+                summary: "Register sekolah (+ upload: logo, operational_license)"
                 value:
                   role: sekolah
                   email: smk@example.com
@@ -32,8 +47,10 @@ paths:
                     - RPL
                     - TKJ
                   short_description: SMK unggulan berfokus pada teknologi.
+                  logo: "(file gambar wajib)"
+                  operational_license: "(file PDF wajib)"
               mitra_perusahaan:
-                summary: Contoh register mitra perusahaan
+                summary: "Register mitra perusahaan (+ upload: company_logo, kemenkumham_decree)"
                 value:
                   role: mitra
                   mitra_type: perusahaan
@@ -46,8 +63,10 @@ paths:
                   employee_total_range: 51-200
                   office_address: Jl. Sudirman No. 10
                   short_description: Perusahaan software enterprise.
+                  company_logo: "(file gambar wajib)"
+                  kemenkumham_decree: "(file PDF wajib)"
               mitra_umkm:
-                summary: Contoh register mitra UMKM
+                summary: "Register mitra UMKM (+ upload: umkm_logo, owner_ktp_photo, image_1–5)"
                 value:
                   role: mitra
                   mitra_type: umkm
@@ -59,9 +78,16 @@ paths:
                   business_type: Kuliner
                   business_address: Jl. Pasar No. 5
                   short_description: UMKM kuliner lokal.
+                  umkm_logo: "(file gambar wajib)"
+                  owner_ktp_photo: "(file gambar wajib)"
+                  image_1: "(file gambar wajib)"
+                  image_2: "(file gambar wajib)"
+                  image_3: "(file gambar wajib)"
+                  image_4: "(file gambar wajib)"
+                  image_5: "(file gambar wajib)"
       responses:
         "201":
-          description: Registrasi berhasil
+          description: Registrasi berhasil. Akun dibuat dengan status `pending`.
           content:
             application/json:
               schema:
@@ -78,39 +104,56 @@ paths:
                     mitra_type: null
                     account_status: pending
                     is_active: false
+                    last_login_at: null
                   role_profile:
                     school_name: SMK Negeri 1
                     npsn: "12345678"
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (field wajib kosong, email duplikat, format salah, dll.)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
               example:
                 success: false
                 message: Validasi gagal.
                 data: null
                 errors:
                   email:
-                    - The email field is required.
+                    - The email has already been taken.
+                  password:
+                    - The password field must be at least 8 characters.
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /auth/login:
     post:
       tags: [Auth]
       summary: Login berdasarkan role
       description: |
-        - Role `siswa`: gunakan `nisn`, `school_origin`, `unique_code`
-        - Role lain: gunakan `email`, `password`
-        - Akun seeded siap pakai:
-          - admin: `admin@kompeta.test` / `admin12345`
-          - sekolah: `school.a@kompeta.test` / `password123`
-          - mitra perusahaan: `mitra.company.a@kompeta.test` / `password123`
-          - mitra umkm: `mitra.umkm.a@kompeta.test` / `password123`
-          - siswa: `nisn=0002345678`, `school_origin=SMA Negeri 2 Jakarta`, `unique_code=qzPSGd04erQblY8G`
+        Endpoint login universal untuk semua role.
+
+        **Mekanisme login per role:**
+        - **Siswa** (`role=siswa`): gunakan `nisn`, `school_origin`, `unique_code`
+        - **Non-siswa** (`role=admin|sekolah|mitra`): gunakan `email`, `password`
+
+        **Response khusus siswa:**
+        - `requires_skill_setup`: `true` jika siswa belum menambahkan skill (onboarding).
+        - `next_step`: `add_skill` jika skill belum diisi, `null` jika sudah lengkap.
+
+        **Akun seeded siap pakai:**
+        - admin: `admin@kompeta.test` / `admin12345`
+        - sekolah: `school.a@kompeta.test` / `password123`
+        - mitra perusahaan: `mitra.company.a@kompeta.test` / `password123`
+        - mitra umkm: `mitra.umkm.a@kompeta.test` / `password123`
+        - siswa: `nisn=0002345678`, `school_origin=SMA Negeri 2 Jakarta`, `unique_code=qzPSGd04erQblY8G`
       security: []
       requestBody:
         required: true
@@ -125,20 +168,18 @@ paths:
                 summary: Login sekolah/admin/mitra
                 value:
                   role: sekolah
-                  email: smk@example.com
+                  email: school.a@kompeta.test
                   password: password123
-                  device_name: web-client
               siswa:
                 summary: Login siswa
                 value:
                   role: siswa
-                  nisn: "1234567890"
-                  school_origin: SMK Negeri 1
-                  unique_code: ABC123XY
-                  device_name: mobile-app
+                  nisn: "0002345678"
+                  school_origin: SMA Negeri 2 Jakarta
+                  unique_code: qzPSGd04erQblY8G
       responses:
         "200":
-          description: Login berhasil
+          description: Login berhasil. Token Sanctum dikembalikan.
           content:
             application/json:
               schema:
@@ -147,38 +188,50 @@ paths:
                 success: true
                 message: Login berhasil.
                 data:
-                  token: 1|token-sanctum-example
+                  token: 1|abcdef1234567890abcdef1234567890abcdef12345678
                   token_type: Bearer
                   user:
-                    id: 11
-                    name: Andi Pratama
+                    id: 13
+                    name: Ahmad Wijaya
                     email: null
                     role: siswa
                     mitra_type: null
                     account_status: active
                     is_active: true
+                    last_login_at: "2026-03-23T10:30:00.000000Z"
                   role_profile:
-                    full_name: Andi Pratama
-                    nisn: "1234567890"
-                    school_origin: SMK Negeri 1
-                  requires_skill_setup: true
-                  next_step: add_skill
+                    full_name: Ahmad Wijaya
+                    nisn: "0002345678"
+                    school_origin: SMA Negeri 2 Jakarta
+                  requires_skill_setup: false
+                  next_step: null
                 errors: null
                 meta: null
-        "401":
-          description: Unauthenticated
+        "403":
+          description: Akun tidak aktif atau belum diverifikasi admin
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              examples:
+                tidak_aktif:
+                  summary: Akun di-nonaktifkan
+                  value:
+                    success: false
+                    message: Akun tidak aktif.
+                    data: null
+                    errors: null
+                    meta: null
+                belum_diverifikasi:
+                  summary: Akun masih pending/menunggu verifikasi admin
+                  value:
+                    success: false
+                    message: Akun belum aktif atau masih menunggu verifikasi.
+                    data: null
+                    errors: null
+                    meta: null
         "422":
-          description: Kredensial tidak valid / validasi gagal
+          description: Kredensial tidak valid atau validasi gagal
           content:
             application/json:
               schema:
@@ -189,11 +242,20 @@ paths:
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /auth/logout:
     post:
       tags: [Auth]
       summary: Logout token aktif
+      description: |
+        Menghapus token Sanctum yang sedang digunakan (current access token).
+        Setelah logout, token tersebut tidak bisa digunakan lagi.
       responses:
         "200":
           description: Logout berhasil
@@ -201,23 +263,42 @@ paths:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Logout berhasil.
+                data: null
+                errors: null
+                meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /auth/me:
     get:
       tags: [Auth]
       summary: Ambil profil user login
+      description: |
+        Mengembalikan data user yang sedang login beserta `role_profile` spesifik role.
+        Untuk siswa, menyertakan field onboarding (`requires_skill_setup`, `next_step`).
+
+        **Perbedaan dengan `/profile`:**
+        - `/auth/me` menyertakan `requires_skill_setup` dan `next_step` (onboarding state).
+        - `/profile` mengembalikan detail profil yang lebih lengkap (termasuk `job_applications` untuk siswa).
       responses:
         "200":
           description: Data user berhasil diambil
@@ -230,38 +311,51 @@ paths:
                 message: Data user berhasil diambil.
                 data:
                   user:
-                    id: 11
-                    name: Andi Pratama
+                    id: 13
+                    name: Ahmad Wijaya
                     email: null
                     role: siswa
                     mitra_type: null
                     account_status: active
                     is_active: true
+                    last_login_at: "2026-03-23T10:30:00.000000Z"
                   role_profile:
-                    full_name: Andi Pratama
-                    nisn: "1234567890"
-                    school_origin: SMK Negeri 1
+                    full_name: Ahmad Wijaya
+                    nisn: "0002345678"
+                    school_origin: SMA Negeri 2 Jakarta
                   requires_skill_setup: false
                   next_step: null
                 errors: null
                 meta: null
         "401":
-          description: Unauthenticated
+          description: Token tidak valid atau sudah expired
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
               example:
                 success: false
                 message: Unauthenticated.
                 data: null
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /user:
     get:
       tags: [Auth]
-      summary: Alias endpoint /auth/me
+      summary: "[DEPRECATED] Alias endpoint /auth/me"
+      deprecated: true
+      description: |
+        **⚠️ DEPRECATED** — Gunakan `/auth/me` sebagai pengganti.
+
+        Endpoint ini adalah alias dari `/auth/me` dan akan dihapus di versi mendatang.
+        Response identik dengan `/auth/me`.
       responses:
         "200":
           description: Data user berhasil diambil
@@ -269,3 +363,42 @@ paths:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthMe"
+              example:
+                success: true
+                message: Data user berhasil diambil.
+                data:
+                  user:
+                    id: 13
+                    name: Ahmad Wijaya
+                    email: null
+                    role: siswa
+                    mitra_type: null
+                    account_status: active
+                    is_active: true
+                    last_login_at: "2026-03-23T10:30:00.000000Z"
+                  role_profile:
+                    full_name: Ahmad Wijaya
+                    nisn: "0002345678"
+                    school_origin: SMA Negeri 2 Jakarta
+                  requires_skill_setup: false
+                  next_step: null
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

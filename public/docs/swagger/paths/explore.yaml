@@ -3,12 +3,21 @@ paths:
     get:
       tags: [Explore]
       summary: List lowongan untuk halaman explore
+      description: |
+        Menampilkan daftar lowongan yang sudah dipublikasikan (published).
+        Mendukung pencarian full-text berdasarkan posisi, skill, atau nama mitra,
+        serta multi-filter berdasarkan tipe pekerjaan, kebijakan kerja, provinsi,
+        level pengalaman, dan rentang waktu update.
+        Diurutkan berdasarkan `updated_at` terbaru.
+      security: []
       parameters:
         - in: query
           name: q
           schema:
             type: string
-          description: Cari berdasarkan posisi, skill, atau nama mitra
+            maxLength: 100
+          description: Cari berdasarkan posisi, skill, atau nama mitra (case-insensitive, partial match)
+          example: accounting
         - in: query
           name: job_types[]
           schema:
@@ -16,6 +25,13 @@ paths:
             items:
               type: string
               enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+          description: |
+            Filter tipe pekerjaan (multi-select):
+            - penuh_waktu: Penuh Waktu
+            - kontrak: Kontrak
+            - magang: Magang
+            - paruh_waktu: Paruh Waktu
+            - freelance: Freelance
         - in: query
           name: work_policies[]
           schema:
@@ -23,12 +39,19 @@ paths:
             items:
               type: string
               enum: [kantor, hybrid, remote]
+          description: |
+            Filter kebijakan kerja (multi-select):
+            - kantor: Kerja di kantor
+            - hybrid: Hybrid (kantor + remote)
+            - remote: Kerja remote/dari rumah
         - in: query
           name: provinces[]
           schema:
             type: array
             items:
               type: string
+          description: Filter provinsi (multi-select, gunakan nama provinsi dari /public/explore/filters)
+          example: ["DKI Jakarta"]
         - in: query
           name: experience_levels[]
           schema:
@@ -36,33 +59,51 @@ paths:
             items:
               type: string
               enum: [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+          description: |
+            Filter level pengalaman (multi-select):
+            - tidak_berpengalaman: Tidak Berpengalaman
+            - fresh_graduate: Fresh Graduate
+            - kurang_dari_setahun: Kurang dari Setahun
         - in: query
           name: updated_within
           schema:
             type: string
             enum: [24h, 7d, 30d, any]
+            default: any
+          description: |
+            Filter rentang waktu update:
+            - 24h: 24 jam terakhir
+            - 7d: Seminggu terakhir
+            - 30d: 1 bulan terakhir
+            - any: Kapan pun (default)
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
         - in: query
           name: per_page
           schema:
             type: integer
             minimum: 1
             maximum: 50
+            default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
       responses:
         "200":
           description: Daftar lowongan berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeExploreJobList"
               example:
                 success: true
                 message: Daftar lowongan berhasil diambil.
                 data:
                   - id: 1
-                    slug: accounting-staff-abc123
+                    slug: accounting-staff-1602be
                     position_name: Accounting Staff
                     job_type: penuh_waktu
                     job_type_label: Penuh Waktu
@@ -74,8 +115,10 @@ paths:
                     mitra_type: perusahaan
                     province: DKI Jakarta
                     location: Jakarta Selatan, DKI Jakarta
-                    skills: [MYOB, Excel]
-                    benefits: [BPJS Kesehatan]
+                    skills: [MYOB, Excel, Akuntansi Dasar]
+                    benefits:
+                      [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
+                    mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
                 errors: null
                 meta:
                   pagination:
@@ -85,51 +128,110 @@ paths:
                     total: 1
                     has_more_pages: false
         "422":
-          description: Validasi gagal
+          description: Validasi gagal (parameter query tidak valid)
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  per_page:
+                    - The per page field must not be greater than 50.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/explore/jobs/{slug}:
     get:
       tags: [Explore]
       summary: Detail lowongan explore
+      description: |
+        Menampilkan detail lengkap sebuah lowongan berdasarkan slug,
+        beserta hingga 6 rekomendasi lowongan serupa (berdasarkan provinsi/tipe pekerjaan yang sama).
+        Jika rekomendasi dari provinsi/tipe tidak cukup, akan dilengkapi dari lowongan terbaru lainnya.
+      security: []
       parameters:
         - in: path
           name: slug
           required: true
           schema:
             type: string
+          description: Slug unik lowongan
+          example: accounting-staff-1602be
       responses:
         "200":
           description: Detail lowongan berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeExploreJobDetail"
               example:
                 success: true
                 message: Detail lowongan berhasil diambil.
                 data:
                   job:
                     id: 1
-                    slug: accounting-staff-abc123
+                    slug: accounting-staff-1602be
                     position_name: Accounting Staff
                     mitra_name: PT Binajasa Sumber Sarana
+                    mitra_type: perusahaan
                     salary_label: Rp 5,7 jt-5,8 jt
+                    salary_min: 5700000
+                    salary_max: 5800000
+                    is_salary_hidden: false
                     category: Keuangan
-                    share_link: https://example.test/explore/accounting-staff-abc123
-                    requirements: Minimal Sarjana (S1)
-                    skills: [MYOB, Excel]
-                    work_benefits: [BPJS Kesehatan]
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: kantor
+                    work_policy_label: Kerja di kantor
+                    experience_level: kurang_dari_setahun
+                    experience_level_label: Kurang dari Setahun
+                    created_at: "2026-03-23T05:00:00+07:00"
+                    created_at_human: 5 jam yang lalu
+                    updated_at: "2026-03-23T05:00:00+07:00"
+                    updated_at_human: 5 jam yang lalu
+                    share_link: https://kompeta.test/explore/accounting-staff-1602be
+                    requirements: "Minimal Sarjana (S1).\nMemahami MYOB.\nKomunikasi baik."
+                    skills: [MYOB, Excel, Akuntansi Dasar]
+                    work_benefits:
+                      [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
                     managed_by: PT Binajasa Sumber Sarana
-                    job_description: Deskripsi pekerjaan
+                    job_description: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                    location: Jakarta Selatan, DKI Jakarta
+                    province: DKI Jakarta
                     about_company:
                       name: PT Binajasa Sumber Sarana
-                      industry_sector: Outsourcing
+                      industry_sector: Outsourcing dan layanan tenaga kerja
                       employee_total_range: 501-1000
-                      description: Tentang perusahaan
+                      description: Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.
                       address: Jakarta Selatan, DKI Jakarta
-                  recommendations: []
+                      website_or_social_url: https://example.com/binajasa
+                      logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                      category_label: Perusahaan
+                  recommendations:
+                    - id: 2
+                      slug: security-freelance-jakarta
+                      position_name: Security Freelance
+                      job_type: freelance
+                      job_type_label: Freelance
+                      work_policy: kantor
+                      work_policy_label: Kerja di kantor
+                      created_at_human: 1 hari yang lalu
+                      salary_label: Gaji tidak ditampilkan
+                      mitra_name: PT Binajasa Sumber Sarana
+                      mitra_type: perusahaan
+                      province: DKI Jakarta
+                      location: Jakarta Selatan, DKI Jakarta
+                      skills: [Office Security, Hotel Security]
+                      benefits: [Uang Makan, Seragam Kerja]
+                      mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
                 errors: null
                 meta: null
         "404":
@@ -137,17 +239,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
   /public/explore/filters:
     get:
       tags: [Explore]
       summary: Opsi filter halaman explore
+      description: |
+        Mengembalikan semua opsi filter yang tersedia untuk halaman explore.
+        Digunakan frontend untuk merender dropdown/checkbox filter.
+        Setiap item filter memiliki `value` (untuk dikirim sebagai query param) dan `label` (untuk ditampilkan di UI).
+      security: []
       responses:
         "200":
           description: Opsi filter explore berhasil diambil
           content:
             application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeExploreFilters"
               example:
                 success: true
                 message: Opsi filter explore berhasil diambil.
@@ -155,17 +276,47 @@ paths:
                   job_types:
                     - value: penuh_waktu
                       label: Penuh Waktu
+                    - value: kontrak
+                      label: Kontrak
+                    - value: magang
+                      label: Magang
+                    - value: paruh_waktu
+                      label: Paruh Waktu
+                    - value: freelance
+                      label: Freelance
                   work_policies:
                     - value: kantor
                       label: Kerja di kantor
+                    - value: hybrid
+                      label: Hybrid
+                    - value: remote
+                      label: Kerja remote/dari rumah
                   provinces:
                     - DKI Jakarta
                     - Jawa Barat
+                    - Jawa Tengah
+                    - DI Yogyakarta
                   experience_levels:
+                    - value: tidak_berpengalaman
+                      label: Tidak Berpengalaman
                     - value: fresh_graduate
                       label: Fresh Graduate
+                    - value: kurang_dari_setahun
+                      label: Kurang dari Setahun
                   updated_within:
                     - value: 7d
                       label: Seminggu terakhir
+                    - value: 24h
+                      label: 24 jam terakhir
+                    - value: 30d
+                      label: 1 bulan terakhir
+                    - value: any
+                      label: Kapan pun
                 errors: null
                 meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

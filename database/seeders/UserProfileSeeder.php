@@ -19,6 +19,9 @@ class UserProfileSeeder extends Seeder
         $this->seedMitra();
         $this->seedSchools();
         $this->seedStudents();
+        $this->seedBulkSchools();
+        $this->seedBulkMitra();
+        $this->seedLargeSchoolWithStudents();
     }
 
     private function seedAdmin(): void
@@ -416,6 +419,203 @@ class UserProfileSeeder extends Seeder
                 'address' => 'Jakarta, DKI Jakarta',
             ]
         );
+    }
+
+    private function seedBulkSchools(int $count = 10): void
+    {
+        for ($i = 1; $i <= $count; $i++) {
+            $index = str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+            $schoolName = "SMK Mitra Karya {$index}";
+
+            $school = User::query()->updateOrCreate(
+                ['email' => "school.bulk.{$index}@kompeta.test"],
+                [
+                    'name' => $schoolName,
+                    'password' => 'password123',
+                    'role' => User::ROLE_SEKOLAH,
+                    'account_status' => User::STATUS_ACTIVE,
+                    'is_active' => true,
+                ]
+            );
+
+            SchoolProfile::query()->updateOrCreate(
+                ['user_id' => $school->id],
+                [
+                    'school_name' => $schoolName,
+                    'npsn' => '31'.str_pad((string) $i, 6, '0', STR_PAD_LEFT),
+                    'accreditation' => $i % 3 === 0 ? 'B' : 'A',
+                    'address' => "Jl. Pendidikan No. {$i}, Kota Contoh",
+                    'expertise_fields' => ['TKJ', 'RPL', 'AKL'],
+                    'logo_path' => "https://via.placeholder.com/200x200?text=SMK+Bulk+{$index}",
+                    'image_1_path' => "https://via.placeholder.com/400x300?text=SMK+Bulk+{$index}+1",
+                    'image_2_path' => "https://via.placeholder.com/400x300?text=SMK+Bulk+{$index}+2",
+                    'image_3_path' => null,
+                    'image_4_path' => null,
+                    'image_5_path' => null,
+                    'short_description' => "Sekolah dummy {$schoolName} untuk kebutuhan pengujian data eksplorasi.",
+                    'operational_license_path' => $this->storeLocalFile(
+                        "profiles/schools/legalities/smk-bulk-{$index}-license.pdf",
+                        "Izin Operasional {$schoolName}"
+                    ),
+                ]
+            );
+        }
+    }
+
+    private function seedBulkMitra(int $total = 10): void
+    {
+        $companyCount = intdiv($total, 2);
+        $umkmCount = $total - $companyCount;
+
+        for ($i = 1; $i <= $companyCount; $i++) {
+            $index = str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+            $companyName = "PT Mitra Industri {$index}";
+
+            $company = User::query()->updateOrCreate(
+                ['email' => "mitra.bulk.company.{$index}@kompeta.test"],
+                [
+                    'name' => $companyName,
+                    'password' => 'password123',
+                    'role' => User::ROLE_MITRA,
+                    'mitra_type' => User::MITRA_PERUSAHAAN,
+                    'account_status' => User::STATUS_ACTIVE,
+                    'is_active' => true,
+                ]
+            );
+
+            CompanyProfile::query()->updateOrCreate(
+                ['user_id' => $company->id],
+                [
+                    'company_name' => $companyName,
+                    'nib' => '777'.str_pad((string) $i, 10, '0', STR_PAD_LEFT),
+                    'industry_sector' => $i % 2 === 0 ? 'Manufaktur' : 'Teknologi Informasi',
+                    'employee_total_range' => $i % 2 === 0 ? '51-200' : '201-500',
+                    'office_address' => "Kawasan Industri Blok {$index}, Kota Contoh",
+                    'website_or_social_url' => "https://example.com/mitra-industri-{$index}",
+                    'short_description' => "Perusahaan dummy {$companyName} untuk simulasi mitra tipe perusahaan.",
+                    'company_logo_path' => "profiles/companies/logos/mitra-industri-{$index}.jpg",
+                    'image_1_path' => "profiles/companies/gallery/mitra-industri-{$index}-1.jpg",
+                    'image_2_path' => "profiles/companies/gallery/mitra-industri-{$index}-2.jpg",
+                    'image_3_path' => null,
+                    'image_4_path' => null,
+                    'image_5_path' => null,
+                    'kemenkumham_decree_path' => $this->storeLocalFile(
+                        "profiles/companies/legalities/mitra-industri-{$index}-sk.pdf",
+                        "SK Kemenkumham {$companyName}"
+                    ),
+                ]
+            );
+        }
+
+        for ($i = 1; $i <= $umkmCount; $i++) {
+            $index = str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+            $businessName = "UMKM Kreatif Nusantara {$index}";
+
+            $umkm = User::query()->updateOrCreate(
+                ['email' => "mitra.bulk.umkm.{$index}@kompeta.test"],
+                [
+                    'name' => $businessName,
+                    'password' => 'password123',
+                    'role' => User::ROLE_MITRA,
+                    'mitra_type' => User::MITRA_UMKM,
+                    'account_status' => User::STATUS_ACTIVE,
+                    'is_active' => true,
+                ]
+            );
+
+            UmkmProfile::query()->updateOrCreate(
+                ['user_id' => $umkm->id],
+                [
+                    'business_name' => $businessName,
+                    'owner_nik' => '3301'.str_pad((string) $i, 12, '0', STR_PAD_LEFT),
+                    'owner_personal_nib' => "NIB-UMKM-BULK-{$index}",
+                    'business_type' => $i % 2 === 0 ? 'Kuliner' : 'Kerajinan',
+                    'business_address' => "Sentra UMKM No. {$i}, Kota Contoh",
+                    'umkm_logo_path' => "https://via.placeholder.com/200x200?text=UMKM+Bulk+{$index}",
+                    'owner_ktp_photo_path' => $this->storeLocalFile(
+                        "profiles/umkm/ktp/umkm-bulk-{$index}-ktp.jpg",
+                        "KTP Owner {$businessName}"
+                    ),
+                    'short_description' => "UMKM dummy {$businessName} untuk simulasi mitra tipe UMKM.",
+                    'image_1_path' => "https://via.placeholder.com/400x300?text=UMKM+Bulk+{$index}+1",
+                    'image_2_path' => "https://via.placeholder.com/400x300?text=UMKM+Bulk+{$index}+2",
+                    'image_3_path' => "https://via.placeholder.com/400x300?text=UMKM+Bulk+{$index}+3",
+                    'image_4_path' => "https://via.placeholder.com/400x300?text=UMKM+Bulk+{$index}+4",
+                    'image_5_path' => "https://via.placeholder.com/400x300?text=UMKM+Bulk+{$index}+5",
+                ]
+            );
+        }
+    }
+
+    private function seedLargeSchoolWithStudents(int $totalStudents = 200): void
+    {
+        $school = User::query()->updateOrCreate(
+            ['email' => 'school.massive@kompeta.test'],
+            [
+                'name' => 'SMK Pusat Talenta Nusantara',
+                'password' => 'password123',
+                'role' => User::ROLE_SEKOLAH,
+                'account_status' => User::STATUS_ACTIVE,
+                'is_active' => true,
+            ]
+        );
+
+        SchoolProfile::query()->updateOrCreate(
+            ['user_id' => $school->id],
+            [
+                'school_name' => 'SMK Pusat Talenta Nusantara',
+                'npsn' => '31999999',
+                'accreditation' => 'A',
+                'address' => 'Jl. Pendidikan Nasional No. 200, Kota Contoh',
+                'expertise_fields' => ['RPL', 'TKJ', 'AKL', 'DKV'],
+                'logo_path' => 'https://via.placeholder.com/200x200?text=SMK+Talenta',
+                'image_1_path' => 'https://via.placeholder.com/400x300?text=SMK+Talenta+1',
+                'image_2_path' => 'https://via.placeholder.com/400x300?text=SMK+Talenta+2',
+                'image_3_path' => 'https://via.placeholder.com/400x300?text=SMK+Talenta+3',
+                'image_4_path' => null,
+                'image_5_path' => null,
+                'short_description' => 'Sekolah dummy skala besar untuk simulasi data 200 siswa lintas status kelulusan.',
+                'operational_license_path' => $this->storeLocalFile(
+                    'profiles/schools/legalities/smk-talenta-license.pdf',
+                    'Izin Operasional SMK Pusat Talenta Nusantara'
+                ),
+            ]
+        );
+
+        for ($i = 1; $i <= $totalStudents; $i++) {
+            $index = str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+            $fullName = "Siswa Massal {$index}";
+            $graduationStatus = $i <= intdiv($totalStudents, 2) ? 'graduated' : 'active';
+
+            $studentUser = User::query()->updateOrCreate(
+                ['email' => "student.massive.{$index}@kompeta.test"],
+                [
+                    'name' => $fullName,
+                    'password' => 'password123',
+                    'role' => User::ROLE_SISWA,
+                    'account_status' => User::STATUS_ACTIVE,
+                    'is_active' => true,
+                ]
+            );
+
+            StudentProfile::query()->updateOrCreate(
+                ['nisn' => '9'.str_pad((string) $i, 9, '0', STR_PAD_LEFT)],
+                [
+                    'user_id' => $studentUser->id,
+                    'school_user_id' => $school->id,
+                    'full_name' => $fullName,
+                    'photo_profile_path' => null,
+                    'major' => $i % 3 === 0 ? 'RPL' : ($i % 3 === 1 ? 'TKJ' : 'AKL'),
+                    'school_origin' => 'SMK Pusat Talenta Nusantara',
+                    'graduation_status' => $graduationStatus,
+                    'class_year' => $graduationStatus === 'graduated' ? '2024' : '2026',
+                    'unique_code' => 'MS'.str_pad((string) $i, 14, '0', STR_PAD_LEFT),
+                    'description' => "Profil dummy {$fullName} untuk simulasi data siswa sekolah besar.",
+                    'phone_number' => '08'.str_pad((string) $i, 10, '0', STR_PAD_LEFT),
+                    'address' => 'Kota Contoh, Indonesia',
+                ]
+            );
+        }
     }
 
     private function storeLocalFile(string $path, string $content): string

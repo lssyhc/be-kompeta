@@ -25,6 +25,18 @@ info:
     - Pending sekolah: school.pending@kompeta.test
     - Pending mitra: mitra.pending@kompeta.test
     - Rejected mitra: mitra.rejected@kompeta.test
+
+    Dataset dummy tambahan (Seeder terbaru):
+    - 10 sekolah tambahan aktif:
+      - Email pattern: school.bulk.01@kompeta.test sampai school.bulk.10@kompeta.test
+    - 10 mitra tambahan aktif (5 perusahaan + 5 UMKM):
+      - Perusahaan email pattern: mitra.bulk.company.01@kompeta.test sampai mitra.bulk.company.05@kompeta.test
+      - UMKM email pattern: mitra.bulk.umkm.01@kompeta.test sampai mitra.bulk.umkm.05@kompeta.test
+    - 1 sekolah dengan data siswa skala besar:
+      - Akun sekolah: school.massive@kompeta.test
+      - Total siswa terkait: 200
+      - Komposisi graduation_status: 100 graduated, 100 active
+      - Email siswa pattern: student.massive.001@kompeta.test sampai student.massive.200@kompeta.test
 servers:
   - url: /api
     description: Current host

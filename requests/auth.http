@@ -268,68 +268,7 @@ Content-Type: image/jpeg
 ###
 
 ### ============================================================
-### 4. REGISTER - Validasi: tolak field yang dilarang (perusahaan)
-###    Expect: 422 dengan error pinpoint_map & contact_person
-### ============================================================
-
-POST {{baseUrl}}/auth/register
-Accept: application/json
-Content-Type: multipart/form-data; boundary=BoundaryKOMPETA
-
---BoundaryKOMPETA
-Content-Disposition: form-data; name="role"
-
-mitra
---BoundaryKOMPETA
-Content-Disposition: form-data; name="mitra_type"
-
-perusahaan
---BoundaryKOMPETA
-Content-Disposition: form-data; name="email"
-
-test.tolak@example.com
---BoundaryKOMPETA
-Content-Disposition: form-data; name="password"
-
-password123
---BoundaryKOMPETA
-Content-Disposition: form-data; name="password_confirmation"
-
-password123
---BoundaryKOMPETA
-Content-Disposition: form-data; name="company_name"
-
-PT Test Tolak
---BoundaryKOMPETA
-Content-Disposition: form-data; name="nib"
-
-9876543210001
---BoundaryKOMPETA
-Content-Disposition: form-data; name="industry_sector"
-
-Retail
---BoundaryKOMPETA
-Content-Disposition: form-data; name="employee_total_range"
-
-1-10
---BoundaryKOMPETA
-Content-Disposition: form-data; name="office_address"
-
-Jl. Test No. 1
---BoundaryKOMPETA
-Content-Disposition: form-data; name="pinpoint_map"
-
--6.2,106.8
---BoundaryKOMPETA
-Content-Disposition: form-data; name="contact_person"
-
-08123456789
---BoundaryKOMPETA--
-
-###
-
-### ============================================================
-### 5. REGISTER - Validasi: tolak role siswa (harus 422)
+### 4. REGISTER - Validasi: tolak role siswa (harus 422)
 ### ============================================================
 
 POST {{baseUrl}}/auth/register
@@ -346,7 +285,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 6. REGISTER - Validasi: tolak role admin (harus 422)
+### 5. REGISTER - Validasi: tolak role admin (harus 422)
 ### ============================================================
 
 POST {{baseUrl}}/auth/register
@@ -363,7 +302,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 7. LOGIN - Sekolah (email + password) sebelum approval admin
+### 6. LOGIN - Sekolah (email + password) sebelum approval admin
 ###    Jalankan Register Sekolah (#1), lalu coba login ini (expected 403)
 ### ============================================================
 
@@ -382,7 +321,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 8. LOGIN - Mitra Perusahaan (email + password) sebelum approval admin
+### 7. LOGIN - Mitra Perusahaan (email + password) sebelum approval admin
 ###    Jalankan Register Mitra Perusahaan (#2), lalu coba login ini (expected 403)
 ### ============================================================
 
@@ -401,7 +340,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 9. LOGIN - Mitra UMKM (email + password) sebelum approval admin
+### 8. LOGIN - Mitra UMKM (email + password) sebelum approval admin
 ###    Jalankan Register Mitra UMKM (#3), lalu coba login ini (expected 403)
 ### ============================================================
 
@@ -420,7 +359,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 10. LOGIN - Admin (seeded via DatabaseSeeder)
+### 9. LOGIN - Admin (seeded via DatabaseSeeder)
 ###     Email   : admin@kompeta.test
 ###     Password: admin12345
 ### ============================================================

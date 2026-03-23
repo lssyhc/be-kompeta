@@ -41,7 +41,6 @@ class RegisterRequest extends FormRequest
                 'image_5' => ['nullable', 'image', 'max:2048'],
                 'short_description' => ['required', 'string', 'max:1000'],
                 'operational_license' => ['required', 'file', 'mimes:pdf', 'max:4096'],
-                'pinpoint_map' => ['prohibited'],
             ]);
         }
 
@@ -62,8 +61,6 @@ class RegisterRequest extends FormRequest
                 'image_4' => ['nullable', 'image', 'max:2048'],
                 'image_5' => ['nullable', 'image', 'max:2048'],
                 'kemenkumham_decree' => ['required', 'file', 'mimes:pdf', 'max:4096'],
-                'pinpoint_map' => ['prohibited'],
-                'contact_person' => ['prohibited'],
             ]);
         }
 
@@ -83,9 +80,6 @@ class RegisterRequest extends FormRequest
                 'image_3' => ['required', 'image', 'max:2048'],
                 'image_4' => ['required', 'image', 'max:2048'],
                 'image_5' => ['required', 'image', 'max:2048'],
-                'foto_tampak_depan' => ['prohibited'],
-                'pinpoint_map' => ['prohibited'],
-                'nomor_whatsapp' => ['prohibited'],
             ]);
         }
 

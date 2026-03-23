@@ -232,35 +232,6 @@ class AuthApiTest extends TestCase
             ]);
     }
 
-    public function test_mitra_perusahaan_register_rejects_forbidden_fields(): void
-    {
-        Storage::fake('local');
-        Storage::fake('public');
-
-        $response = $this->post('/api/auth/register', [
-            'role' => User::ROLE_MITRA,
-            'mitra_type' => User::MITRA_PERUSAHAAN,
-            'email' => 'corp@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'company_name' => 'PT Maju Jaya',
-            'nib' => '1234567890123',
-            'industry_sector' => 'IT',
-            'employee_total_range' => '51-200',
-            'office_address' => 'Jl. Sudirman No. 10',
-            'short_description' => 'Perusahaan teknologi fokus pada software enterprise.',
-            'company_logo' => UploadedFile::fake()->image('company-logo.jpg'),
-            'kemenkumham_decree' => UploadedFile::fake()->create('sk.pdf', 100, 'application/pdf'),
-            'pinpoint_map' => '-6.2,106.8',
-            'contact_person' => '08123456789',
-        ], [
-            'Accept' => 'application/json',
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['pinpoint_map', 'contact_person']);
-    }
-
     public function test_umkm_register_requires_all_five_images(): void
     {
         Storage::fake('local');

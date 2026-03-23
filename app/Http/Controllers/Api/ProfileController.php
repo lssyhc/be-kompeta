@@ -103,6 +103,7 @@ class ProfileController extends Controller
             }
 
             $profilePayload = $studentProfile->toArray();
+
             /** @var Collection<int, StudentApplication> $applications */
             $applications = $studentProfile->applications;
             $profilePayload['job_applications'] = $applications

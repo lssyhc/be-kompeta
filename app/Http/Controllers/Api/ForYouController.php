@@ -80,10 +80,6 @@ class ForYouController extends Controller
         ], 'Opsi urutan for you berhasil diambil.');
     }
 
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array{skills: array<int, string>, work_policies: array<int, string>, job_types: array<int, string>, province: ?string}
-     */
     private function resolvePreferences(array $validated): array
     {
         $querySkills = collect($validated['preferred_skills'] ?? [])
@@ -123,9 +119,6 @@ class ForYouController extends Controller
         ];
     }
 
-    /**
-     * @param  array{skills: array<int, string>, work_policies: array<int, string>, job_types: array<int, string>, province: ?string}  $preferences
-     */
     private function applyPreferenceScoring(Builder $query, array $preferences): void
     {
         $query->select('job_vacancies.*');
@@ -151,9 +144,6 @@ class ForYouController extends Controller
         }
     }
 
-    /**
-     * @param  array<int, string>  $preferredValues
-     */
     private function appendMatchScoreColumn(Builder $query, string $column, string $alias, array $preferredValues): void
     {
         if (count($preferredValues) < 1) {

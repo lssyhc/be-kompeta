@@ -15,9 +15,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin User */
 class SchoolDetailResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $profile = $this->schoolProfile;

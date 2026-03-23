@@ -49,7 +49,7 @@ class AdminRegistrationController extends Controller
             $query->where('mitra_type', $validated['mitra_type']);
         }
 
-        /** @var LengthAwarePaginator $paginator */
+        /** @var LengthAwarePaginator<int, mixed> $paginator */
         $paginator = $query
             ->paginate($perPage)
             ->appends($request->query());

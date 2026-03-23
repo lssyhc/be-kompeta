@@ -11,9 +11,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin User */
 class MitraDetailResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         [
@@ -42,9 +39,6 @@ class MitraDetailResource extends JsonResource
         ];
     }
 
-    /**
-     * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string, 4: ?string, 5: ?string, 6: ?string, 7: array<string>}
-     */
     private function resolveProfileFields(): array
     {
         if ($this->mitra_type === User::MITRA_PERUSAHAAN) {

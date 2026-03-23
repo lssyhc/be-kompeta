@@ -42,7 +42,7 @@ class SchoolController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        /** @var User|null $user */
+
         $user = User::query()
             ->where('role', User::ROLE_SEKOLAH)
             ->where('account_status', User::STATUS_ACTIVE)

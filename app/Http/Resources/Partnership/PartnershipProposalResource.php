@@ -12,9 +12,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin PartnershipProposal */
 class PartnershipProposalResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $mitraUser = $this->mitraUser;

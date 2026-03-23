@@ -10,9 +10,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin Article */
 class ArticleCardResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $contentType = $this->contentType;

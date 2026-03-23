@@ -11,9 +11,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin JobVacancy */
 class ExploreJobDetailResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         $frontendBaseUrl = rtrim((string) (config('app.frontend_url') ?: config('app.url')), '/');

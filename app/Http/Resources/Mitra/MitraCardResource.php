@@ -14,9 +14,6 @@ use Illuminate\Support\Carbon;
 /** @mixin User */
 class MitraCardResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         [$name, $logoUrl, $address, $sector] = $this->resolveProfileFields();
@@ -50,9 +47,6 @@ class MitraCardResource extends JsonResource
         ];
     }
 
-    /**
-     * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string}
-     */
     private function resolveProfileFields(): array
     {
         if ($this->mitra_type === User::MITRA_PERUSAHAAN) {

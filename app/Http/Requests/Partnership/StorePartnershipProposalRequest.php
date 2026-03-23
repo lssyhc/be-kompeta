@@ -16,7 +16,7 @@ class StorePartnershipProposalRequest extends FormRequest
         return [
             'target_user_id' => ['required', 'integer', 'exists:users,id'],
             'proposal_pdf' => ['required', 'file', 'mimes:pdf', 'max:5120'],
-            'signature_file' => ['required', 'file', 'mimes:pdf', 'max:2048'],
+            'signature_file' => ['required', 'file', 'mimes:pdf', 'max:5120'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }

@@ -14,7 +14,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->withHeaders([
             'Accept' => 'application/json',
-        ])->get('/api/user');
+        ])->get('/api/auth/me');
 
         $response->assertStatus(401);
     }

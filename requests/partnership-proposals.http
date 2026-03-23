@@ -17,7 +17,7 @@ Content-Type: application/json
 
 ###
 
-### 1) CREATE DRAFT PROPOSAL
+### 1) SEND PROPOSAL
 POST {{baseUrl}}/partnership-proposals
 Accept: application/json
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
@@ -60,21 +60,7 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 
 ###
 
-### 4) UPDATE DRAFT PROPOSAL
-PUT {{baseUrl}}/partnership-proposals/{{proposalId}}
-Accept: application/json
-Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="notes"
-
-Revisi proposal batch 2.
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
-
-###
-
-### 5) SUBMIT PROPOSAL
-POST {{baseUrl}}/partnership-proposals/{{proposalId}}/submit
+### 4) LIST RECEIVED PROPOSALS
+GET {{baseUrl}}/partnership-proposals?scope=received
 Accept: application/json
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}

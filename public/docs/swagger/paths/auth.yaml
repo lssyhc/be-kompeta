@@ -15,8 +15,8 @@ paths:
         Jika Swagger UI menampilkan text editor (bukan form), gunakan Postman/curl untuk mengirim file.
 
         **File wajib per role:**
-        - **Sekolah:** `logo` (gambar, maks 2 MB), `operational_license` (PDF, maks 4 MB)
-        - **Mitra perusahaan:** `company_logo` (gambar, maks 2 MB), `kemenkumham_decree` (PDF, maks 4 MB)
+        - **Sekolah:** `logo` (gambar, maks 2 MB), `operational_license` (PDF, maks 5 MB)
+        - **Mitra perusahaan:** `company_logo` (gambar, maks 2 MB), `kemenkumham_decree` (PDF, maks 5 MB)
         - **Mitra UMKM:** `umkm_logo` (gambar, maks 2 MB), `owner_ktp_photo` (gambar, maks 2 MB), `image_1`–`image_5` (gambar, masing-masing maks 2 MB)
 
         **File opsional (semua role kecuali UMKM):**
@@ -299,63 +299,6 @@ paths:
         **Perbedaan dengan `/profile`:**
         - `/auth/me` menyertakan `requires_skill_setup` dan `next_step` (onboarding state).
         - `/profile` mengembalikan detail profil yang lebih lengkap (termasuk `job_applications` untuk siswa).
-      responses:
-        "200":
-          description: Data user berhasil diambil
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthMe"
-              example:
-                success: true
-                message: Data user berhasil diambil.
-                data:
-                  user:
-                    id: 13
-                    name: Ahmad Wijaya
-                    email: null
-                    role: siswa
-                    mitra_type: null
-                    account_status: active
-                    is_active: true
-                    last_login_at: "2026-03-23T10:30:00.000000Z"
-                  role_profile:
-                    full_name: Ahmad Wijaya
-                    nisn: "0002345678"
-                    school_origin: SMA Negeri 2 Jakarta
-                  requires_skill_setup: false
-                  next_step: null
-                errors: null
-                meta: null
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-  /user:
-    get:
-      tags: [Auth]
-      summary: "[DEPRECATED] Alias endpoint /auth/me"
-      deprecated: true
-      description: |
-        **⚠️ DEPRECATED** — Gunakan `/auth/me` sebagai pengganti.
-
-        Endpoint ini adalah alias dari `/auth/me` dan akan dihapus di versi mendatang.
-        Response identik dengan `/auth/me`.
       responses:
         "200":
           description: Data user berhasil diambil

@@ -18,7 +18,7 @@ Content-Type: application/json
 
 ###
 
-### 1) CREATE DRAFT APPLICATION (UPLOAD CV)
+### 1) SEND APPLICATION (UPLOAD CV)
 POST {{baseUrl}}/student/job-applications
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
@@ -41,36 +41,15 @@ Content-Type: application/pdf
 
 ###
 
-### 2) UPDATE DRAFT APPLICATION
-@applicationId = 1
-PUT {{baseUrl}}/student/job-applications/{{applicationId}}
-Accept: application/json
-Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="cover_letter"
-
-Saya memperbarui draft lamaran dan siap mengirim lamaran final.
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
-
-###
-
-### 3) SUBMIT DRAFT APPLICATION
-POST {{baseUrl}}/student/job-applications/{{applicationId}}/submit
-Accept: application/json
-Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
-
-###
-
-### 4) LIST MY APPLICATIONS
+### 2) LIST MY APPLICATIONS
 GET {{baseUrl}}/student/job-applications
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 
 ###
 
-### 5) SHOW MY APPLICATION DETAIL
+### 3) SHOW MY APPLICATION DETAIL
+@applicationId = 1
 GET {{baseUrl}}/student/job-applications/{{applicationId}}
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}

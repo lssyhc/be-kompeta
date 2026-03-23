@@ -33,14 +33,14 @@ class RegisterRequest extends FormRequest
                 'address' => ['required', 'string'],
                 'expertise_fields' => ['required', 'array', 'min:1'],
                 'expertise_fields.*' => ['required', 'string', 'max:100'],
-                'logo' => ['required', 'image', 'max:2048'],
-                'image_1' => ['nullable', 'image', 'max:2048'],
-                'image_2' => ['nullable', 'image', 'max:2048'],
-                'image_3' => ['nullable', 'image', 'max:2048'],
-                'image_4' => ['nullable', 'image', 'max:2048'],
-                'image_5' => ['nullable', 'image', 'max:2048'],
+                'logo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_1' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_2' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_3' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_4' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_5' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'short_description' => ['required', 'string', 'max:1000'],
-                'operational_license' => ['required', 'file', 'mimes:pdf', 'max:4096'],
+                'operational_license' => ['required', 'file', 'mimes:pdf', 'max:5120'],
             ]);
         }
 
@@ -54,13 +54,13 @@ class RegisterRequest extends FormRequest
                 'office_address' => ['required', 'string'],
                 'website_or_social_url' => ['nullable', 'url', 'max:255'],
                 'short_description' => ['required', 'string', 'max:1000'],
-                'company_logo' => ['required', 'image', 'max:2048'],
-                'image_1' => ['nullable', 'image', 'max:2048'],
-                'image_2' => ['nullable', 'image', 'max:2048'],
-                'image_3' => ['nullable', 'image', 'max:2048'],
-                'image_4' => ['nullable', 'image', 'max:2048'],
-                'image_5' => ['nullable', 'image', 'max:2048'],
-                'kemenkumham_decree' => ['required', 'file', 'mimes:pdf', 'max:4096'],
+                'company_logo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_1' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_2' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_3' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_4' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_5' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'kemenkumham_decree' => ['required', 'file', 'mimes:pdf', 'max:5120'],
             ]);
         }
 
@@ -73,13 +73,13 @@ class RegisterRequest extends FormRequest
                 'business_type' => ['required', 'string', 'max:100'],
                 'business_address' => ['required', 'string'],
                 'short_description' => ['required', 'string', 'max:1000'],
-                'umkm_logo' => ['required', 'image', 'max:2048'],
-                'owner_ktp_photo' => ['required', 'image', 'max:2048'],
-                'image_1' => ['required', 'image', 'max:2048'],
-                'image_2' => ['required', 'image', 'max:2048'],
-                'image_3' => ['required', 'image', 'max:2048'],
-                'image_4' => ['required', 'image', 'max:2048'],
-                'image_5' => ['required', 'image', 'max:2048'],
+                'umkm_logo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'owner_ktp_photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_1' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_2' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_3' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_4' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'image_5' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             ]);
         }
 

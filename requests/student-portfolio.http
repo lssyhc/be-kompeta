@@ -417,11 +417,11 @@ Content-Type: application/json
 
 ### ============================================================
 ### 19. APPLICATION REMINDER
-###     Endpoint: GET /api/student/application-reminder
-###     Menampilkan pesan pengingat untuk siswa saat melamar kerja
+###     Endpoint: GET /api/application-reminder
+###     Menampilkan pesan pengingat saat melamar kerja
 ### ============================================================
 
-GET {{baseUrl}}/student/application-reminder
+GET {{baseUrl}}/application-reminder
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 

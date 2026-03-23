@@ -116,13 +116,14 @@ paths:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
-  /student/application-reminder:
+  /application-reminder:
     get:
       tags: [Student Portfolio]
-      summary: Ambil reminder lamaran siswa
+      summary: Ambil reminder lamaran
       description: |
-        Mengembalikan teks reminder statis untuk siswa terkait lamaran kerja.
+        Mengembalikan teks reminder statis terkait lamaran kerja.
         Pesan reminder bersifat hardcoded di server.
+        Endpoint ini dapat diakses oleh semua user yang sudah login.
       responses:
         "200":
           description: Reminder berhasil diambil

@@ -5,7 +5,7 @@ paths:
       summary: Riwayat lamaran kerja siswa
       description: |
         Menampilkan riwayat lamaran kerja siswa yang sedang login (paginated).
-        Diurutkan berdasarkan `applied_at`, `submitted_at`, `created_at` (terbaru dulu).
+        Diurutkan berdasarkan `applied_at`, `created_at` (terbaru dulu).
 
         Hanya user dengan role `siswa` yang dapat mengakses.
       parameters:
@@ -88,22 +88,17 @@ paths:
 
     post:
       tags: [Student Job Applications]
-      summary: Buat draft lamaran kerja ke lowongan mitra
+      summary: Kirim lamaran kerja ke lowongan mitra
       description: |
-        Membuat draft lamaran kerja baru untuk lowongan yang sudah dipublikasi.
-
-        **Alur lamaran:**
-        1. Siswa membuat draft (`POST /student/job-applications`) → status `draft`
-        2. Siswa bisa memperbarui draft (`PUT /student/job-applications/{id}`)
-        3. Siswa mengirim draft (`POST /student/job-applications/{id}/submit`) → status `submitted`
+        Membuat dan langsung mengirim lamaran kerja baru untuk lowongan yang sudah dipublikasi.
 
         **Validasi bisnis:**
         - Lowongan (`job_vacancy_id`) harus ada dan berstatus `published`.
-        - Siswa tidak boleh memiliki draft atau lamaran `submitted` aktif untuk lowongan yang sama (duplikat ditolak dengan 422).
+        - Siswa tidak boleh memiliki lamaran `submitted` aktif untuk lowongan yang sama (duplikat ditolak dengan 422).
 
         **Field:**
         - `job_vacancy_id` (wajib): ID lowongan kerja target
-        - `cv` (wajib): File CV (PDF/DOC/DOCX, maks 4 MB)
+        - `cv` (wajib): File CV (PDF, maks 5 MB)
         - `cover_letter` (opsional): Surat lamaran teks (maks 2000 karakter)
       requestBody:
         required: true
@@ -113,14 +108,14 @@ paths:
               $ref: "../openapi.yaml#/components/schemas/StoreStudentJobApplicationRequest"
       responses:
         "201":
-          description: Draft lamaran pekerjaan berhasil dibuat
+          description: Lamaran pekerjaan berhasil dikirim
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
               example:
                 success: true
-                message: Draft lamaran pekerjaan berhasil dibuat.
+                message: Lamaran pekerjaan berhasil dikirim.
                 data:
                   id: 1
                   student_profile_id: 1
@@ -129,9 +124,9 @@ paths:
                   mitra_user_id: 2
                   company_name: PT Binajasa Sumber Sarana
                   role_type: Accounting Staff
-                  status_submit: draft
-                  submitted_at: null
-                  applied_at: null
+                  status_submit: submitted
+                  submitted_at: "2026-03-19"
+                  applied_at: "2026-03-19T09:00:00+07:00"
                   cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
                   has_cv_file: true
                 errors: null
@@ -190,10 +185,10 @@ paths:
                         - The job vacancy id field is required.
                     meta: null
                 duplikat:
-                  summary: Draft/lamaran aktif sudah ada untuk lowongan ini
+                  summary: Lamaran aktif sudah ada untuk lowongan ini
                   value:
                     success: false
-                    message: Anda sudah memiliki draft atau lamaran aktif untuk lowongan ini.
+                    message: Lamaran untuk lowongan ini sudah ada.
                     data: null
                     errors: null
                     meta: null
@@ -280,227 +275,6 @@ paths:
                 data: null
                 errors: null
                 meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-    put:
-      tags: [Student Job Applications]
-      summary: Perbarui draft lamaran kerja siswa
-      description: |
-        Memperbarui draft lamaran kerja yang belum dikirim.
-
-        **Syarat:**
-        - Lamaran harus masih berstatus `draft`. Lamaran yang sudah `submitted` tidak dapat diedit (422).
-
-        **Field yang bisa diperbarui:**
-        - `cv`: File CV pengganti (akan menghapus file CV lama dari storage)
-        - `cover_letter`: Teks surat lamaran
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID lamaran kerja (harus berstatus draft)
-          example: 1
-      requestBody:
-        required: false
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "../openapi.yaml#/components/schemas/UpdateStudentJobApplicationRequest"
-      responses:
-        "200":
-          description: Draft lamaran berhasil diperbarui
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
-              example:
-                success: true
-                message: Draft lamaran berhasil diperbarui.
-                data:
-                  id: 1
-                  student_profile_id: 1
-                  job_vacancy_id: 1
-                  job_slug: accounting-staff-1602be
-                  mitra_user_id: 2
-                  company_name: PT Binajasa Sumber Sarana
-                  role_type: Accounting Staff
-                  status_submit: draft
-                  submitted_at: null
-                  applied_at: null
-                  cover_letter: Cover letter diperbarui.
-                  has_cv_file: true
-                errors: null
-                meta: null
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "403":
-          description: User bukan role siswa
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
-              example:
-                success: false
-                message: Hanya user siswa yang dapat mengedit lamaran.
-                data: null
-                errors: null
-                meta: null
-        "404":
-          description: Draft lamaran tidak ditemukan
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
-              example:
-                success: false
-                message: Lamaran tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "422":
-          description: Lamaran sudah dikirim (tidak bisa diedit) atau validasi gagal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              example:
-                success: false
-                message: Lamaran sudah dikirim dan tidak dapat diubah.
-                data: null
-                errors: null
-                meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-  /student/job-applications/{id}/submit:
-    post:
-      tags: [Student Job Applications]
-      summary: Kirim draft lamaran kerja siswa
-      description: |
-        Mengirim (submit) draft lamaran kerja sehingga statusnya berubah dari `draft` ke `submitted`.
-
-        **Syarat submit:**
-        - Lamaran harus berstatus `draft`.
-        - Lamaran harus sudah memiliki file CV yang diunggah. Jika belum, akan ditolak dengan 422.
-
-        **Setelah submit:**
-        - `status_submit` berubah dari `draft` → `submitted`
-        - `submitted_at` diisi tanggal hari ini
-        - `applied_at` diisi timestamp saat ini
-        - Lamaran tidak dapat diedit lagi setelah dikirim.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID lamaran kerja (harus berstatus draft)
-          example: 1
-      responses:
-        "200":
-          description: Lamaran pekerjaan berhasil dikirim
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
-              example:
-                success: true
-                message: Lamaran pekerjaan berhasil dikirim.
-                data:
-                  id: 1
-                  student_profile_id: 1
-                  job_vacancy_id: 1
-                  job_slug: accounting-staff-1602be
-                  mitra_user_id: 2
-                  company_name: PT Binajasa Sumber Sarana
-                  role_type: Accounting Staff
-                  status_submit: submitted
-                  submitted_at: "2026-03-19"
-                  applied_at: "2026-03-19T09:00:00+07:00"
-                  cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
-                  has_cv_file: true
-                errors: null
-                meta: null
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "403":
-          description: User bukan role siswa
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
-              example:
-                success: false
-                message: Hanya user siswa yang dapat mengirim lamaran.
-                data: null
-                errors: null
-                meta: null
-        "404":
-          description: Draft lamaran tidak ditemukan
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
-              example:
-                success: false
-                message: Lamaran tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "422":
-          description: Draft tidak valid, sudah dikirim, atau CV belum diunggah
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              examples:
-                sudah_dikirim:
-                  summary: Lamaran sudah dikirim sebelumnya
-                  value:
-                    success: false
-                    message: Lamaran sudah dikirim sebelumnya.
-                    data: null
-                    errors: null
-                    meta: null
-                cv_kosong:
-                  summary: File CV belum diunggah
-                  value:
-                    success: false
-                    message: File CV harus diunggah sebelum mengirim lamaran.
-                    data: null
-                    errors: null
-                    meta: null
         "500":
           description: Kesalahan server internal
           content:

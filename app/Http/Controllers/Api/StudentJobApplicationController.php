@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentJobApplicationRequest;
-use App\Http\Requests\Student\UpdateStudentJobApplicationRequest;
 use App\Http\Resources\Student\StudentJobApplicationResource;
 use App\Models\JobVacancy;
 use App\Models\StudentApplication;
@@ -12,7 +11,6 @@ use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class StudentJobApplicationController extends Controller
 {
@@ -30,7 +28,6 @@ class StudentJobApplicationController extends Controller
             ->where('student_profile_id', $studentProfile->id)
             ->with(['jobVacancy'])
             ->orderByDesc('applied_at')
-            ->orderByDesc('submitted_at')
             ->orderByDesc('created_at')
             ->paginate($perPage)
             ->appends($request->query());
@@ -65,12 +62,14 @@ class StudentJobApplicationController extends Controller
         $alreadyApplied = StudentApplication::query()
             ->where('student_profile_id', $studentProfile->id)
             ->where('job_vacancy_id', $jobVacancy->id)
-            ->whereIn('status', [StudentApplication::STATUS_DRAFT, StudentApplication::STATUS_SUBMITTED])
+            ->where('status', StudentApplication::STATUS_SUBMITTED)
             ->exists();
 
         if ($alreadyApplied) {
-            return $this->errorResponse('Draft/lamaran aktif untuk lowongan ini sudah ada.', 422);
+            return $this->errorResponse('Lamaran untuk lowongan ini sudah ada.', 422);
         }
+
+        $now = now();
 
         $application = StudentApplication::query()->create([
             'student_profile_id' => $studentProfile->id,
@@ -78,19 +77,19 @@ class StudentJobApplicationController extends Controller
             'mitra_user_id' => $jobVacancy->mitra_user_id,
             'company_name' => $jobVacancy->resolveMitraName() ?? '',
             'role_type' => $jobVacancy->position_name,
-            'submitted_at' => null,
-            'submit_status' => StudentApplication::STATUS_DRAFT,
+            'submitted_at' => $now->toDateString(),
+            'submit_status' => StudentApplication::STATUS_SUBMITTED,
             'cv_path' => $request->file('cv')->store('student-applications/cv', 'local'),
             'cover_letter' => $validated['cover_letter'] ?? null,
-            'status' => StudentApplication::STATUS_DRAFT,
-            'applied_at' => null,
+            'status' => StudentApplication::STATUS_SUBMITTED,
+            'applied_at' => $now,
         ]);
 
         $application->loadMissing(['jobVacancy']);
 
         return $this->successResponse(
             (new StudentJobApplicationResource($application))->resolve(),
-            'Draft lamaran pekerjaan berhasil dibuat.',
+            'Lamaran pekerjaan berhasil dikirim.',
             201
         );
     }
@@ -116,91 +115,6 @@ class StudentJobApplicationController extends Controller
         return $this->successResponse(
             (new StudentJobApplicationResource($application))->resolve(),
             'Detail lamaran berhasil diambil.'
-        );
-    }
-
-    public function update(UpdateStudentJobApplicationRequest $request, int $id): JsonResponse
-    {
-        $studentProfile = $this->resolveStudentProfile($request);
-
-        if (! $studentProfile instanceof StudentProfile) {
-            return $this->errorResponse('Hanya user siswa yang dapat mengubah draft lamaran.', 403);
-        }
-
-        $application = StudentApplication::query()
-            ->where('id', $id)
-            ->where('student_profile_id', $studentProfile->id)
-            ->with(['jobVacancy'])
-            ->first();
-
-        if (! $application instanceof StudentApplication) {
-            return $this->errorResponse('Draft lamaran tidak ditemukan.', 404);
-        }
-
-        if (! $application->isDraft()) {
-            return $this->errorResponse('Lamaran yang sudah dikirim tidak dapat diubah.', 422);
-        }
-
-        $payload = [];
-
-        if ($request->hasFile('cv')) {
-            if (is_string($application->cv_path) && $application->cv_path !== '') {
-                Storage::disk('local')->delete($application->cv_path);
-            }
-
-            $payload['cv_path'] = $request->file('cv')->store('student-applications/cv', 'local');
-        }
-
-        if ($request->has('cover_letter')) {
-            $payload['cover_letter'] = $request->input('cover_letter');
-        }
-
-        if (! empty($payload)) {
-            $application->update($payload);
-        }
-
-        return $this->successResponse(
-            (new StudentJobApplicationResource($application))->resolve(),
-            'Draft lamaran berhasil diperbarui.'
-        );
-    }
-
-    public function submit(Request $request, int $id): JsonResponse
-    {
-        $studentProfile = $this->resolveStudentProfile($request);
-
-        if (! $studentProfile instanceof StudentProfile) {
-            return $this->errorResponse('Hanya user siswa yang dapat mengirim lamaran.', 403);
-        }
-
-        $application = StudentApplication::query()
-            ->where('id', $id)
-            ->where('student_profile_id', $studentProfile->id)
-            ->with(['jobVacancy'])
-            ->first();
-
-        if (! $application instanceof StudentApplication) {
-            return $this->errorResponse('Draft lamaran tidak ditemukan.', 404);
-        }
-
-        if (! $application->isDraft()) {
-            return $this->errorResponse('Lamaran ini sudah pernah dikirim.', 422);
-        }
-
-        if (! is_string($application->cv_path) || $application->cv_path === '') {
-            return $this->errorResponse('Draft belum memiliki file CV.', 422);
-        }
-
-        $application->update([
-            'status' => StudentApplication::STATUS_SUBMITTED,
-            'submit_status' => StudentApplication::STATUS_SUBMITTED,
-            'submitted_at' => now()->toDateString(),
-            'applied_at' => now(),
-        ]);
-
-        return $this->successResponse(
-            (new StudentJobApplicationResource($application))->resolve(),
-            'Lamaran pekerjaan berhasil dikirim.'
         );
     }
 

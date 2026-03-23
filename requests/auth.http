@@ -515,47 +515,7 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 19. DOWNLOAD DOKUMEN PRIVATE - SEKOLAH
-###     Tipe: operational_license
-### ============================================================
-
-GET {{baseUrl}}/files/me/operational_license
-Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
-
-###
-
-### ============================================================
-### 20. DOWNLOAD DOKUMEN PRIVATE - MITRA PERUSAHAAN
-###     Tipe: kemenkumham_decree
-### ============================================================
-
-GET {{baseUrl}}/files/me/kemenkumham_decree
-Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
-
-###
-
-### ============================================================
-### 21. DOWNLOAD DOKUMEN PRIVATE - MITRA UMKM
-###     Tipe: owner_ktp
-### ============================================================
-
-GET {{baseUrl}}/files/me/owner_ktp
-Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
-
-###
-
-### ============================================================
-### 22. USER ALIAS - Endpoint alias dari /auth/me
-### ============================================================
-
-GET {{baseUrl}}/user
-Accept: application/json
-Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
-
-###
-
-### ============================================================
-### 23. OPENAPI RAW DOCUMENT
+### 19. OPENAPI RAW DOCUMENT
 ###     Endpoint publik untuk mengambil file spesifikasi OpenAPI
 ### ============================================================
 

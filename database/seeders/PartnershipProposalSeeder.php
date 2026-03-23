@@ -47,9 +47,9 @@ class PartnershipProposalSeeder extends Seeder
                 'mitra_user_id' => $umkmA->id,
                 'proposal_pdf_path' => $draftProposalPdf,
                 'signature_path' => $draftSignature,
-                'notes' => 'Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.',
-                'status' => PartnershipProposal::STATUS_DRAFT,
-                'submitted_at' => null,
+                'notes' => 'Kolaborasi kewirausahaan untuk program kelas industri UMKM.',
+                'status' => PartnershipProposal::STATUS_SUBMITTED,
+                'submitted_at' => now()->subDays(3),
             ]
         );
     }

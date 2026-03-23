@@ -171,7 +171,8 @@ class ForYouController extends Controller
             $query
                 ->orderByRaw('CASE WHEN work_policy = ? THEN 2 WHEN work_policy = ? THEN 1 ELSE 0 END DESC', [JobVacancy::WORK_POLICY_REMOTE, JobVacancy::WORK_POLICY_HYBRID])
                 ->orderByDesc('matched_skill_count')
-                ->orderByDesc('updated_at');
+                ->orderByDesc('updated_at')
+                ->orderByDesc('created_at');
 
             return;
         }
@@ -180,7 +181,8 @@ class ForYouController extends Controller
             $query
                 ->orderByRaw('CASE WHEN work_policy = ? THEN 2 WHEN work_policy = ? THEN 1 ELSE 0 END DESC', [JobVacancy::WORK_POLICY_HYBRID, JobVacancy::WORK_POLICY_REMOTE])
                 ->orderByDesc('matched_skill_count')
-                ->orderByDesc('updated_at');
+                ->orderByDesc('updated_at')
+                ->orderByDesc('created_at');
 
             return;
         }
@@ -189,7 +191,8 @@ class ForYouController extends Controller
             $query
                 ->orderByRaw('CASE WHEN job_type = ? THEN 2 WHEN job_type = ? THEN 1 ELSE 0 END DESC', [JobVacancy::JOB_TYPE_PART_TIME, JobVacancy::JOB_TYPE_FREELANCE])
                 ->orderByDesc('matched_skill_count')
-                ->orderByDesc('updated_at');
+                ->orderByDesc('updated_at')
+                ->orderByDesc('created_at');
 
             return;
         }

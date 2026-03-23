@@ -192,10 +192,11 @@ class OpenApiContractTest extends TestCase
         $protectedProbes = [
             ['method' => 'POST', 'uri' => '/api/auth/logout', 'docPath' => '/auth/logout'],
             ['method' => 'GET', 'uri' => '/api/auth/me', 'docPath' => '/auth/me'],
-            ['method' => 'GET', 'uri' => '/api/user', 'docPath' => '/user'],
 
             ['method' => 'GET', 'uri' => '/api/profile', 'docPath' => '/profile'],
             ['method' => 'PUT', 'uri' => '/api/profile', 'docPath' => '/profile'],
+
+            ['method' => 'GET', 'uri' => '/api/application-reminder', 'docPath' => '/application-reminder'],
 
             ['method' => 'GET', 'uri' => '/api/school/students', 'docPath' => '/school/students'],
             ['method' => 'POST', 'uri' => '/api/school/students', 'docPath' => '/school/students'],
@@ -205,20 +206,13 @@ class OpenApiContractTest extends TestCase
             ['method' => 'DELETE', 'uri' => '/api/school/students/1', 'docPath' => '/school/students/{id}'],
 
             ['method' => 'POST', 'uri' => '/api/student/portfolio-items', 'docPath' => '/student/portfolio-items'],
-            ['method' => 'GET', 'uri' => '/api/student/application-reminder', 'docPath' => '/student/application-reminder'],
             ['method' => 'GET', 'uri' => '/api/student/job-applications', 'docPath' => '/student/job-applications'],
             ['method' => 'POST', 'uri' => '/api/student/job-applications', 'docPath' => '/student/job-applications'],
             ['method' => 'GET', 'uri' => '/api/student/job-applications/1', 'docPath' => '/student/job-applications/{id}'],
-            ['method' => 'PUT', 'uri' => '/api/student/job-applications/1', 'docPath' => '/student/job-applications/{id}'],
-            ['method' => 'POST', 'uri' => '/api/student/job-applications/1/submit', 'docPath' => '/student/job-applications/{id}/submit'],
 
             ['method' => 'GET', 'uri' => '/api/partnership-proposals', 'docPath' => '/partnership-proposals'],
             ['method' => 'POST', 'uri' => '/api/partnership-proposals', 'docPath' => '/partnership-proposals'],
             ['method' => 'GET', 'uri' => '/api/partnership-proposals/1', 'docPath' => '/partnership-proposals/{id}'],
-            ['method' => 'PUT', 'uri' => '/api/partnership-proposals/1', 'docPath' => '/partnership-proposals/{id}'],
-            ['method' => 'POST', 'uri' => '/api/partnership-proposals/1/submit', 'docPath' => '/partnership-proposals/{id}/submit'],
-
-            ['method' => 'GET', 'uri' => '/api/files/me/operational_license', 'docPath' => '/files/me/{type}'],
 
             ['method' => 'POST', 'uri' => '/api/admin/blog/articles', 'docPath' => '/admin/blog/articles'],
             ['method' => 'GET', 'uri' => '/api/admin/registrations', 'docPath' => '/admin/registrations'],

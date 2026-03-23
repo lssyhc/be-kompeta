@@ -112,7 +112,7 @@ class ProfileController extends Controller
                         'company_name' => $application->company_name,
                         'role_type' => $application->role_type,
                         'submitted_at' => $application->submitted_at?->toDateString(),
-                        'status' => $application->status ?: $application->submit_status,
+                        'status' => $application->status,
                     ];
                 })
                 ->values()

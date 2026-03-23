@@ -12,8 +12,6 @@ class PartnershipProposal extends Model
 {
     use HasFactory;
 
-    public const STATUS_DRAFT = 'draft';
-
     public const STATUS_SUBMITTED = 'submitted';
 
     protected $fillable = [
@@ -58,10 +56,5 @@ class PartnershipProposal extends Model
     public function scopeSubmitted($query)
     {
         return $query->where('status', self::STATUS_SUBMITTED);
-    }
-
-    public function isDraft(): bool
-    {
-        return $this->status === self::STATUS_DRAFT;
     }
 }

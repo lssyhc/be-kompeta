@@ -55,9 +55,9 @@ paths:
                     nama_mitra: Roti Bunda Rasa
                     mitra_tipe: umkm
                     sektor_atau_tipe: Kuliner
-                    notes: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
-                    status_submit: draft
-                    tanggal_submit: null
+                    notes: Kolaborasi kewirausahaan untuk program kelas industri UMKM.
+                    status_submit: submitted
+                    tanggal_submit: "2026-03-20T10:00:00+07:00"
                     created_at: "2026-03-23T10:00:00+07:00"
                     updated_at: "2026-03-23T10:00:00+07:00"
                 errors: null
@@ -89,19 +89,19 @@ paths:
 
     post:
       tags: [Partnership Proposals]
-      summary: Buat draft pengajuan kemitraan
+      summary: Kirim pengajuan kemitraan
       description: |
-        Membuat draft pengajuan kemitraan baru.
+        Membuat dan langsung mengirim pengajuan kemitraan baru.
         Hanya user dengan role `sekolah` atau `mitra` yang dapat membuat pengajuan.
 
         **Aturan bisnis:**
         - Sekolah hanya bisa mengajukan ke mitra, mitra hanya bisa mengajukan ke sekolah.
         - Tidak bisa mengajukan ke diri sendiri.
-        - Tidak boleh ada pengajuan aktif (`draft`/`submitted`) untuk pasangan proposer→target yang sama (duplikat ditolak 422).
+        - Tidak boleh ada pengajuan `submitted` aktif untuk pasangan proposer→target yang sama (duplikat ditolak 422).
 
         **File yang wajib diunggah:**
         - `proposal_pdf`: File proposal (PDF, maks 5 MB)
-        - `signature_file`: File tanda tangan (PDF, maks 2 MB)
+        - `signature_file`: File tanda tangan (PDF, maks 5 MB)
       requestBody:
         required: true
         content:
@@ -110,14 +110,14 @@ paths:
               $ref: "../openapi.yaml#/components/schemas/StorePartnershipProposalRequest"
       responses:
         "201":
-          description: Draft pengajuan kemitraan berhasil dibuat
+          description: Pengajuan kemitraan berhasil dikirim
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
               example:
                 success: true
-                message: Draft pengajuan kemitraan berhasil dibuat.
+                message: Pengajuan kemitraan berhasil dikirim.
                 data:
                   id: 2
                   proposer_user_id: 4
@@ -127,11 +127,11 @@ paths:
                   nama_mitra: Roti Bunda Rasa
                   mitra_tipe: umkm
                   sektor_atau_tipe: Kuliner
-                  notes: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
-                  status_submit: draft
-                  tanggal_submit: null
+                  notes: Kolaborasi kewirausahaan untuk program kelas industri UMKM.
+                  status_submit: submitted
+                  tanggal_submit: "2026-03-23T12:00:00+07:00"
                   created_at: "2026-03-23T10:00:00+07:00"
-                  updated_at: "2026-03-23T10:00:00+07:00"
+                  updated_at: "2026-03-23T12:00:00+07:00"
                 errors: null
                 meta: null
         "401":
@@ -262,192 +262,6 @@ paths:
               example:
                 success: false
                 message: Pengajuan kemitraan tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-    put:
-      tags: [Partnership Proposals]
-      summary: Update draft pengajuan kemitraan
-      description: |
-        Memperbarui draft pengajuan kemitraan yang belum dikirim.
-        Hanya **proposer** (pembuat pengajuan) yang dapat mengedit.
-
-        **Syarat:**
-        - Pengajuan harus berstatus `draft`. Pengajuan yang sudah `submitted` tidak dapat diedit (422).
-
-        **Field yang bisa diperbarui:**
-        - `proposal_pdf`: File proposal pengganti (PDF, maks 5 MB) — file lama dihapus dari storage
-        - `signature_file`: File tanda tangan pengganti (PDF, maks 2 MB) — file lama dihapus dari storage
-        - `notes`: Catatan pengajuan (maks 2000 karakter)
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID pengajuan kemitraan (harus berstatus draft)
-          example: 2
-      requestBody:
-        required: false
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "../openapi.yaml#/components/schemas/UpdatePartnershipProposalRequest"
-      responses:
-        "200":
-          description: Draft pengajuan kemitraan berhasil diperbarui
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
-              example:
-                success: true
-                message: Draft pengajuan kemitraan berhasil diperbarui.
-                data:
-                  id: 2
-                  proposer_user_id: 4
-                  target_user_id: 8
-                  school_user_id: 8
-                  mitra_user_id: 4
-                  nama_mitra: Roti Bunda Rasa
-                  mitra_tipe: umkm
-                  sektor_atau_tipe: Kuliner
-                  notes: Catatan diperbarui.
-                  status_submit: draft
-                  tanggal_submit: null
-                  created_at: "2026-03-23T10:00:00+07:00"
-                  updated_at: "2026-03-23T11:30:00+07:00"
-                errors: null
-                meta: null
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "404":
-          description: Draft tidak ditemukan atau bukan milik proposer
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
-              example:
-                success: false
-                message: Pengajuan kemitraan tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "422":
-          description: Pengajuan sudah dikirim (tidak bisa diedit) atau validasi gagal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              example:
-                success: false
-                message: Pengajuan yang sudah dikirim tidak dapat diubah.
-                data: null
-                errors: null
-                meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-  /partnership-proposals/{id}/submit:
-    post:
-      tags: [Partnership Proposals]
-      summary: Submit draft pengajuan kemitraan
-      description: |
-        Mengirim (submit) draft pengajuan kemitraan sehingga statusnya berubah dari `draft` ke `submitted`.
-        Hanya **proposer** yang dapat mengirim.
-
-        **Setelah submit:**
-        - `status_submit` berubah dari `draft` → `submitted`
-        - `tanggal_submit` diisi timestamp saat ini
-        - Pengajuan tidak dapat diedit lagi setelah dikirim.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID pengajuan kemitraan (harus berstatus draft)
-          example: 2
-      responses:
-        "200":
-          description: Pengajuan kemitraan berhasil dikirim
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePartnershipProposal"
-              example:
-                success: true
-                message: Pengajuan kemitraan berhasil dikirim.
-                data:
-                  id: 2
-                  proposer_user_id: 4
-                  target_user_id: 8
-                  school_user_id: 8
-                  mitra_user_id: 4
-                  nama_mitra: Roti Bunda Rasa
-                  mitra_tipe: umkm
-                  sektor_atau_tipe: Kuliner
-                  notes: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
-                  status_submit: submitted
-                  tanggal_submit: "2026-03-23T12:00:00+07:00"
-                  created_at: "2026-03-23T10:00:00+07:00"
-                  updated_at: "2026-03-23T12:00:00+07:00"
-                errors: null
-                meta: null
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "404":
-          description: Draft tidak ditemukan atau bukan milik proposer
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
-              example:
-                success: false
-                message: Pengajuan kemitraan tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "422":
-          description: Pengajuan sudah dikirim sebelumnya
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              example:
-                success: false
-                message: Pengajuan sudah dikirim sebelumnya.
                 data: null
                 errors: null
                 meta: null

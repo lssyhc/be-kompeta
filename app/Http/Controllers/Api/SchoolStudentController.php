@@ -72,6 +72,7 @@ class SchoolStudentController extends Controller
             ->when($request->query('class_year'), fn ($q, $year) => $q->where('class_year', $year))
             ->when($request->query('graduation_status'), fn ($q, $status) => $q->where('graduation_status', $status))
             ->with('user:id,role,account_status,is_active,last_login_at')
+            ->orderByDesc('created_at')
             ->paginate(20);
 
         return $this->paginatedResponse($students, 'Daftar siswa berhasil diambil.');
@@ -98,6 +99,7 @@ class SchoolStudentController extends Controller
                     ->orWhere('nisn', 'like', "%{$keyword}%");
             })
             ->with('user:id,role,account_status,is_active,last_login_at')
+            ->orderByDesc('created_at')
             ->limit(50)
             ->get();
 

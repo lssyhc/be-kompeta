@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Partnership\StorePartnershipProposalRequest;
-use App\Http\Requests\Partnership\UpdatePartnershipProposalRequest;
 use App\Http\Resources\Partnership\PartnershipProposalResource;
 use App\Models\PartnershipProposal;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PartnershipProposalController extends Controller
 {
@@ -84,7 +82,7 @@ class PartnershipProposalController extends Controller
         $existingOpenProposal = PartnershipProposal::query()
             ->where('proposer_user_id', $user->id)
             ->where('target_user_id', $targetUser->id)
-            ->whereIn('status', [PartnershipProposal::STATUS_DRAFT, PartnershipProposal::STATUS_SUBMITTED])
+            ->where('status', PartnershipProposal::STATUS_SUBMITTED)
             ->exists();
 
         if ($existingOpenProposal) {
@@ -99,15 +97,15 @@ class PartnershipProposalController extends Controller
             'proposal_pdf_path' => $request->file('proposal_pdf')->store('partnership/proposals', 'local'),
             'signature_path' => $request->file('signature_file')->store('partnership/signatures', 'local'),
             'notes' => $validated['notes'] ?? null,
-            'status' => PartnershipProposal::STATUS_DRAFT,
-            'submitted_at' => null,
+            'status' => PartnershipProposal::STATUS_SUBMITTED,
+            'submitted_at' => now(),
         ]);
 
         $proposal->loadMissing(['mitraUser.companyProfile', 'mitraUser.umkmProfile']);
 
         return $this->successResponse(
             (new PartnershipProposalResource($proposal))->resolve(),
-            'Draft pengajuan kemitraan berhasil dibuat.',
+            'Pengajuan kemitraan berhasil dikirim.',
             201
         );
     }
@@ -136,94 +134,6 @@ class PartnershipProposalController extends Controller
         return $this->successResponse(
             (new PartnershipProposalResource($proposal))->resolve(),
             'Detail pengajuan kemitraan berhasil diambil.'
-        );
-    }
-
-    public function update(UpdatePartnershipProposalRequest $request, int $id): JsonResponse
-    {
-        $user = $request->user();
-
-        if (! $user instanceof User) {
-            return $this->errorResponse('Unauthenticated.', 401);
-        }
-
-        $proposal = PartnershipProposal::query()
-            ->where('id', $id)
-            ->where('proposer_user_id', $user->id)
-            ->first();
-
-        if (! $proposal instanceof PartnershipProposal) {
-            return $this->errorResponse('Draft pengajuan kemitraan tidak ditemukan.', 404);
-        }
-
-        if (! $proposal->isDraft()) {
-            return $this->errorResponse('Pengajuan yang sudah dikirim tidak dapat diubah.', 422);
-        }
-
-        $payload = [];
-
-        if ($request->hasFile('proposal_pdf')) {
-            if ($proposal->proposal_pdf_path !== '') {
-                Storage::disk('local')->delete($proposal->proposal_pdf_path);
-            }
-
-            $payload['proposal_pdf_path'] = $request->file('proposal_pdf')->store('partnership/proposals', 'local');
-        }
-
-        if ($request->hasFile('signature_file')) {
-            if ($proposal->signature_path !== '') {
-                Storage::disk('local')->delete($proposal->signature_path);
-            }
-
-            $payload['signature_path'] = $request->file('signature_file')->store('partnership/signatures', 'local');
-        }
-
-        if ($request->has('notes')) {
-            $payload['notes'] = $request->input('notes');
-        }
-
-        if (! empty($payload)) {
-            $proposal->update($payload);
-        }
-
-        $proposal->loadMissing(['mitraUser.companyProfile', 'mitraUser.umkmProfile']);
-
-        return $this->successResponse(
-            (new PartnershipProposalResource($proposal))->resolve(),
-            'Draft pengajuan kemitraan berhasil diperbarui.'
-        );
-    }
-
-    public function submit(Request $request, int $id): JsonResponse
-    {
-        $user = $request->user();
-
-        if (! $user instanceof User) {
-            return $this->errorResponse('Unauthenticated.', 401);
-        }
-
-        $proposal = PartnershipProposal::query()
-            ->where('id', $id)
-            ->where('proposer_user_id', $user->id)
-            ->with(['mitraUser.companyProfile', 'mitraUser.umkmProfile'])
-            ->first();
-
-        if (! $proposal instanceof PartnershipProposal) {
-            return $this->errorResponse('Draft pengajuan kemitraan tidak ditemukan.', 404);
-        }
-
-        if (! $proposal->isDraft()) {
-            return $this->errorResponse('Pengajuan ini sudah pernah dikirim.', 422);
-        }
-
-        $proposal->update([
-            'status' => PartnershipProposal::STATUS_SUBMITTED,
-            'submitted_at' => now(),
-        ]);
-
-        return $this->successResponse(
-            (new PartnershipProposalResource($proposal))->resolve(),
-            'Pengajuan kemitraan berhasil dikirim.'
         );
     }
 }

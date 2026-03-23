@@ -51,7 +51,6 @@ tags:
   - name: Student Portfolio
   - name: Student Job Applications
   - name: Partnership Proposals
-  - name: Files
   - name: Explore
   - name: For You
   - name: Mitra
@@ -74,9 +73,6 @@ paths:
     $ref: "./paths/auth.yaml#/paths/~1auth~1logout"
   /auth/me:
     $ref: "./paths/auth.yaml#/paths/~1auth~1me"
-  /user:
-    $ref: "./paths/auth.yaml#/paths/~1user"
-    # DEPRECATED: alias /auth/me — gunakan /auth/me
 
   /profile:
     $ref: "./paths/profile.yaml#/paths/~1profile"
@@ -90,24 +86,17 @@ paths:
 
   /student/portfolio-items:
     $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items"
-  /student/application-reminder:
-    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1application-reminder"
+  /application-reminder:
+    $ref: "./paths/student-portfolio.yaml#/paths/~1application-reminder"
   /student/job-applications:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications"
   /student/job-applications/{id}:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}"
-  /student/job-applications/{id}/submit:
-    $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}~1submit"
 
   /partnership-proposals:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals"
   /partnership-proposals/{id}:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}"
-  /partnership-proposals/{id}/submit:
-    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1submit"
-
-  /files/me/{type}:
-    $ref: "./paths/files.yaml#/paths/~1files~1me~1{type}"
 
   /public/explore/jobs:
     $ref: "./paths/explore.yaml#/paths/~1public~1explore~1jobs"
@@ -1022,12 +1011,8 @@ components:
           type: string
         status_submit:
           type: string
-          enum: [draft, submitted]
+          enum: [submitted]
         submitted_at:
-          nullable: true
-          type: string
-          format: date
-        applied_at:
           nullable: true
           type: string
           format: date-time
@@ -1065,7 +1050,7 @@ components:
           type: string
         status_submit:
           type: string
-          enum: [draft, submitted]
+          enum: [submitted]
         tanggal_submit:
           nullable: true
           type: string
@@ -1164,7 +1149,7 @@ components:
         operational_license:
           type: string
           format: binary
-          description: "Izin operasional sekolah (file PDF wajib, maks 4 MB)"
+          description: "Izin operasional sekolah (file PDF wajib, maks 5 MB)"
 
     RegisterMitraPerusahaanRequest:
       type: object
@@ -1258,7 +1243,7 @@ components:
         kemenkumham_decree:
           type: string
           format: binary
-          description: "SK Kemenkumham (file PDF wajib, maks 4 MB)"
+          description: "SK Kemenkumham (file PDF wajib, maks 5 MB)"
 
     RegisterMitraUmkmRequest:
       type: object
@@ -1554,25 +1539,12 @@ components:
         cv:
           type: string
           format: binary
-          description: "File CV (wajib, PDF/DOC/DOCX, maks 4 MB)"
+          description: "File CV (wajib, PDF, maks 5 MB)"
         cover_letter:
           type: string
           maxLength: 2000
           example: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
           description: "Surat lamaran teks (opsional, maks 2000 karakter)"
-
-    UpdateStudentJobApplicationRequest:
-      type: object
-      properties:
-        cv:
-          type: string
-          format: binary
-          description: "File CV pengganti (opsional, PDF/DOC/DOCX, maks 4 MB)"
-        cover_letter:
-          type: string
-          maxLength: 2000
-          example: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
-          description: "Surat lamaran teks pengganti (opsional, maks 2000 karakter)"
 
     StorePartnershipProposalRequest:
       type: object
@@ -1589,29 +1561,12 @@ components:
         signature_file:
           type: string
           format: binary
-          description: "File PDF tanda tangan/surat kuasa (wajib, maks 2 MB)"
+          description: "File PDF tanda tangan/surat kuasa (wajib, maks 5 MB)"
         notes:
           type: string
           maxLength: 2000
-          example: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
+          example: Kolaborasi kewirausahaan untuk program kelas industri UMKM.
           description: "Catatan tambahan (opsional, maks 2000 karakter)"
-
-    UpdatePartnershipProposalRequest:
-      type: object
-      properties:
-        proposal_pdf:
-          type: string
-          format: binary
-          description: "File PDF proposal pengganti (opsional, maks 5 MB)"
-        signature_file:
-          type: string
-          format: binary
-          description: "File PDF tanda tangan pengganti (opsional, maks 2 MB)"
-        notes:
-          type: string
-          maxLength: 2000
-          example: Draft kolaborasi kewirausahaan untuk program kelas industri UMKM.
-          description: "Catatan tambahan pengganti (opsional, maks 2000 karakter)"
 
     # ──────────────────────────────────────────────
     # Schema: Explore / For You / Mitra / Schools
@@ -2221,7 +2176,7 @@ components:
           example: "2026-03-22T08:30:00+07:00"
         status_submit:
           type: string
-          enum: [draft, submitted]
+          enum: [submitted]
           example: submitted
 
     SchoolDetail:

@@ -16,7 +16,7 @@ class StoreArticleRequest extends FormRequest
         return [
             'content_type_id' => ['required', 'integer', 'exists:content_types,id'],
             'title' => ['required', 'string', 'max:255'],
-            'thumbnail' => ['required', 'image', 'max:4096'],
+            'thumbnail' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'body' => ['required', 'string'],
             'is_published' => ['nullable', 'boolean'],
             'published_at' => ['nullable', 'date'],

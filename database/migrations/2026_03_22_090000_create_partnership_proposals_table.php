@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('proposal_pdf_path');
             $table->string('signature_path');
             $table->text('notes')->nullable();
-            $table->string('status', 30)->default('draft')->index();
+            $table->string('status', 30)->default('submitted')->index();
             $table->timestamp('submitted_at')->nullable()->index();
             $table->timestamps();
 

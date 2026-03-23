@@ -15,8 +15,6 @@ class StudentApplication extends Model
 {
     use HasFactory;
 
-    public const STATUS_DRAFT = 'draft';
-
     public const STATUS_SUBMITTED = 'submitted';
 
     protected $fillable = [
@@ -54,10 +52,5 @@ class StudentApplication extends Model
     public function mitraUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'mitra_user_id');
-    }
-
-    public function isDraft(): bool
-    {
-        return $this->status === self::STATUS_DRAFT;
     }
 }

@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\PartnershipProposalController;
-use App\Http\Controllers\Api\PrivateFileController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
@@ -26,11 +25,13 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum');
-
 Route::middleware('auth:sanctum')->prefix('profile')->group(function () {
     Route::get('/', [ProfileController::class, 'show']);
     Route::put('/', [ProfileController::class, 'update']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/application-reminder', [StudentPortfolioController::class, 'applicationReminder']);
 });
 
 Route::get('/docs/openapi', function () {
@@ -63,24 +64,15 @@ Route::middleware('auth:sanctum')->prefix('school')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::post('/portfolio-items', [StudentPortfolioController::class, 'storePortfolioItem']);
-    Route::get('/application-reminder', [StudentPortfolioController::class, 'applicationReminder']);
     Route::get('/job-applications', [StudentJobApplicationController::class, 'index']);
     Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
     Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');
-    Route::put('/job-applications/{id}', [StudentJobApplicationController::class, 'update'])->whereNumber('id');
-    Route::post('/job-applications/{id}/submit', [StudentJobApplicationController::class, 'submit'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(function () {
     Route::get('/', [PartnershipProposalController::class, 'index']);
     Route::post('/', [PartnershipProposalController::class, 'store']);
     Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
-    Route::put('/{id}', [PartnershipProposalController::class, 'update'])->whereNumber('id');
-    Route::post('/{id}/submit', [PartnershipProposalController::class, 'submit'])->whereNumber('id');
-});
-
-Route::middleware('auth:sanctum')->prefix('files')->group(function () {
-    Route::get('/me/{type}', [PrivateFileController::class, 'downloadMyDocument']);
 });
 
 Route::middleware('auth:sanctum')->prefix('admin/blog')->group(function () {

@@ -43,6 +43,7 @@ class MitraController extends Controller
 
         $paginator = $query
             ->orderByDesc('last_login_at')
+            ->orderByDesc('created_at')
             ->paginate($perPage)
             ->appends($request->query());
 

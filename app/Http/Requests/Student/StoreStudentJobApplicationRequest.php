@@ -15,7 +15,7 @@ class StoreStudentJobApplicationRequest extends FormRequest
     {
         return [
             'job_vacancy_id' => ['required', 'integer', 'exists:job_vacancies,id'],
-            'cv' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:4096'],
+            'cv' => ['required', 'file', 'mimes:pdf', 'max:5120'],
             'cover_letter' => ['nullable', 'string', 'max:2000'],
         ];
     }

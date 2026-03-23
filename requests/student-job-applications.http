@@ -11,15 +11,15 @@ Content-Type: application/json
 
 {
   "role": "siswa",
-  "nisn": "0002345678",
-  "school_origin": "SMA Negeri 2 Jakarta",
-  "unique_code": "qzPSGd04erQblY8G",
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ",
   "device_name": "rest-client"
 }
 
 ###
 
-### 1) APPLY JOB (UPLOAD CV)
+### 1) CREATE DRAFT APPLICATION (UPLOAD CV)
 POST {{baseUrl}}/student/job-applications
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
@@ -42,15 +42,36 @@ Content-Type: application/pdf
 
 ###
 
-### 2) LIST MY APPLICATIONS
+### 2) UPDATE DRAFT APPLICATION
+@applicationId = 1
+PUT {{baseUrl}}/student/job-applications/{{applicationId}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cover_letter"
+
+Saya memperbarui draft lamaran dan siap mengirim lamaran final.
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 3) SUBMIT DRAFT APPLICATION
+POST {{baseUrl}}/student/job-applications/{{applicationId}}/submit
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 4) LIST MY APPLICATIONS
 GET {{baseUrl}}/student/job-applications
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 
 ###
 
-### 3) SHOW MY APPLICATION DETAIL
-@applicationId = 1
+### 5) SHOW MY APPLICATION DETAIL
 GET {{baseUrl}}/student/job-applications/{{applicationId}}
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}

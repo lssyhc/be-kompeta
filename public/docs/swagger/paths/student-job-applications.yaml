@@ -38,7 +38,7 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
     post:
       tags: [Student Job Applications]
-      summary: Kirim lamaran kerja ke lowongan mitra
+      summary: Buat draft lamaran kerja ke lowongan mitra
       requestBody:
         required: true
         content:
@@ -47,7 +47,7 @@ paths:
               $ref: "../openapi.yaml#/components/schemas/StoreStudentJobApplicationRequest"
       responses:
         "201":
-          description: Lamaran pekerjaan berhasil dikirim
+          description: Draft lamaran pekerjaan berhasil dibuat
           content:
             application/json:
               schema:
@@ -71,7 +71,7 @@ paths:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
         "422":
-          description: Validasi gagal atau lamaran duplikat
+          description: Validasi gagal atau draft/lamaran aktif duplikat
           content:
             application/json:
               schema:
@@ -108,6 +108,94 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
         "404":
           description: Lamaran tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+    put:
+      tags: [Student Job Applications]
+      summary: Perbarui draft lamaran kerja siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/UpdateStudentJobApplicationRequest"
+      responses:
+        "200":
+          description: Draft lamaran berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Draft lamaran tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Lamaran sudah dikirim atau validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+
+  /student/job-applications/{id}/submit:
+    post:
+      tags: [Student Job Applications]
+      summary: Kirim draft lamaran kerja siswa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lamaran pekerjaan berhasil dikirim
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeStudentJobApplication"
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Draft lamaran tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Draft tidak valid atau lamaran sudah dikirim
           content:
             application/json:
               schema:

@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::get('/job-applications', [StudentJobApplicationController::class, 'index']);
     Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
     Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');
+    Route::put('/job-applications/{id}', [StudentJobApplicationController::class, 'update'])->whereNumber('id');
+    Route::post('/job-applications/{id}/submit', [StudentJobApplicationController::class, 'submit'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(function () {

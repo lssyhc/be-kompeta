@@ -34,7 +34,7 @@ class StudentJobApplicationSeeder extends Seeder
                 'submit_status' => 'submitted',
                 'cv_path' => $cvA1,
                 'cover_letter' => 'Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.',
-                'status' => StudentApplication::STATUS_APPLIED,
+                'status' => StudentApplication::STATUS_SUBMITTED,
                 'applied_at' => now()->subDays(4),
             ]
         );
@@ -52,7 +52,7 @@ class StudentJobApplicationSeeder extends Seeder
                 'submit_status' => 'submitted',
                 'cv_path' => $cvB1,
                 'cover_letter' => 'Saya siap berkontribusi sebagai data entry operator dan belajar cepat.',
-                'status' => StudentApplication::STATUS_APPLIED,
+                'status' => StudentApplication::STATUS_SUBMITTED,
                 'applied_at' => now()->subDays(2),
             ]
         );

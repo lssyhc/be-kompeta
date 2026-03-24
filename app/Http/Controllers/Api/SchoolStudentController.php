@@ -31,7 +31,6 @@ class SchoolStudentController extends Controller
                 'password' => Str::random(32),
                 'role' => User::ROLE_SISWA,
                 'account_status' => 'active',
-                'is_active' => true,
             ]);
 
             StudentProfile::query()->create([
@@ -71,7 +70,7 @@ class SchoolStudentController extends Controller
             ->where('school_user_id', $schoolUser->id)
             ->when($request->query('class_year'), fn ($q, $year) => $q->where('class_year', $year))
             ->when($request->query('graduation_status'), fn ($q, $status) => $q->where('graduation_status', $status))
-            ->with('user:id,role,account_status,is_active,last_login_at')
+            ->with('user:id,role,account_status,last_login_at')
             ->orderByDesc('created_at')
             ->paginate(20);
 
@@ -98,7 +97,7 @@ class SchoolStudentController extends Controller
                 $q->where('full_name', 'like', "%{$keyword}%")
                     ->orWhere('nisn', 'like', "%{$keyword}%");
             })
-            ->with('user:id,role,account_status,is_active,last_login_at')
+            ->with('user:id,role,account_status,last_login_at')
             ->orderByDesc('created_at')
             ->limit(50)
             ->get();
@@ -123,7 +122,7 @@ class SchoolStudentController extends Controller
             ->where('id', $id)
             ->where('school_user_id', $schoolUser->id)
             ->with([
-                'user:id,role,account_status,is_active,last_login_at',
+                'user:id,role,account_status,last_login_at',
                 'skills',
                 'experiences',
                 'achievements',

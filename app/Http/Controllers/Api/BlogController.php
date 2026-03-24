@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Blog\ArticleIndexRequest;
 use App\Http\Requests\Blog\StoreArticleRequest;
+use App\Http\Requests\Blog\UpdateArticleRequest;
 use App\Http\Resources\Blog\ArticleCardResource;
 use App\Http\Resources\Blog\ArticleDetailResource;
 use App\Models\Article;
@@ -153,6 +154,81 @@ class BlogController extends Controller
             'Artikel berhasil dibuat.',
             201
         );
+    }
+
+    public function update(UpdateArticleRequest $request, string $slug): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return $this->errorResponse('Unauthenticated.', 401);
+        }
+
+        if ($user->role !== User::ROLE_ADMIN) {
+            return $this->errorResponse('Hanya admin yang dapat mengubah artikel.', 403);
+        }
+
+        $article = Article::query()->where('slug', $slug)->first();
+
+        if (! $article instanceof Article) {
+            return $this->errorResponse('Artikel tidak ditemukan.', 404);
+        }
+
+        $validated = $request->validated();
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail_path'] = $request->file('thumbnail')->store('blog/thumbnails', 'public');
+            unset($validated['thumbnail']);
+        }
+
+        if (isset($validated['title']) && $validated['title'] !== $article->title) {
+            $validated['slug'] = $this->generateUniqueSlug($validated['title']);
+        }
+
+        if (isset($validated['is_published'])) {
+            $isPublished = (bool) $validated['is_published'];
+
+            if ($isPublished && ! $article->published_at) {
+                $validated['published_at'] = $validated['published_at'] ?? now();
+            }
+
+            if (! $isPublished) {
+                $validated['published_at'] = null;
+            }
+        }
+
+        $validated['updated_by'] = $user->id;
+
+        $article->update($validated);
+        $article->refresh()->loadMissing(['contentType', 'creator']);
+
+        return $this->successResponse(
+            (new ArticleDetailResource($article))->resolve(),
+            'Artikel berhasil diperbarui.'
+        );
+    }
+
+    public function destroy(Request $request, string $slug): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return $this->errorResponse('Unauthenticated.', 401);
+        }
+
+        if ($user->role !== User::ROLE_ADMIN) {
+            return $this->errorResponse('Hanya admin yang dapat menghapus artikel.', 403);
+        }
+
+        $article = Article::query()->where('slug', $slug)->first();
+
+        if (! $article instanceof Article) {
+            return $this->errorResponse('Artikel tidak ditemukan.', 404);
+        }
+
+        $article->delete();
+
+        return $this->successResponse(null, 'Artikel berhasil dihapus.');
     }
 
     private function generateUniqueSlug(string $title): string

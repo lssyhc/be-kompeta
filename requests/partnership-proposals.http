@@ -64,3 +64,17 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 GET {{baseUrl}}/partnership-proposals?scope=received
 Accept: application/json
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### 5) DOWNLOAD PROPOSAL PDF
+GET {{baseUrl}}/partnership-proposals/{{proposalId}}/proposal-pdf
+Accept: application/octet-stream
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### 6) DOWNLOAD SIGNATURE
+GET {{baseUrl}}/partnership-proposals/{{proposalId}}/signature
+Accept: application/octet-stream
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}

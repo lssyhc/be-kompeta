@@ -88,14 +88,12 @@ class StudentPortfolioSeeder extends Seeder
                 'role_type' => 'Data Entry Operator',
             ],
             [
-                'submitted_at' => now()->subMonths(2)->toDateString(),
-                'submit_status' => 'submitted',
+                'applied_at' => now()->subMonths(2),
+                'status' => 'applied',
                 'job_vacancy_id' => null,
                 'mitra_user_id' => null,
                 'cv_path' => null,
                 'cover_letter' => null,
-                'status' => 'applied',
-                'applied_at' => now()->subMonths(2),
             ]
         );
     }

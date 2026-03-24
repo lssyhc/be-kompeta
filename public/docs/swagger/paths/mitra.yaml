@@ -5,7 +5,7 @@ paths:
       summary: List mitra (perusahaan & UMKM)
       description: |
         Menampilkan daftar mitra (perusahaan dan UMKM) sebagai card-card.
-        Hanya akun mitra yang sudah disetujui admin (status `active` dan `is_active=true`) yang akan tampil.
+        Hanya akun mitra yang sudah disetujui admin (`account_status=active`) yang akan tampil.
         Mendukung pencarian berdasarkan nama dan filter berdasarkan tipe mitra.
         Diurutkan berdasarkan aktivitas login terakhir (`last_login_at` DESC).
       security: []
@@ -106,7 +106,7 @@ paths:
         - Daftar semua lowongan aktif (published) dari mitra tersebut
         - Hingga 5 mitra serupa (berdasarkan sektor industri, keaktifan, dan ketersediaan loker)
 
-        Hanya dapat diakses untuk akun mitra yang sudah disetujui admin (status `active` dan `is_active=true`).
+        Hanya dapat diakses untuk akun mitra yang sudah disetujui admin (`account_status=active`).
       security: []
       parameters:
         - in: path

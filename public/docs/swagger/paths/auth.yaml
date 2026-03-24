@@ -8,7 +8,7 @@ paths:
         Untuk role `mitra`, wajib mengirim `mitra_type` (`perusahaan` atau `umkm`).
 
         **Alur setelah registrasi:**
-        - Akun sekolah dan mitra dibuat dengan `account_status=pending` dan `is_active=false`.
+        - Akun sekolah dan mitra dibuat dengan `account_status=pending`.
         - Akun harus menunggu persetujuan admin melalui endpoint `/admin/registrations/{id}/approve`.
         - Setelah admin approve/reject, email notifikasi otomatis dikirim ke email pendaftar.
 
@@ -104,7 +104,6 @@ paths:
                     role: sekolah
                     mitra_type: null
                     account_status: pending
-                    is_active: false
                     last_login_at: null
                   role_profile:
                     school_name: SMK Negeri 1
@@ -198,7 +197,6 @@ paths:
                     role: siswa
                     mitra_type: null
                     account_status: active
-                    is_active: true
                     last_login_at: "2026-03-23T10:30:00.000000Z"
                   role_profile:
                     full_name: Ahmad Wijaya
@@ -318,7 +316,6 @@ paths:
                     role: siswa
                     mitra_type: null
                     account_status: active
-                    is_active: true
                     last_login_at: "2026-03-23T10:30:00.000000Z"
                   role_profile:
                     full_name: Ahmad Wijaya

@@ -25,7 +25,6 @@ class MitraController extends Controller
         $query = User::query()
             ->where('role', User::ROLE_MITRA)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->with(['companyProfile', 'umkmProfile'])
             ->withCount(['jobVacancies as vacancy_count' => fn ($q) => $q->where('is_published', true)]);
 
@@ -59,7 +58,6 @@ class MitraController extends Controller
         $user = User::query()
             ->where('role', User::ROLE_MITRA)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->where('id', $id)
             ->with(['companyProfile', 'umkmProfile'])
             ->withCount(['jobVacancies as vacancy_count' => fn ($q) => $q->where('is_published', true)])
@@ -93,7 +91,6 @@ class MitraController extends Controller
         $sameTypeCandidates = User::query()
             ->where('role', User::ROLE_MITRA)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->where('mitra_type', $currentUser->mitra_type)
             ->where('id', '!=', $currentUser->id)
             ->with(['companyProfile', 'umkmProfile', 'featuredVacancy.skills'])
@@ -119,7 +116,6 @@ class MitraController extends Controller
         $fillers = User::query()
             ->where('role', User::ROLE_MITRA)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->whereNotIn('id', $excludeIds)
             ->with(['companyProfile', 'umkmProfile', 'featuredVacancy.skills'])
             ->withCount(['jobVacancies as vacancy_count' => fn ($q) => $q->where('is_published', true)])

@@ -11,8 +11,7 @@ class PublicStatisticsController extends Controller
     public function summary(): JsonResponse
     {
         $activeUsers = User::query()
-            ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true);
+            ->where('account_status', User::STATUS_ACTIVE);
 
         $data = [
             'student_count' => (clone $activeUsers)->where('role', User::ROLE_SISWA)->count(),

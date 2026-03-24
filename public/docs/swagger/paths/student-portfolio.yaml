@@ -13,7 +13,7 @@ paths:
         | `skill` | StudentSkill | `title` | — |
         | `experience` | StudentExperience | `title`, `description`, `position`, `company_name`, `start_date` | `end_date` |
         | `achievement` | StudentAchievement | `title`, `description`, `achievement_date`, `institution_name` | — |
-        | `application` | StudentApplication | `company_name`, `role_type`, `submitted_at`, `submit_status` | — |
+        | `application` | StudentApplication | `company_name`, `role_type`, `applied_at`, `status` | — |
 
         Item yang dibuat dikembalikan dalam `data.item`.
       requestBody:
@@ -52,8 +52,8 @@ paths:
                   type: application
                   company_name: PT Maju Jaya
                   role_type: Backend Intern
-                  submitted_at: "2024-03-01"
-                  submit_status: submitted
+                  applied_at: "2024-03-01"
+                  status: submitted
       responses:
         "201":
           description: Data portfolio berhasil ditambahkan

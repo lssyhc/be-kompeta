@@ -93,11 +93,17 @@ paths:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications"
   /student/job-applications/{id}:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}"
+  /student/job-applications/{id}/cv:
+    $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}~1cv"
 
   /partnership-proposals:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals"
   /partnership-proposals/{id}:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}"
+  /partnership-proposals/{id}/proposal-pdf:
+    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1proposal-pdf"
+  /partnership-proposals/{id}/signature:
+    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1signature"
 
   /public/explore/jobs:
     $ref: "./paths/explore.yaml#/paths/~1public~1explore~1jobs"
@@ -127,12 +133,16 @@ paths:
 
   /admin/blog/articles:
     $ref: "./paths/blog.yaml#/paths/~1admin~1blog~1articles"
+  /admin/blog/articles/{slug}:
+    $ref: "./paths/blog.yaml#/paths/~1admin~1blog~1articles~1{slug}"
   /admin/registrations:
     $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations"
   /admin/registrations/{id}:
     $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}"
   /admin/registrations/{id}/approve:
     $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}~1approve"
+  /admin/registrations/{id}/documents/{type}:
+    $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}~1documents~1{type}"
   /admin/registrations/{id}/reject:
     $ref: "./paths/admin-registrations.yaml#/paths/~1admin~1registrations~1{id}~1reject"
   /public/blog/content-types:
@@ -622,8 +632,6 @@ components:
             - rejected: Ditolak admin
           enum: [pending, active, rejected]
           example: active
-        is_active:
-          type: boolean
         last_login_at:
           nullable: true
           type: string
@@ -953,11 +961,6 @@ components:
           type: string
         role_type:
           type: string
-        submitted_at:
-          type: string
-          format: date
-        submit_status:
-          type: string
         job_vacancy_id:
           nullable: true
           type: integer
@@ -984,10 +987,10 @@ components:
           type: string
         role_type:
           type: string
-        submitted_at:
+        applied_at:
           nullable: true
           type: string
-          format: date
+          format: date-time
         status:
           nullable: true
           type: string
@@ -1010,10 +1013,10 @@ components:
           type: string
         role_type:
           type: string
-        status_submit:
+        status:
           type: string
           enum: [submitted]
-        submitted_at:
+        applied_at:
           nullable: true
           type: string
           format: date-time
@@ -1060,6 +1063,12 @@ components:
           nullable: true
           type: string
           format: date-time
+        proposal_pdf_url:
+          nullable: true
+          type: string
+        signature_url:
+          nullable: true
+          type: string
         updated_at:
           nullable: true
           type: string
@@ -1518,12 +1527,12 @@ components:
           maxLength: 255
           description: "Jenis posisi yang dilamar (wajib untuk application)"
           example: Backend Intern
-        submitted_at:
+        applied_at:
           type: string
           format: date
           description: "Tanggal pengajuan lamaran (wajib untuk application)"
           example: "2024-03-01"
-        submit_status:
+        status:
           type: string
           maxLength: 100
           description: "Status pengajuan lamaran (wajib untuk application)"

@@ -33,7 +33,6 @@ class AuthController extends Controller
                 'role' => $role,
                 'mitra_type' => $mitraType,
                 'account_status' => $this->resolveInitialStatus($role),
-                'is_active' => $this->resolveInitialActiveState($role),
             ]);
 
             if ($role === User::ROLE_SEKOLAH) {
@@ -133,8 +132,6 @@ class AuthController extends Controller
 
         $user->forceFill([
             'last_login_at' => now(),
-            'last_login_ip' => $request->ip(),
-            'last_login_user_agent' => (string) $request->userAgent(),
         ])->save();
 
         $token = $user->createToken(
@@ -205,11 +202,6 @@ class AuthController extends Controller
         return User::STATUS_ACTIVE;
     }
 
-    private function resolveInitialActiveState(string $role): bool
-    {
-        return ! in_array($role, [User::ROLE_SEKOLAH, User::ROLE_MITRA], true);
-    }
-
     private function compactUser(User $user): array
     {
         return [
@@ -219,7 +211,6 @@ class AuthController extends Controller
             'role' => $user->role,
             'mitra_type' => $user->mitra_type,
             'account_status' => $user->account_status,
-            'is_active' => $user->is_active,
             'last_login_at' => $user->last_login_at,
         ];
     }

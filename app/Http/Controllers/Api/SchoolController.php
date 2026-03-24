@@ -20,7 +20,6 @@ class SchoolController extends Controller
         $query = User::query()
             ->where('role', User::ROLE_SEKOLAH)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->with(['schoolProfile']);
 
         if ($keyword !== '') {
@@ -46,7 +45,6 @@ class SchoolController extends Controller
         $user = User::query()
             ->where('role', User::ROLE_SEKOLAH)
             ->where('account_status', User::STATUS_ACTIVE)
-            ->where('is_active', true)
             ->where('id', $id)
             ->with([
                 'schoolProfile',

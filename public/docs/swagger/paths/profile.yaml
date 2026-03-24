@@ -34,7 +34,6 @@ paths:
                         role: admin
                         mitra_type: null
                         account_status: active
-                        is_active: true
                         last_login_at: "2026-06-01T10:00:00.000000Z"
                       role_profile:
                         id: 1
@@ -57,7 +56,6 @@ paths:
                         role: siswa
                         mitra_type: null
                         account_status: active
-                        is_active: true
                         last_login_at: "2026-06-01T09:00:00.000000Z"
                       role_profile:
                         id: 1
@@ -74,7 +72,7 @@ paths:
                         job_applications:
                           - company_name: PT Binajasa Sumber Sarana
                             role_type: Accounting Staff
-                            submitted_at: "2026-03-19"
+                            applied_at: "2026-03-19T09:00:00+07:00"
                             status: submitted
                     errors: null
                     meta: null
@@ -241,7 +239,6 @@ paths:
                         role: admin
                         mitra_type: null
                         account_status: active
-                        is_active: true
                         last_login_at: "2026-06-01T10:00:00.000000Z"
                       role_profile:
                         id: 1
@@ -264,7 +261,6 @@ paths:
                         role: siswa
                         mitra_type: null
                         account_status: active
-                        is_active: true
                         last_login_at: "2026-06-01T09:00:00.000000Z"
                       role_profile:
                         id: 1
@@ -281,7 +277,7 @@ paths:
                         job_applications:
                           - company_name: PT Binajasa Sumber Sarana
                             role_type: Accounting Staff
-                            submitted_at: "2026-03-19"
+                            applied_at: "2026-03-19T09:00:00+07:00"
                             status: submitted
                     errors: null
                     meta: null

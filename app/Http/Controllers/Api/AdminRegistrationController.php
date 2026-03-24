@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class AdminRegistrationController extends Controller
 {
@@ -116,7 +117,6 @@ class AdminRegistrationController extends Controller
 
         $user->forceFill([
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ])->save();
 
         try {
@@ -162,7 +162,6 @@ class AdminRegistrationController extends Controller
 
         $user->forceFill([
             'account_status' => User::STATUS_REJECTED,
-            'is_active' => false,
         ])->save();
 
         try {
@@ -229,6 +228,7 @@ class AdminRegistrationController extends Controller
                 'accreditation' => $schoolProfile->accreditation,
                 'address' => $schoolProfile->address,
                 'short_description' => $schoolProfile->short_description,
+                'operational_license_url' => url("/api/admin/registrations/{$user->id}/documents/school-license"),
             ];
         }
 
@@ -242,6 +242,7 @@ class AdminRegistrationController extends Controller
                 'industry_sector' => $companyProfile->industry_sector,
                 'office_address' => $companyProfile->office_address,
                 'short_description' => $companyProfile->short_description,
+                'kemenkumham_decree_url' => url("/api/admin/registrations/{$user->id}/documents/company-decree"),
             ];
         }
 
@@ -255,6 +256,7 @@ class AdminRegistrationController extends Controller
                 'business_type' => $umkmProfile->business_type,
                 'business_address' => $umkmProfile->business_address,
                 'short_description' => $umkmProfile->short_description,
+                'owner_ktp_photo_url' => url("/api/admin/registrations/{$user->id}/documents/umkm-ktp"),
             ];
         }
 
@@ -263,5 +265,37 @@ class AdminRegistrationController extends Controller
             'role' => $user->role,
             'mitra_type' => $user->mitra_type,
         ];
+    }
+
+    public function downloadDocument(Request $request, int $id, string $type): mixed
+    {
+        $admin = $request->user();
+
+        if (! $admin instanceof User || $admin->role !== User::ROLE_ADMIN) {
+            return $this->errorResponse('Hanya admin yang dapat mengakses dokumen.', 403);
+        }
+
+        $user = $this->findRegistrationUser($id);
+
+        if (! $user instanceof User) {
+            return $this->errorResponse('Data registrasi tidak ditemukan.', 404);
+        }
+
+        $schoolProfile = $user->schoolProfile;
+        $companyProfile = $user->companyProfile;
+        $umkmProfile = $user->umkmProfile;
+
+        $path = match ($type) {
+            'school-license' => $schoolProfile instanceof SchoolProfile ? $schoolProfile->operational_license_path : null,
+            'company-decree' => $companyProfile instanceof CompanyProfile ? $companyProfile->kemenkumham_decree_path : null,
+            'umkm-ktp' => $umkmProfile instanceof UmkmProfile ? $umkmProfile->owner_ktp_photo_path : null,
+            default => null,
+        };
+
+        if (! is_string($path) || $path === '' || ! Storage::disk('local')->exists($path)) {
+            return $this->errorResponse('Dokumen tidak ditemukan.', 404);
+        }
+
+        return Storage::disk('local')->download($path);
     }
 }

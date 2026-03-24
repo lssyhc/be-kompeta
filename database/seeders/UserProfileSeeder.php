@@ -33,7 +33,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'admin12345',
                 'role' => User::ROLE_ADMIN,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -53,7 +52,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_PERUSAHAAN,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -85,7 +83,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_PERUSAHAAN,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -117,7 +114,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_UMKM,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -148,7 +144,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_UMKM,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -179,7 +174,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_PERUSAHAAN,
                 'account_status' => User::STATUS_PENDING,
-                'is_active' => false,
             ]
         );
 
@@ -211,7 +205,6 @@ class UserProfileSeeder extends Seeder
                 'role' => User::ROLE_MITRA,
                 'mitra_type' => User::MITRA_UMKM,
                 'account_status' => User::STATUS_REJECTED,
-                'is_active' => false,
             ]
         );
 
@@ -244,7 +237,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SEKOLAH,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -274,7 +266,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SEKOLAH,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -304,7 +295,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SEKOLAH,
                 'account_status' => User::STATUS_PENDING,
-                'is_active' => false,
             ]
         );
 
@@ -340,7 +330,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SISWA,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -369,7 +358,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SISWA,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -398,7 +386,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SISWA,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -434,7 +421,6 @@ class UserProfileSeeder extends Seeder
                     'password' => 'password123',
                     'role' => User::ROLE_SEKOLAH,
                     'account_status' => User::STATUS_ACTIVE,
-                    'is_active' => true,
                 ]
             );
 
@@ -479,7 +465,6 @@ class UserProfileSeeder extends Seeder
                     'role' => User::ROLE_MITRA,
                     'mitra_type' => User::MITRA_PERUSAHAAN,
                     'account_status' => User::STATUS_ACTIVE,
-                    'is_active' => true,
                 ]
             );
 
@@ -519,7 +504,6 @@ class UserProfileSeeder extends Seeder
                     'role' => User::ROLE_MITRA,
                     'mitra_type' => User::MITRA_UMKM,
                     'account_status' => User::STATUS_ACTIVE,
-                    'is_active' => true,
                 ]
             );
 
@@ -556,7 +540,6 @@ class UserProfileSeeder extends Seeder
                 'password' => 'password123',
                 'role' => User::ROLE_SEKOLAH,
                 'account_status' => User::STATUS_ACTIVE,
-                'is_active' => true,
             ]
         );
 
@@ -594,7 +577,6 @@ class UserProfileSeeder extends Seeder
                     'password' => 'password123',
                     'role' => User::ROLE_SISWA,
                     'account_status' => User::STATUS_ACTIVE,
-                    'is_active' => true,
                 ]
             );
 

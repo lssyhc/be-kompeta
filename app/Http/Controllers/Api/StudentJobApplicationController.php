@@ -11,6 +11,7 @@ use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class StudentJobApplicationController extends Controller
 {
@@ -77,8 +78,6 @@ class StudentJobApplicationController extends Controller
             'mitra_user_id' => $jobVacancy->mitra_user_id,
             'company_name' => $jobVacancy->resolveMitraName() ?? '',
             'role_type' => $jobVacancy->position_name,
-            'submitted_at' => $now->toDateString(),
-            'submit_status' => StudentApplication::STATUS_SUBMITTED,
             'cv_path' => $request->file('cv')->store('student-applications/cv', 'local'),
             'cover_letter' => $validated['cover_letter'] ?? null,
             'status' => StudentApplication::STATUS_SUBMITTED,
@@ -116,6 +115,32 @@ class StudentJobApplicationController extends Controller
             (new StudentJobApplicationResource($application))->resolve(),
             'Detail lamaran berhasil diambil.'
         );
+    }
+
+    public function downloadCv(Request $request, int $id): mixed
+    {
+        $studentProfile = $this->resolveStudentProfile($request);
+
+        if (! $studentProfile instanceof StudentProfile) {
+            return $this->errorResponse('Hanya user siswa yang dapat mengunduh CV.', 403);
+        }
+
+        $application = StudentApplication::query()
+            ->where('id', $id)
+            ->where('student_profile_id', $studentProfile->id)
+            ->first();
+
+        if (! $application instanceof StudentApplication) {
+            return $this->errorResponse('Lamaran tidak ditemukan.', 404);
+        }
+
+        $path = $application->cv_path;
+
+        if (! is_string($path) || $path === '' || ! Storage::disk('local')->exists($path)) {
+            return $this->errorResponse('Dokumen CV tidak ditemukan.', 404);
+        }
+
+        return Storage::disk('local')->download($path);
     }
 
     private function resolveStudentProfile(Request $request): ?StudentProfile

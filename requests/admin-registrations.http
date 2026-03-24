@@ -88,7 +88,17 @@ Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 7. AKSES TANPA TOKEN (harus 401)
+### 7. DOWNLOAD DOKUMEN LEGALITAS
+###    Type: school-license | company-decree | umkm-ktp
+### ============================================================
+GET {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/documents/school-license
+Accept: application/octet-stream
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 8. AKSES TANPA TOKEN (harus 401)
 ### ============================================================
 GET {{baseUrl}}/admin/registrations
 Accept: application/json
@@ -96,7 +106,7 @@ Accept: application/json
 ###
 
 ### ============================================================
-### 8. AKSES DENGAN TOKEN NON-ADMIN (harus 403)
+### 9. AKSES DENGAN TOKEN NON-ADMIN (harus 403)
 ###    Contoh gunakan token sekolah/mitra dari auth.http
 ### ============================================================
 GET {{baseUrl}}/admin/registrations

@@ -5,7 +5,7 @@ paths:
       summary: List sekolah
       description: |
         Menampilkan daftar sekolah dengan informasi dasar (nama, lokasi, logo, jurusan).
-        Hanya akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`) yang ditampilkan.
+        Hanya akun sekolah yang sudah disetujui admin (`account_status=active`) yang ditampilkan.
         Mendukung pencarian berdasarkan nama sekolah (case-insensitive, partial match).
         Diurutkan berdasarkan `created_at` terbaru.
       security: []
@@ -79,7 +79,7 @@ paths:
         - Daftar siswa dari sekolah tersebut
         - Pengajuan kemitraan yang sudah disubmit (status submitted)
 
-        Hanya dapat diakses untuk akun sekolah yang sudah disetujui admin (status `active` dan `is_active=true`).
+        Hanya dapat diakses untuk akun sekolah yang sudah disetujui admin (`account_status=active`).
       security: []
       parameters:
         - in: path

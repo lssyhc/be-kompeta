@@ -85,7 +85,6 @@ class ProfileController extends Controller
             'role' => $user->role,
             'mitra_type' => $user->mitra_type,
             'account_status' => $user->account_status,
-            'is_active' => $user->is_active,
             'last_login_at' => $user->last_login_at,
         ];
     }
@@ -111,7 +110,7 @@ class ProfileController extends Controller
                     return [
                         'company_name' => $application->company_name,
                         'role_type' => $application->role_type,
-                        'submitted_at' => $application->submitted_at?->toDateString(),
+                        'applied_at' => $application->applied_at?->toIso8601String(),
                         'status' => $application->status,
                     ];
                 })

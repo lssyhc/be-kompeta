@@ -70,6 +70,7 @@ paths:
                       accreditation: B
                       address: Malang, Jawa Timur
                       short_description: Data sekolah contoh untuk status pending approval.
+                      operational_license_url: http://localhost:8000/api/admin/registrations/10/documents/school-license
                 errors: null
                 meta:
                   pagination:
@@ -161,6 +162,7 @@ paths:
                     accreditation: B
                     address: Malang, Jawa Timur
                     short_description: Data sekolah contoh untuk status pending approval.
+                    operational_license_url: http://localhost:8000/api/admin/registrations/10/documents/school-license
                 errors: null
                 meta: null
         "401":
@@ -211,7 +213,7 @@ paths:
       tags: [Admin Registrations]
       summary: Setujui registrasi pending
       description: |
-        Mengubah status registrasi menjadi `active` dan `is_active=true`.
+        Mengubah status registrasi menjadi `active`.
         Hanya registrasi dengan status `pending` yang dapat disetujui.
         Hanya user dengan role `admin` yang dapat mengakses.
 
@@ -246,6 +248,7 @@ paths:
                     accreditation: B
                     address: Malang, Jawa Timur
                     short_description: Data sekolah contoh untuk status pending approval.
+                    operational_license_url: http://localhost:8000/api/admin/registrations/10/documents/school-license
                 errors: null
                 meta: null
         "401":
@@ -303,12 +306,93 @@ paths:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
+  /admin/registrations/{id}/documents/{type}:
+    get:
+      tags: [Admin Registrations]
+      summary: Download dokumen legalitas registrasi
+      description: |
+        Mengunduh dokumen legalitas yang diunggah saat registrasi.
+        Hanya user dengan role `admin` yang dapat mengakses.
+
+        **Tipe dokumen yang tersedia (`type`):**
+        - `school-license`: Surat izin operasional sekolah
+        - `company-decree`: SK Kemenkumham perusahaan
+        - `umkm-ktp`: Foto KTP pemilik UMKM
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID user yang registrasinya ingin dilihat dokumennya
+          example: 10
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [school-license, company-decree, umkm-ktp]
+          description: Tipe dokumen yang ingin diunduh
+          example: school-license
+      responses:
+        "200":
+          description: File dokumen berhasil diunduh
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya admin yang dapat mengakses dokumen.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Data registrasi atau dokumen tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Dokumen tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
   /admin/registrations/{id}/reject:
     patch:
       tags: [Admin Registrations]
       summary: Tolak registrasi pending
       description: |
-        Mengubah status registrasi menjadi `rejected` dan `is_active=false`.
+        Mengubah status registrasi menjadi `rejected`.
         Hanya registrasi dengan status `pending` yang dapat ditolak.
         Hanya user dengan role `admin` yang dapat mengakses.
 
@@ -365,6 +449,7 @@ paths:
                     accreditation: B
                     address: Malang, Jawa Timur
                     short_description: Data sekolah contoh untuk status pending approval.
+                    operational_license_url: http://localhost:8000/api/admin/registrations/10/documents/school-license
                 errors: null
                 meta: null
         "401":

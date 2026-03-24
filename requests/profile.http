@@ -281,7 +281,7 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 ### Pastikan role_profile.job_applications berisi:
 ### - company_name
 ### - role_type
-### - submitted_at
+### - applied_at
 ### - status
 ### ============================================================
 

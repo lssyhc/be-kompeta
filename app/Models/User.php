@@ -46,10 +46,7 @@ class User extends Authenticatable
         'role',
         'mitra_type',
         'account_status',
-        'is_active',
         'last_login_at',
-        'last_login_ip',
-        'last_login_user_agent',
     ];
 
     /**
@@ -59,7 +56,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -70,9 +66,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_active' => 'boolean',
             'last_login_at' => 'datetime',
         ];
     }

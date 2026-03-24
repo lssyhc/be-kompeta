@@ -50,8 +50,8 @@ class StudentPortfolioController extends Controller
                 'student_profile_id' => $studentProfile->id,
                 'company_name' => $validated['company_name'] ?? '',
                 'role_type' => $validated['role_type'] ?? '',
-                'submitted_at' => $validated['submitted_at'] ?? now()->toDateString(),
-                'submit_status' => $validated['submit_status'] ?? 'submitted',
+                'applied_at' => $validated['applied_at'] ?? now(),
+                'status' => $validated['status'] ?? 'submitted',
             ]),
             default => null,
         };

@@ -21,7 +21,6 @@ class StudentJobApplicationResource extends JsonResource
             'company_name' => $this->company_name,
             'role_type' => $this->role_type,
             'status_submit' => $this->status,
-            'submitted_at' => $this->submitted_at?->toDateString(),
             'applied_at' => $this->applied_at?->toIso8601String(),
             'cover_letter' => $this->cover_letter,
             'has_cv_file' => is_string($this->cv_path) && $this->cv_path !== '',

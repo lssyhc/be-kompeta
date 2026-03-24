@@ -45,7 +45,6 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.user.role', User::ROLE_SEKOLAH)
             ->assertJsonPath('data.user.account_status', User::STATUS_PENDING)
-            ->assertJsonPath('data.user.is_active', false)
             ->assertJsonPath('data.role_profile.npsn', '12345678');
 
         $this->assertDatabaseHas('users', [
@@ -66,7 +65,6 @@ class AuthApiTest extends TestCase
             'password' => Hash::make('password123'),
             'role' => User::ROLE_SEKOLAH,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         $response = $this->postJson('/api/auth/login', [
@@ -87,7 +85,6 @@ class AuthApiTest extends TestCase
         $admin = User::factory()->create([
             'role' => User::ROLE_ADMIN,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         $school = User::factory()->create([
@@ -95,7 +92,6 @@ class AuthApiTest extends TestCase
             'email' => 'approval-school@example.com',
             'role' => User::ROLE_SEKOLAH,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         SchoolProfile::query()->create([
@@ -126,7 +122,6 @@ class AuthApiTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $school->id,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
     }
 
@@ -136,14 +131,12 @@ class AuthApiTest extends TestCase
             'name' => 'SMK Approved',
             'role' => User::ROLE_SEKOLAH,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         $pendingSchool = User::factory()->create([
             'name' => 'SMK Pending',
             'role' => User::ROLE_SEKOLAH,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         SchoolProfile::query()->create([
@@ -175,7 +168,6 @@ class AuthApiTest extends TestCase
             'role' => User::ROLE_MITRA,
             'mitra_type' => User::MITRA_PERUSAHAAN,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         $pendingMitra = User::factory()->create([
@@ -183,7 +175,6 @@ class AuthApiTest extends TestCase
             'role' => User::ROLE_MITRA,
             'mitra_type' => User::MITRA_PERUSAHAAN,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         CompanyProfile::query()->create([
@@ -324,7 +315,6 @@ class AuthApiTest extends TestCase
         $school = User::factory()->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         Sanctum::actingAs($school);
@@ -361,13 +351,11 @@ class AuthApiTest extends TestCase
         $school = User::factory()->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $studentUser = User::factory()->create([
             'role' => User::ROLE_SISWA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $studentProfile = StudentProfile::query()->create([
@@ -403,19 +391,16 @@ class AuthApiTest extends TestCase
         $school = User::factory()->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $otherSchool = User::factory()->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $studentUser = User::factory()->create([
             'role' => User::ROLE_SISWA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $studentProfile = StudentProfile::query()->create([
@@ -443,7 +428,6 @@ class AuthApiTest extends TestCase
         $mitra = User::factory()->create([
             'role' => User::ROLE_MITRA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         Sanctum::actingAs($mitra);
@@ -461,7 +445,6 @@ class AuthApiTest extends TestCase
             'email' => null,
             'role' => User::ROLE_SISWA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         StudentProfile::query()->create([
@@ -505,7 +488,6 @@ class AuthApiTest extends TestCase
             'email' => null,
             'role' => User::ROLE_SISWA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $studentProfile = StudentProfile::query()->create([
@@ -543,7 +525,6 @@ class AuthApiTest extends TestCase
             'password' => Hash::make('password123'),
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         $response = $this->postJson('/api/auth/login', [
@@ -570,7 +551,6 @@ class AuthApiTest extends TestCase
         $school = User::factory()->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         SchoolProfile::query()->create([
@@ -603,7 +583,6 @@ class AuthApiTest extends TestCase
         $admin = User::factory()->create([
             'role' => User::ROLE_ADMIN,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         Sanctum::actingAs($admin);
@@ -632,7 +611,6 @@ class AuthApiTest extends TestCase
         $admin = User::factory()->create([
             'role' => User::ROLE_ADMIN,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         Sanctum::actingAs($admin);
@@ -652,7 +630,6 @@ class AuthApiTest extends TestCase
         $student = User::factory()->create([
             'role' => User::ROLE_SISWA,
             'account_status' => 'active',
-            'is_active' => true,
         ]);
 
         StudentProfile::query()->create([

@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserFactory extends Factory
 {
@@ -16,23 +15,11 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => User::ROLE_SISWA,
             'mitra_type' => null,
             'account_status' => 'active',
-            'is_active' => true,
             'last_login_at' => null,
-            'last_login_ip' => null,
-            'last_login_user_agent' => null,
-            'remember_token' => Str::random(10),
         ];
-    }
-
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
     }
 }

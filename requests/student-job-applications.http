@@ -53,3 +53,10 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 GET {{baseUrl}}/student/job-applications/{{applicationId}}
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 4) DOWNLOAD CV
+GET {{baseUrl}}/student/job-applications/{{applicationId}}/cv
+Accept: application/octet-stream
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property Carbon|null $submitted_at
  * @property Carbon|null $applied_at
  */
 class StudentApplication extends Model
@@ -23,8 +22,6 @@ class StudentApplication extends Model
         'mitra_user_id',
         'company_name',
         'role_type',
-        'submitted_at',
-        'submit_status',
         'cv_path',
         'cover_letter',
         'status',
@@ -34,7 +31,6 @@ class StudentApplication extends Model
     protected function casts(): array
     {
         return [
-            'submitted_at' => 'date',
             'applied_at' => 'datetime',
         ];
     }

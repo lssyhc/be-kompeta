@@ -15,40 +15,34 @@ class PublicStatisticsApiTest extends TestCase
         User::factory()->count(3)->create([
             'role' => User::ROLE_SISWA,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         User::factory()->count(2)->create([
             'role' => User::ROLE_SEKOLAH,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         User::factory()->count(4)->create([
             'role' => User::ROLE_MITRA,
             'mitra_type' => User::MITRA_PERUSAHAAN,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         User::factory()->count(5)->create([
             'role' => User::ROLE_MITRA,
             'mitra_type' => User::MITRA_UMKM,
             'account_status' => User::STATUS_ACTIVE,
-            'is_active' => true,
         ]);
 
         User::factory()->create([
             'role' => User::ROLE_SISWA,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         User::factory()->create([
             'role' => User::ROLE_MITRA,
             'mitra_type' => User::MITRA_PERUSAHAAN,
             'account_status' => User::STATUS_PENDING,
-            'is_active' => false,
         ]);
 
         $response = $this->getJson('/api/public/summary');

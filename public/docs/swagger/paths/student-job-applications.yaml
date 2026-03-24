@@ -42,8 +42,7 @@ paths:
                     mitra_user_id: 2
                     company_name: PT Binajasa Sumber Sarana
                     role_type: Accounting Staff
-                    status_submit: submitted
-                    submitted_at: "2026-03-19"
+                    status: submitted
                     applied_at: "2026-03-19T09:00:00+07:00"
                     cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
                     has_cv_file: true
@@ -124,8 +123,7 @@ paths:
                   mitra_user_id: 2
                   company_name: PT Binajasa Sumber Sarana
                   role_type: Accounting Staff
-                  status_submit: submitted
-                  submitted_at: "2026-03-19"
+                  status: submitted
                   applied_at: "2026-03-19T09:00:00+07:00"
                   cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
                   has_cv_file: true
@@ -232,8 +230,7 @@ paths:
                   mitra_user_id: 2
                   company_name: PT Binajasa Sumber Sarana
                   role_type: Accounting Staff
-                  status_submit: submitted
-                  submitted_at: "2026-03-19"
+                  status: submitted
                   applied_at: "2026-03-19T09:00:00+07:00"
                   cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
                   has_cv_file: true
@@ -272,6 +269,74 @@ paths:
               example:
                 success: false
                 message: Lamaran tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /student/job-applications/{id}/cv:
+    get:
+      tags: [Student Job Applications]
+      summary: Download file CV lamaran
+      description: |
+        Mengunduh file CV yang dilampirkan pada lamaran kerja.
+        Hanya siswa pemilik lamaran yang dapat mengunduh.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lamaran kerja (StudentApplication)
+          example: 1
+      responses:
+        "200":
+          description: File CV berhasil diunduh
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat mengunduh CV.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lamaran atau dokumen CV tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Dokumen CV tidak ditemukan.
                 data: null
                 errors: null
                 meta: null

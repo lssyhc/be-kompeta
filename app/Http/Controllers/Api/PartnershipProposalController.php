@@ -9,6 +9,7 @@ use App\Models\PartnershipProposal;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PartnershipProposalController extends Controller
 {
@@ -135,5 +136,56 @@ class PartnershipProposalController extends Controller
             (new PartnershipProposalResource($proposal))->resolve(),
             'Detail pengajuan kemitraan berhasil diambil.'
         );
+    }
+
+    public function downloadProposalPdf(Request $request, int $id): mixed
+    {
+        $proposal = $this->findAuthorizedProposal($request, $id);
+
+        if (! $proposal instanceof PartnershipProposal) {
+            return $this->errorResponse('Pengajuan kemitraan tidak ditemukan.', 404);
+        }
+
+        $path = $proposal->proposal_pdf_path;
+
+        if (empty($path) || ! Storage::disk('local')->exists($path)) {
+            return $this->errorResponse('Dokumen proposal tidak ditemukan.', 404);
+        }
+
+        return Storage::disk('local')->download($path);
+    }
+
+    public function downloadSignature(Request $request, int $id): mixed
+    {
+        $proposal = $this->findAuthorizedProposal($request, $id);
+
+        if (! $proposal instanceof PartnershipProposal) {
+            return $this->errorResponse('Pengajuan kemitraan tidak ditemukan.', 404);
+        }
+
+        $path = $proposal->signature_path;
+
+        if (empty($path) || ! Storage::disk('local')->exists($path)) {
+            return $this->errorResponse('Dokumen tanda tangan tidak ditemukan.', 404);
+        }
+
+        return Storage::disk('local')->download($path);
+    }
+
+    private function findAuthorizedProposal(Request $request, int $id): ?PartnershipProposal
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return null;
+        }
+
+        return PartnershipProposal::query()
+            ->where('id', $id)
+            ->where(function ($query) use ($user) {
+                $query->where('proposer_user_id', $user->id)
+                    ->orWhere('target_user_id', $user->id);
+            })
+            ->first();
     }
 }

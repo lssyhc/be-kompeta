@@ -100,7 +100,7 @@ paths:
         Otomatis membuat akun `User` dengan role `siswa` dan `StudentProfile` terkait.
 
         **Proses internal:**
-        1. Buat `User` dengan `role=siswa`, `account_status=active`, `is_active=true`
+        1. Buat `User` dengan `role=siswa`, `account_status=active`
         2. Buat `StudentProfile` dengan `school_user_id` dari sekolah login
         3. Generate `unique_code` 8 karakter acak untuk login siswa
 

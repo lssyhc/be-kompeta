@@ -28,6 +28,8 @@ class PartnershipProposalResource extends JsonResource
             'notes' => $this->notes,
             'status_submit' => $this->status,
             'tanggal_submit' => $this->submitted_at?->toIso8601String(),
+            'proposal_pdf_url' => url("/api/partnership-proposals/{$this->id}/proposal-pdf"),
+            'signature_url' => url("/api/partnership-proposals/{$this->id}/signature"),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

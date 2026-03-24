@@ -117,7 +117,40 @@ Content-Type: image/jpeg
 ###
 
 ### ============================================================
-### 10. CREATE ARTICLE TANPA TOKEN (harus 401)
+### 10. UPDATE ARTICLE (ADMIN ONLY)
+###     Slug diambil dari response blogCreateByAdmin
+### ============================================================
+@articleSlug = artikel-dari-rest-client
+# @name blogUpdateByAdmin
+PUT {{baseUrl}}/admin/blog/articles/{{articleSlug}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+Artikel Diperbarui via REST Client
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="body"
+
+Konten artikel yang sudah diperbarui.
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### ============================================================
+### 11. DELETE ARTICLE (ADMIN ONLY)
+### ============================================================
+# @name blogDeleteByAdmin
+DELETE {{baseUrl}}/admin/blog/articles/{{articleSlug}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### ============================================================
+### 12. CREATE ARTICLE TANPA TOKEN (harus 401)
 ### ============================================================
 # @name blogCreateUnauthorized
 POST {{baseUrl}}/admin/blog/articles

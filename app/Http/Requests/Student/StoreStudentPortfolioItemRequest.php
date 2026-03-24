@@ -24,8 +24,8 @@ class StoreStudentPortfolioItemRequest extends FormRequest
             'achievement_date' => ['required_if:type,achievement', 'nullable', 'date'],
             'institution_name' => ['required_if:type,achievement', 'nullable', 'string', 'max:255'],
             'role_type' => ['required_if:type,application', 'nullable', 'string', 'max:255'],
-            'submitted_at' => ['required_if:type,application', 'nullable', 'date'],
-            'submit_status' => ['required_if:type,application', 'nullable', 'string', 'max:100'],
+            'applied_at' => ['required_if:type,application', 'nullable', 'date'],
+            'status' => ['required_if:type,application', 'nullable', 'string', 'max:100'],
         ];
     }
 }

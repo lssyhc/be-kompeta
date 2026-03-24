@@ -68,16 +68,21 @@ Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::get('/job-applications', [StudentJobApplicationController::class, 'index']);
     Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
     Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');
+    Route::get('/job-applications/{id}/cv', [StudentJobApplicationController::class, 'downloadCv'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(function () {
     Route::get('/', [PartnershipProposalController::class, 'index']);
     Route::post('/', [PartnershipProposalController::class, 'store']);
     Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
+    Route::get('/{id}/proposal-pdf', [PartnershipProposalController::class, 'downloadProposalPdf'])->whereNumber('id');
+    Route::get('/{id}/signature', [PartnershipProposalController::class, 'downloadSignature'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('admin/blog')->group(function () {
     Route::post('/articles', [BlogController::class, 'store']);
+    Route::put('/articles/{slug}', [BlogController::class, 'update']);
+    Route::delete('/articles/{slug}', [BlogController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->prefix('admin/registrations')->group(function () {
@@ -85,6 +90,7 @@ Route::middleware('auth:sanctum')->prefix('admin/registrations')->group(function
     Route::get('/{id}', [AdminRegistrationController::class, 'show'])->whereNumber('id');
     Route::patch('/{id}/approve', [AdminRegistrationController::class, 'approve'])->whereNumber('id');
     Route::patch('/{id}/reject', [AdminRegistrationController::class, 'reject'])->whereNumber('id');
+    Route::get('/{id}/documents/{type}', [AdminRegistrationController::class, 'downloadDocument'])->whereNumber('id');
 });
 
 Route::prefix('public/explore')->group(function () {

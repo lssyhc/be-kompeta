@@ -325,6 +325,214 @@ paths:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
+  /admin/blog/articles/{slug}:
+    put:
+      tags: [Blog]
+      summary: Update artikel blog (admin only)
+      description: |
+        Mengubah artikel blog berdasarkan slug. Hanya user dengan role `admin` yang dapat mengakses.
+
+        Semua field bersifat opsional (partial update).
+        Jika `title` diubah, `slug` otomatis di-regenerate.
+        Jika `is_published` diubah ke `true` dan belum ada `published_at`, otomatis diisi saat ini.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          description: Slug unik artikel
+          example: artikel-perdana-kompeta
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content_type_id:
+                  type: integer
+                  description: ID tipe konten blog (harus aktif)
+                  example: 1
+                title:
+                  type: string
+                  maxLength: 255
+                  description: Judul artikel
+                  example: Artikel Diperbarui
+                thumbnail:
+                  type: string
+                  format: binary
+                  description: Gambar thumbnail baru (file upload)
+                body:
+                  type: string
+                  description: Isi konten artikel
+                  example: Isi konten artikel yang diperbarui.
+                is_published:
+                  type: boolean
+                  description: Apakah artikel dipublikasi
+                published_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: Tanggal publikasi kustom (ISO 8601)
+      responses:
+        "200":
+          description: Artikel berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeArticleDetail"
+              example:
+                success: true
+                message: Artikel berhasil diperbarui.
+                data:
+                  id: 1
+                  content_type:
+                    id: 1
+                    name: News
+                    slug: news
+                  title: Artikel Diperbarui
+                  slug: artikel-diperbarui
+                  body: Isi konten artikel yang diperbarui.
+                  view_count: 0
+                  thumbnail_url: http://localhost:8000/storage/blog/thumbnails/sample.jpg
+                  is_published: true
+                  published_at: "2026-03-22T02:08:14Z"
+                  created_by: 1
+                  created_by_name: System Admin
+                  created_at: "2026-03-22T02:08:14Z"
+                  updated_at: "2026-03-22T03:00:00Z"
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya admin yang dapat mengubah artikel.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Artikel tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Artikel tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  title:
+                    - The title must be a string.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+    delete:
+      tags: [Blog]
+      summary: Hapus artikel blog (admin only)
+      description: |
+        Menghapus artikel blog berdasarkan slug. Hanya user dengan role `admin` yang dapat mengakses.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          description: Slug unik artikel
+          example: artikel-perdana-kompeta
+      responses:
+        "200":
+          description: Artikel berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Artikel berhasil dihapus.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role admin
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya admin yang dapat menghapus artikel.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Artikel tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Artikel tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
   /public/blog/articles/{slug}:
     get:
       tags: [Blog]

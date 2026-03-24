@@ -308,7 +308,7 @@ Content-Type: application/json
 ### ============================================================
 ### 13. TAMBAH PORTFOLIO - APPLICATION (Lamaran Pekerjaan/Magang)
 ###     type: "application"
-###     Field wajib: company_name, role_type, submitted_at, submit_status
+###     Field wajib: company_name, role_type, applied_at, status
 ### ============================================================
 
 # @name tambahApplication
@@ -321,8 +321,8 @@ Content-Type: application/json
   "type": "application",
   "company_name": "PT Maju Jaya Teknologi",
   "role_type": "Back-End Developer Intern",
-  "submitted_at": "2024-02-01",
-  "submit_status": "submitted"
+  "applied_at": "2024-02-01",
+  "status": "submitted"
 }
 
 ###
@@ -340,8 +340,8 @@ Content-Type: application/json
   "type": "application",
   "company_name": "CV Digital Kreatif",
   "role_type": "Full-Stack Developer Intern",
-  "submitted_at": "2024-03-15",
-  "submit_status": "accepted"
+  "applied_at": "2024-03-15",
+  "status": "accepted"
 }
 
 ###
@@ -359,8 +359,8 @@ Content-Type: application/json
   "type": "application",
   "company_name": "PT Teknologi Nusantara",
   "role_type": "Mobile Developer Intern",
-  "submitted_at": "2024-01-20",
-  "submit_status": "rejected"
+  "applied_at": "2024-01-20",
+  "status": "rejected"
 }
 
 ###

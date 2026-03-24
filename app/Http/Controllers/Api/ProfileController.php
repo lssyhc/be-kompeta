@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -54,17 +55,8 @@ class ProfileController extends Controller
         }
 
         $profilePayload = $validated['profile'] ?? [];
-
-        if ($user->role === User::ROLE_SISWA) {
-            $legacyStudentPayload = array_intersect_key($validated, array_flip([
-                'description',
-                'phone_number',
-                'address',
-                'class_year',
-            ]));
-
-            $profilePayload = array_merge($legacyStudentPayload, $profilePayload);
-        }
+        $filePayload = $this->handleFileUploads($request, $user, $profile);
+        $profilePayload = array_merge($profilePayload, $filePayload);
 
         if (! empty($profilePayload)) {
             $profile->update($profilePayload);
@@ -74,6 +66,90 @@ class ProfileController extends Controller
             'user' => $this->compactUser($user),
             'role_profile' => $this->resolveRoleProfile($user),
         ], 'Profil berhasil diperbarui.');
+    }
+
+    private function handleFileUploads(UpdateProfileRequest $request, User $user, Model $profile): array
+    {
+        $filePayload = [];
+
+        if ($user->role === User::ROLE_SISWA) {
+            /** @var StudentProfile $profile */
+            if ($request->hasFile('photo_profile')) {
+                $this->deleteOldFile($profile->photo_profile_path, 'public');
+                $filePayload['photo_profile_path'] = $request->file('photo_profile')->store('profiles/students/photos', 'public');
+            }
+        }
+
+        if ($user->role === User::ROLE_SEKOLAH) {
+            /** @var SchoolProfile $profile */
+            if ($request->hasFile('logo')) {
+                $this->deleteOldFile($profile->logo_path, 'public');
+                $filePayload['logo_path'] = $request->file('logo')->store('profiles/schools/logos', 'public');
+            }
+            if ($request->hasFile('operational_license')) {
+                $this->deleteOldFile($profile->operational_license_path, 'local');
+                $filePayload['operational_license_path'] = $request->file('operational_license')->store('profiles/schools/legalities', 'local');
+            }
+            foreach (range(1, 5) as $i) {
+                if ($request->hasFile("image_{$i}")) {
+                    $this->deleteOldFile($profile->{"image_{$i}_path"}, 'public');
+                    $filePayload["image_{$i}_path"] = $request->file("image_{$i}")->store('profiles/schools/images', 'public');
+                }
+            }
+        }
+
+        if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_PERUSAHAAN) {
+            /** @var CompanyProfile $profile */
+            if ($request->hasFile('company_logo')) {
+                $this->deleteOldFile($profile->company_logo_path, 'public');
+                $filePayload['company_logo_path'] = $request->file('company_logo')->store('profiles/companies/logos', 'public');
+            }
+            if ($request->hasFile('kemenkumham_decree')) {
+                $this->deleteOldFile($profile->kemenkumham_decree_path, 'local');
+                $filePayload['kemenkumham_decree_path'] = $request->file('kemenkumham_decree')->store('profiles/companies/legalities', 'local');
+            }
+            foreach (range(1, 5) as $i) {
+                if ($request->hasFile("image_{$i}")) {
+                    $this->deleteOldFile($profile->{"image_{$i}_path"}, 'public');
+                    $filePayload["image_{$i}_path"] = $request->file("image_{$i}")->store('profiles/companies/images', 'public');
+                }
+            }
+        }
+
+        if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_UMKM) {
+            /** @var UmkmProfile $profile */
+            if ($request->hasFile('umkm_logo')) {
+                $this->deleteOldFile($profile->umkm_logo_path, 'public');
+                $filePayload['umkm_logo_path'] = $request->file('umkm_logo')->store('profiles/umkm/logos', 'public');
+            }
+            if ($request->hasFile('owner_ktp_photo')) {
+                $this->deleteOldFile($profile->owner_ktp_photo_path, 'local');
+                $filePayload['owner_ktp_photo_path'] = $request->file('owner_ktp_photo')->store('profiles/umkm/ktp', 'local');
+            }
+            foreach (range(1, 5) as $i) {
+                if ($request->hasFile("image_{$i}")) {
+                    $this->deleteOldFile($profile->{"image_{$i}_path"}, 'public');
+                    $filePayload["image_{$i}_path"] = $request->file("image_{$i}")->store('profiles/umkm/images', 'public');
+                }
+            }
+        }
+
+        if ($user->role === User::ROLE_ADMIN) {
+            /** @var AdminProfile $profile */
+            if ($request->hasFile('avatar')) {
+                $this->deleteOldFile($profile->avatar_path, 'public');
+                $filePayload['avatar_path'] = $request->file('avatar')->store('profiles/admins/avatars', 'public');
+            }
+        }
+
+        return $filePayload;
+    }
+
+    private function deleteOldFile(?string $path, string $disk): void
+    {
+        if ($path && Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->delete($path);
+        }
     }
 
     private function compactUser(User $user): array

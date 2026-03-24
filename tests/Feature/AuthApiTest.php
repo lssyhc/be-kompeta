@@ -645,10 +645,11 @@ class AuthApiTest extends TestCase
         Sanctum::actingAs($student);
 
         $response = $this->putJson('/api/profile', [
-            'description' => 'Siswa fokus backend Laravel.',
-            'phone_number' => '081234567890',
-            'address' => 'Jakarta Selatan',
-            'class_year' => '2026',
+            'profile' => [
+                'description' => 'Siswa fokus backend Laravel.',
+                'phone_number' => '081234567890',
+                'address' => 'Jakarta Selatan',
+            ],
         ]);
 
         $response->assertStatus(200)
@@ -657,15 +658,13 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('data.user.role', User::ROLE_SISWA)
             ->assertJsonPath('data.role_profile.description', 'Siswa fokus backend Laravel.')
             ->assertJsonPath('data.role_profile.phone_number', '081234567890')
-            ->assertJsonPath('data.role_profile.address', 'Jakarta Selatan')
-            ->assertJsonPath('data.role_profile.class_year', '2026');
+            ->assertJsonPath('data.role_profile.address', 'Jakarta Selatan');
 
         $this->assertDatabaseHas('student_profiles', [
             'user_id' => $student->id,
             'description' => 'Siswa fokus backend Laravel.',
             'phone_number' => '081234567890',
             'address' => 'Jakarta Selatan',
-            'class_year' => '2026',
         ]);
     }
 }

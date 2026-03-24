@@ -100,7 +100,7 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 2. UPDATE PROFILE ADMIN
+### 2. UPDATE PROFILE ADMIN (JSON only)
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -120,6 +120,28 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 ###
 
 ### ============================================================
+### 2b. UPDATE PROFILE ADMIN (with avatar file)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----AdminUpload
+
+------AdminUpload
+Content-Disposition: form-data; name="profile[full_name]"
+
+System Admin Kompeta
+------AdminUpload
+Content-Disposition: form-data; name="avatar"; filename="avatar.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------AdminUpload--
+
+###
+
+### ============================================================
 ### 3. GET PROFILE SEKOLAH
 ### ============================================================
 
@@ -130,7 +152,7 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 4. UPDATE PROFILE SEKOLAH
+### 4. UPDATE PROFILE SEKOLAH (JSON only)
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -150,6 +172,42 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ###
 
 ### ============================================================
+### 4b. UPDATE PROFILE SEKOLAH (with file uploads)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----SekolahUpload
+
+------SekolahUpload
+Content-Disposition: form-data; name="profile[short_description]"
+
+Sekolah vokasi unggulan untuk bidang teknologi dan bisnis.
+------SekolahUpload
+Content-Disposition: form-data; name="profile[accreditation]"
+
+A
+------SekolahUpload
+Content-Disposition: form-data; name="logo"; filename="logo.png"
+Content-Type: image/png
+
+< ./sample-files/sample-image.jpg
+------SekolahUpload
+Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------SekolahUpload
+Content-Disposition: form-data; name="operational_license"; filename="license.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/sample-pdf.pdf
+------SekolahUpload--
+
+###
+
+### ============================================================
 ### 5. GET PROFILE MITRA PERUSAHAAN
 ### ============================================================
 
@@ -160,7 +218,7 @@ Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 6. UPDATE PROFILE MITRA PERUSAHAAN
+### 6. UPDATE PROFILE MITRA PERUSAHAAN (JSON only)
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -181,6 +239,38 @@ Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
 ###
 
 ### ============================================================
+### 6b. UPDATE PROFILE MITRA PERUSAHAAN (with file uploads)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----PerusahaanUpload
+
+------PerusahaanUpload
+Content-Disposition: form-data; name="profile[short_description]"
+
+Perusahaan outsourcing dan operasional bisnis.
+------PerusahaanUpload
+Content-Disposition: form-data; name="company_logo"; filename="company-logo.png"
+Content-Type: image/png
+
+< ./sample-files/sample-image.jpg
+------PerusahaanUpload
+Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------PerusahaanUpload
+Content-Disposition: form-data; name="kemenkumham_decree"; filename="decree.pdf"
+Content-Type: application/pdf
+
+< ./sample-files/sample-pdf.pdf
+------PerusahaanUpload--
+
+###
+
+### ============================================================
 ### 7. GET PROFILE MITRA UMKM
 ### ============================================================
 
@@ -191,7 +281,7 @@ Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 8. UPDATE PROFILE MITRA UMKM
+### 8. UPDATE PROFILE MITRA UMKM (JSON only)
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -207,6 +297,38 @@ Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
     "owner_personal_nib": "NIB-UMKM-001"
   }
 }
+
+###
+
+### ============================================================
+### 8b. UPDATE PROFILE MITRA UMKM (with file uploads)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----UmkmUpload
+
+------UmkmUpload
+Content-Disposition: form-data; name="profile[short_description]"
+
+UMKM bakery dengan fokus produksi harian.
+------UmkmUpload
+Content-Disposition: form-data; name="umkm_logo"; filename="umkm-logo.png"
+Content-Type: image/png
+
+< ./sample-files/sample-image.jpg
+------UmkmUpload
+Content-Disposition: form-data; name="owner_ktp_photo"; filename="ktp.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------UmkmUpload
+Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------UmkmUpload--
 
 ###
 
@@ -239,25 +361,7 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 11. UPDATE PROFILE SISWA
-### ============================================================
-
-PUT {{baseUrl}}/profile
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
-
-{
-  "description": "Siswa RPL fokus backend Laravel.",
-  "phone_number": "081234567890",
-  "address": "Jakarta Selatan",
-  "class_year": "2026"
-}
-
-###
-
-### ============================================================
-### 12. UPDATE PROFILE SISWA (format nested juga didukung)
+### 11. UPDATE PROFILE SISWA (JSON only)
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -267,12 +371,38 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 
 {
   "profile": {
-    "description": "Siswa RPL fokus backend Laravel (nested).",
+    "full_name": "Budi Santoso",
+    "description": "Siswa RPL fokus backend Laravel.",
     "phone_number": "081234567890",
-    "address": "Jakarta Selatan",
-    "class_year": "2026"
+    "address": "Jakarta Selatan"
   }
 }
+
+###
+
+### ============================================================
+### 12. UPDATE PROFILE SISWA (with photo upload)
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----SiswaUpload
+
+------SiswaUpload
+Content-Disposition: form-data; name="profile[description]"
+
+Siswa RPL fokus backend Laravel.
+------SiswaUpload
+Content-Disposition: form-data; name="profile[phone_number]"
+
+081234567890
+------SiswaUpload
+Content-Disposition: form-data; name="photo_profile"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/sample-image.jpg
+------SiswaUpload--
 
 ###
 

@@ -100,37 +100,42 @@ paths:
       summary: Update profile user login lintas role
       description: |
         Update profile universal untuk semua role.
-        Payload menggunakan dua object:
-        - `user` (opsional): data umum user (contoh: `name`)
-        - `profile` (opsional): data profile spesifik role
+        Endpoint menerima `multipart/form-data` untuk mendukung upload file (logo, gambar, dokumen) bersama data teks.
+
+        **Payload:**
+        - `user[name]` (opsional): nama tampilan user
+        - `profile[field]` (opsional): data profile spesifik role
+        - File upload di level root (opsional): file gambar/dokumen sesuai role
 
         **Field `profile` per role:**
         | Role                | Field yang diterima |
         |---------------------|---------------------|
         | admin               | `full_name` |
-        | sekolah             | `short_description`, `address`, `accreditation`, `expertise_fields` |
-        | mitra perusahaan    | `short_description`, `office_address`, `website_or_social_url`, `industry_sector`, `employee_total_range` |
-        | mitra umkm          | `short_description`, `business_address`, `business_type`, `owner_personal_nib` |
-        | siswa               | `description`, `phone_number`, `address`, `class_year` |
+        | sekolah             | `accreditation`, `address`, `expertise_fields`, `short_description` |
+        | mitra perusahaan    | `industry_sector`, `employee_total_range`, `office_address`, `website_or_social_url`, `short_description` |
+        | mitra umkm          | `owner_personal_nib`, `business_type`, `business_address`, `short_description` |
+        | siswa               | `full_name`, `description`, `phone_number`, `address` |
 
-        **Kompatibilitas siswa (legacy format):**
-        Selain format nested `profile.{field}`, siswa juga bisa mengirim field di level root:
-        ```json
-        {
-          "description": "...",
-          "phone_number": "...",
-          "address": "...",
-          "class_year": "2026"
-        }
-        ```
-        Kedua format valid dan menghasilkan response yang sama.
+        **File upload per role:**
+        | Role                | Field file | Tipe | Max size |
+        |---------------------|-----------|------|----------|
+        | admin               | `avatar` | image (jpg/jpeg/png/webp) | 2 MB |
+        | sekolah             | `logo` | image | 2 MB |
+        | sekolah             | `image_1`–`image_5` | image | 2 MB |
+        | sekolah             | `operational_license` | pdf | 5 MB |
+        | mitra perusahaan    | `company_logo` | image | 2 MB |
+        | mitra perusahaan    | `image_1`–`image_5` | image | 2 MB |
+        | mitra perusahaan    | `kemenkumham_decree` | pdf | 5 MB |
+        | mitra umkm          | `umkm_logo` | image | 2 MB |
+        | mitra umkm          | `owner_ktp_photo` | image | 2 MB |
+        | mitra umkm          | `image_1`–`image_5` | image | 2 MB |
+        | siswa               | `photo_profile` | image | 2 MB |
 
-        **Response sukses:**
-        Response identik dengan `GET /profile` — mengembalikan `user` dan `role_profile` yang sudah diperbarui.
+        File lama otomatis dihapus saat file baru diupload.
       requestBody:
         required: false
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -144,28 +149,114 @@ paths:
                       description: Nama tampilan user
                 profile:
                   type: object
-                  description: Data profile spesifik role (lihat tabel di atas)
-                  additionalProperties: true
-                description:
+                  description: Data profile spesifik role (lihat tabel di description)
+                  properties:
+                    full_name:
+                      type: string
+                      maxLength: 255
+                      description: "[Admin/Siswa] Nama lengkap"
+                    description:
+                      type: string
+                      maxLength: 2000
+                      description: "[Siswa] Deskripsi diri"
+                    phone_number:
+                      type: string
+                      maxLength: 30
+                      description: "[Siswa] Nomor telepon"
+                    address:
+                      type: string
+                      description: "[Siswa/Sekolah] Alamat"
+                    accreditation:
+                      type: string
+                      enum: [A, B, C, Belum Terakreditasi]
+                      description: "[Sekolah] Akreditasi"
+                    expertise_fields:
+                      type: array
+                      items:
+                        type: string
+                      description: "[Sekolah] Bidang keahlian"
+                    short_description:
+                      type: string
+                      maxLength: 1000
+                      description: "[Sekolah/Perusahaan/UMKM] Deskripsi singkat"
+                    industry_sector:
+                      type: string
+                      maxLength: 100
+                      description: "[Perusahaan] Sektor industri"
+                    employee_total_range:
+                      type: string
+                      maxLength: 50
+                      description: "[Perusahaan] Range jumlah karyawan"
+                    office_address:
+                      type: string
+                      description: "[Perusahaan] Alamat kantor"
+                    website_or_social_url:
+                      type: string
+                      format: uri
+                      description: "[Perusahaan] URL website/sosial media"
+                    owner_personal_nib:
+                      type: string
+                      maxLength: 50
+                      description: "[UMKM] NIB pemilik"
+                    business_type:
+                      type: string
+                      maxLength: 100
+                      description: "[UMKM] Jenis usaha"
+                    business_address:
+                      type: string
+                      description: "[UMKM] Alamat usaha"
+                avatar:
                   type: string
-                  nullable: true
-                  maxLength: 2000
-                  description: "[Siswa legacy format] Deskripsi diri siswa"
-                phone_number:
+                  format: binary
+                  description: "[Admin] Avatar (jpg/jpeg/png/webp, max 2MB)"
+                photo_profile:
                   type: string
-                  nullable: true
-                  maxLength: 30
-                  description: "[Siswa legacy format] Nomor telepon siswa"
-                address:
+                  format: binary
+                  description: "[Siswa] Foto profil (jpg/jpeg/png/webp, max 2MB)"
+                logo:
                   type: string
-                  nullable: true
-                  description: "[Siswa legacy format] Alamat siswa"
-                class_year:
+                  format: binary
+                  description: "[Sekolah] Logo (jpg/jpeg/png/webp, max 2MB)"
+                operational_license:
                   type: string
-                  nullable: true
-                  minLength: 4
-                  maxLength: 4
-                  description: "[Siswa legacy format] Tahun kelas siswa (4 digit, contoh: 2026)"
+                  format: binary
+                  description: "[Sekolah] Izin operasional (pdf, max 5MB)"
+                company_logo:
+                  type: string
+                  format: binary
+                  description: "[Perusahaan] Logo perusahaan (jpg/jpeg/png/webp, max 2MB)"
+                kemenkumham_decree:
+                  type: string
+                  format: binary
+                  description: "[Perusahaan] SK Kemenkumham (pdf, max 5MB)"
+                umkm_logo:
+                  type: string
+                  format: binary
+                  description: "[UMKM] Logo UMKM (jpg/jpeg/png/webp, max 2MB)"
+                owner_ktp_photo:
+                  type: string
+                  format: binary
+                  description: "[UMKM] Foto KTP pemilik (jpg/jpeg/png/webp, max 2MB)"
+                image_1:
+                  type: string
+                  format: binary
+                  description: "[Sekolah/Perusahaan/UMKM] Gambar 1 (jpg/jpeg/png/webp, max 2MB)"
+                image_2:
+                  type: string
+                  format: binary
+                  description: "[Sekolah/Perusahaan/UMKM] Gambar 2"
+                image_3:
+                  type: string
+                  format: binary
+                  description: "[Sekolah/Perusahaan/UMKM] Gambar 3"
+                image_4:
+                  type: string
+                  format: binary
+                  description: "[Sekolah/Perusahaan/UMKM] Gambar 4"
+                image_5:
+                  type: string
+                  format: binary
+                  description: "[Sekolah/Perusahaan/UMKM] Gambar 5"
             examples:
               admin:
                 summary: Update profile admin
@@ -177,8 +268,6 @@ paths:
               sekolah:
                 summary: Update profile sekolah
                 value:
-                  user:
-                    name: SMK Negeri 1
                   profile:
                     short_description: Sekolah vokasi unggulan.
                     address: Jl. Pendidikan No. 1
@@ -204,20 +293,13 @@ paths:
                     business_type: Kuliner
                     owner_personal_nib: "9876543210"
               siswa:
-                summary: Update profile siswa (legacy format)
-                value:
-                  description: Siswa RPL fokus backend Laravel.
-                  phone_number: "081234567890"
-                  address: Jakarta Selatan
-                  class_year: "2026"
-              siswa_nested:
-                summary: Update profile siswa (nested format)
+                summary: Update profile siswa
                 value:
                   profile:
+                    full_name: Budi Santoso
                     description: Siswa RPL fokus backend Laravel.
                     phone_number: "081234567890"
                     address: Jakarta Selatan
-                    class_year: "2026"
       responses:
         "200":
           description: Profil berhasil diperbarui

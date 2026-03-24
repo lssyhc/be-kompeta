@@ -55,6 +55,7 @@ tags:
   - name: For You
   - name: Mitra
   - name: Schools
+  - name: Public Summary
   - name: Blog
   - name: Docs
 
@@ -121,6 +122,8 @@ paths:
     $ref: "./paths/schools.yaml#/paths/~1public~1schools"
   /public/schools/{id}:
     $ref: "./paths/schools.yaml#/paths/~1public~1schools~1{id}"
+  /public/summary:
+    $ref: "./paths/public-summary.yaml#/paths/~1public~1summary"
 
   /admin/blog/articles:
     $ref: "./paths/blog.yaml#/paths/~1admin~1blog~1articles"
@@ -2350,6 +2353,34 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/SchoolDetail"
+
+    PublicSummary:
+      type: object
+      properties:
+        student_count:
+          type: integer
+          minimum: 0
+          example: 120
+        school_count:
+          type: integer
+          minimum: 0
+          example: 25
+        company_mitra_count:
+          type: integer
+          minimum: 0
+          example: 18
+        umkm_mitra_count:
+          type: integer
+          minimum: 0
+          example: 11
+
+    SuccessEnvelopePublicSummary:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/PublicSummary"
 
     # ──────────────────────────────────────────────
     # Global Error Responses

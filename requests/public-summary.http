@@ -1,0 +1,17 @@
+### ============================================================
+### PUBLIC SUMMARY API - REST Client Testing
+### ============================================================
+### Base URL - sesuaikan jika port berbeda
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### 1. PUBLIC SUMMARY
+### Endpoint: GET /api/public/summary
+### Mengembalikan total akun aktif untuk siswa, sekolah, dan mitra per tipe.
+### ============================================================
+
+# @name publicSummary
+GET {{baseUrl}}/public/summary
+Accept: application/json
+
+###

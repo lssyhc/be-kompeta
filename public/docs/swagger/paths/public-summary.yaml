@@ -1,0 +1,35 @@
+paths:
+  /public/summary:
+    get:
+      tags: [Public Summary]
+      summary: Public summary statistics
+      description: |
+        Menampilkan ringkasan jumlah akun publik yang aktif, terdiri dari:
+        - total siswa aktif
+        - total sekolah aktif
+        - total mitra perusahaan aktif
+        - total mitra UMKM aktif
+      security: []
+      responses:
+        "200":
+          description: Statistik publik berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePublicSummary"
+              example:
+                success: true
+                message: Statistik publik berhasil diambil.
+                data:
+                  student_count: 120
+                  school_count: 25
+                  company_mitra_count: 18
+                  umkm_mitra_count: 11
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

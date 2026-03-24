@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\PartnershipProposalController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\PublicStatisticsController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentJobApplicationController;
@@ -113,4 +114,8 @@ Route::prefix('public/mitra')->group(function () {
 Route::prefix('public/schools')->group(function () {
     Route::get('/', [SchoolController::class, 'index']);
     Route::get('/{id}', [SchoolController::class, 'show'])->whereNumber('id');
+});
+
+Route::prefix('public')->group(function () {
+    Route::get('/summary', [PublicStatisticsController::class, 'summary']);
 });

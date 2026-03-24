@@ -19,7 +19,7 @@ class MitraDetailResource extends JsonResource
             $address,
             $sector,
             $employeeRange,
-            $socialUrl,
+            $socials,
             $description,
             $gallery,
         ] = $this->resolveProfileFields();
@@ -33,7 +33,7 @@ class MitraDetailResource extends JsonResource
             'address' => $address,
             'industry_sector' => $sector,
             'employee_total_range' => $employeeRange,
-            'website_or_social_url' => $socialUrl,
+            'socials' => $socials,
             'gallery' => $gallery,
             'vacancy_count' => (int) ($this->vacancy_count ?? 0),
         ];
@@ -50,7 +50,7 @@ class MitraDetailResource extends JsonResource
                     $profile->office_address,
                     $profile->industry_sector,
                     $profile->employee_total_range,
-                    $profile->website_or_social_url,
+                    $profile->socials,
                     $profile->short_description,
                     $this->buildGallery(
                         $profile->image_1_url,
@@ -72,7 +72,7 @@ class MitraDetailResource extends JsonResource
                     $profile->business_address,
                     $profile->business_type,
                     null,
-                    null,
+                    $profile->socials,
                     $profile->short_description,
                     $this->buildGallery(
                         $profile->image_1_url,

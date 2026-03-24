@@ -26,6 +26,7 @@ class UmkmProfile extends Model
         'owner_personal_nib',
         'business_type',
         'business_address',
+        'socials',
         'umkm_logo_path',
         'owner_ktp_photo_path',
         'short_description',
@@ -35,6 +36,13 @@ class UmkmProfile extends Model
         'image_4_path',
         'image_5_path',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'socials' => 'array',
+        ];
+    }
 
     public function user()
     {

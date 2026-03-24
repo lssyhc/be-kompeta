@@ -111,9 +111,9 @@ paths:
         | Role                | Field yang diterima |
         |---------------------|---------------------|
         | admin               | `full_name` |
-        | sekolah             | `accreditation`, `address`, `expertise_fields`, `short_description` |
-        | mitra perusahaan    | `industry_sector`, `employee_total_range`, `office_address`, `website_or_social_url`, `short_description` |
-        | mitra umkm          | `owner_personal_nib`, `business_type`, `business_address`, `short_description` |
+        | sekolah             | `accreditation`, `address`, `expertise_fields`, `short_description`, `socials` |
+        | mitra perusahaan    | `industry_sector`, `employee_total_range`, `office_address`, `socials`, `short_description` |
+        | mitra umkm          | `owner_personal_nib`, `business_type`, `business_address`, `socials`, `short_description` |
         | siswa               | `full_name`, `description`, `phone_number`, `address` |
 
         **File upload per role:**
@@ -190,10 +190,26 @@ paths:
                     office_address:
                       type: string
                       description: "[Perusahaan] Alamat kantor"
-                    website_or_social_url:
-                      type: string
-                      format: uri
-                      description: "[Perusahaan] URL website/sosial media"
+                    socials:
+                      type: object
+                      nullable: true
+                      description: "[Sekolah/Perusahaan/UMKM] Sosial media"
+                      properties:
+                        website:
+                          type: string
+                          format: uri
+                          nullable: true
+                        instagram:
+                          type: string
+                          format: uri
+                          nullable: true
+                        linkedin:
+                          type: string
+                          format: uri
+                          nullable: true
+                        whatsapp:
+                          type: string
+                          nullable: true
                     owner_personal_nib:
                       type: string
                       maxLength: 50
@@ -275,13 +291,20 @@ paths:
                     expertise_fields:
                       - RPL
                       - TKJ
+                    socials:
+                      website: https://smknegeri1.sch.id
+                      instagram: https://instagram.com/smknegeri1
               mitra_perusahaan:
                 summary: Update profile mitra perusahaan
                 value:
                   profile:
                     short_description: Perusahaan software enterprise.
                     office_address: Jl. Sudirman No. 10
-                    website_or_social_url: https://example.com
+                    socials:
+                      website: https://example.com
+                      instagram: https://instagram.com/company
+                      linkedin: https://linkedin.com/company/example
+                      whatsapp: "6281234567890"
                     industry_sector: Teknologi Informasi
                     employee_total_range: 51-200
               mitra_umkm:
@@ -292,6 +315,9 @@ paths:
                     business_address: Jl. Pasar No. 5
                     business_type: Kuliner
                     owner_personal_nib: "9876543210"
+                    socials:
+                      instagram: https://instagram.com/umkm
+                      whatsapp: "6281234567890"
               siswa:
                 summary: Update profile siswa
                 value:

@@ -187,7 +187,11 @@ paths:
                       employee_total_range: 201-500
                       description: Mitra digitalisasi operasional dan pengolahan data untuk bisnis menengah.
                       address: Bandung, Jawa Barat
-                      website_or_social_url: https://example.com/surya-data
+                      socials:
+                        website: https://example.com/surya-data
+                        instagram: https://instagram.com/suryadata
+                        linkedin: null
+                        whatsapp: "6289876543210"
                       logo_url: https://via.placeholder.com/200x200?text=Surya
                       category_label: Perusahaan
                 errors: null

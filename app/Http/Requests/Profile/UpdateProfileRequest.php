@@ -39,12 +39,17 @@ class UpdateProfileRequest extends FormRequest
 
         if ($user->role === User::ROLE_SEKOLAH) {
             return array_merge($rules, [
-                'profile' => ['sometimes', 'array:accreditation,address,expertise_fields,short_description'],
+                'profile' => ['sometimes', 'array:accreditation,address,expertise_fields,short_description,socials'],
                 'profile.accreditation' => ['sometimes', 'string', Rule::in(['A', 'B', 'C', 'Belum Terakreditasi'])],
                 'profile.address' => ['sometimes', 'string'],
                 'profile.expertise_fields' => ['sometimes', 'array', 'min:1'],
                 'profile.expertise_fields.*' => ['required_with:profile.expertise_fields', 'string', 'max:100'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
+                'profile.socials' => ['sometimes', 'nullable', 'array'],
+                'profile.socials.website' => ['nullable', 'url', 'max:255'],
+                'profile.socials.instagram' => ['nullable', 'url', 'max:255'],
+                'profile.socials.linkedin' => ['nullable', 'url', 'max:255'],
+                'profile.socials.whatsapp' => ['nullable', 'string', 'max:30'],
                 'logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'image_1' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'image_2' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
@@ -57,11 +62,15 @@ class UpdateProfileRequest extends FormRequest
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_PERUSAHAAN) {
             return array_merge($rules, [
-                'profile' => ['sometimes', 'array:industry_sector,employee_total_range,office_address,website_or_social_url,short_description'],
+                'profile' => ['sometimes', 'array:industry_sector,employee_total_range,office_address,socials,short_description'],
                 'profile.industry_sector' => ['sometimes', 'string', 'max:100'],
                 'profile.employee_total_range' => ['sometimes', 'string', 'max:50'],
                 'profile.office_address' => ['sometimes', 'string'],
-                'profile.website_or_social_url' => ['sometimes', 'nullable', 'url', 'max:255'],
+                'profile.socials' => ['sometimes', 'nullable', 'array'],
+                'profile.socials.website' => ['nullable', 'url', 'max:255'],
+                'profile.socials.instagram' => ['nullable', 'url', 'max:255'],
+                'profile.socials.linkedin' => ['nullable', 'url', 'max:255'],
+                'profile.socials.whatsapp' => ['nullable', 'string', 'max:30'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
                 'company_logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'image_1' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
@@ -75,10 +84,15 @@ class UpdateProfileRequest extends FormRequest
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_UMKM) {
             return array_merge($rules, [
-                'profile' => ['sometimes', 'array:owner_personal_nib,business_type,business_address,short_description'],
+                'profile' => ['sometimes', 'array:owner_personal_nib,business_type,business_address,socials,short_description'],
                 'profile.owner_personal_nib' => ['sometimes', 'nullable', 'string', 'max:50'],
                 'profile.business_type' => ['sometimes', 'string', 'max:100'],
                 'profile.business_address' => ['sometimes', 'string'],
+                'profile.socials' => ['sometimes', 'nullable', 'array'],
+                'profile.socials.website' => ['nullable', 'url', 'max:255'],
+                'profile.socials.instagram' => ['nullable', 'url', 'max:255'],
+                'profile.socials.linkedin' => ['nullable', 'url', 'max:255'],
+                'profile.socials.whatsapp' => ['nullable', 'string', 'max:30'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
                 'umkm_logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'owner_ktp_photo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],

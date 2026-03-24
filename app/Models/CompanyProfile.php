@@ -26,7 +26,7 @@ class CompanyProfile extends Model
         'industry_sector',
         'employee_total_range',
         'office_address',
-        'website_or_social_url',
+        'socials',
         'short_description',
         'company_logo_path',
         'image_1_path',
@@ -36,6 +36,13 @@ class CompanyProfile extends Model
         'image_5_path',
         'kemenkumham_decree_path',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'socials' => 'array',
+        ];
+    }
 
     public function user()
     {

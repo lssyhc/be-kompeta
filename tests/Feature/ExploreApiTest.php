@@ -142,7 +142,7 @@ class ExploreApiTest extends TestCase
             'industry_sector' => 'Teknologi',
             'employee_total_range' => '201-500',
             'office_address' => 'Bandung, Jawa Barat',
-            'website_or_social_url' => 'https://example.com',
+            'socials' => ['website' => 'https://example.com', 'instagram' => null, 'linkedin' => null, 'whatsapp' => null],
             'short_description' => 'Perusahaan uji untuk endpoint explore.',
             'company_logo_path' => 'profiles/companies/logos/test.png',
             'image_1_path' => null,

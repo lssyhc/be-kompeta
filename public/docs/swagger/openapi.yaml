@@ -666,6 +666,22 @@ components:
           type: string
         address:
           type: string
+        socials:
+          nullable: true
+          type: object
+          properties:
+            website:
+              nullable: true
+              type: string
+            instagram:
+              nullable: true
+              type: string
+            linkedin:
+              nullable: true
+              type: string
+            whatsapp:
+              nullable: true
+              type: string
         expertise_fields:
           type: array
           items:
@@ -722,9 +738,22 @@ components:
           type: string
         office_address:
           type: string
-        website_or_social_url:
+        socials:
           nullable: true
-          type: string
+          type: object
+          properties:
+            website:
+              nullable: true
+              type: string
+            instagram:
+              nullable: true
+              type: string
+            linkedin:
+              nullable: true
+              type: string
+            whatsapp:
+              nullable: true
+              type: string
         short_description:
           type: string
         company_logo_path:
@@ -778,6 +807,22 @@ components:
           type: string
         business_address:
           type: string
+        socials:
+          nullable: true
+          type: object
+          properties:
+            website:
+              nullable: true
+              type: string
+            instagram:
+              nullable: true
+              type: string
+            linkedin:
+              nullable: true
+              type: string
+            whatsapp:
+              nullable: true
+              type: string
         short_description:
           type: string
         umkm_logo_path:
@@ -1130,6 +1175,28 @@ components:
             type: string
             maxLength: 100
           example: ["RPL", "TKJ"]
+        socials:
+          type: object
+          nullable: true
+          description: "Sosial media sekolah (semua opsional)"
+          properties:
+            website:
+              type: string
+              format: uri
+              nullable: true
+              example: https://smknegeri1.sch.id
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+              example: https://instagram.com/smknegeri1
+            linkedin:
+              type: string
+              format: uri
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
         logo:
           type: string
           format: binary
@@ -1220,10 +1287,30 @@ components:
         office_address:
           type: string
           example: Jl. Sudirman No. 10
-        website_or_social_url:
-          type: string
-          format: uri
-          example: https://example.com
+        socials:
+          type: object
+          nullable: true
+          description: "Sosial media mitra (semua opsional)"
+          properties:
+            website:
+              type: string
+              format: uri
+              nullable: true
+              example: https://example.com
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+              example: https://instagram.com/company
+            linkedin:
+              type: string
+              format: uri
+              nullable: true
+              example: https://linkedin.com/company/example
+            whatsapp:
+              type: string
+              nullable: true
+              example: "6281234567890"
         short_description:
           type: string
           maxLength: 1000
@@ -1317,6 +1404,29 @@ components:
         business_address:
           type: string
           example: Jl. Pasar No. 5
+        socials:
+          type: object
+          nullable: true
+          description: "Sosial media mitra (semua opsional)"
+          properties:
+            website:
+              type: string
+              format: uri
+              nullable: true
+              example: https://example.com/umkm
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+              example: https://instagram.com/umkm
+            linkedin:
+              type: string
+              format: uri
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
+              example: "6281234567890"
         short_description:
           type: string
           maxLength: 1000
@@ -1748,11 +1858,24 @@ components:
           nullable: true
           description: Alamat kantor
           example: Jakarta Selatan, DKI Jakarta
-        website_or_social_url:
-          type: string
+        socials:
+          type: object
           nullable: true
-          description: URL website atau sosial media
-          example: https://instagram.com/binajasa
+          description: Sosial media mitra
+          properties:
+            website:
+              type: string
+              nullable: true
+              example: https://instagram.com/binajasa
+            instagram:
+              type: string
+              nullable: true
+            linkedin:
+              type: string
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
         logo_url:
           type: string
           nullable: true
@@ -2126,10 +2249,24 @@ components:
           nullable: true
           description: Rentang jumlah karyawan (hanya perusahaan)
           example: "51 - 200"
-        website_or_social_url:
-          type: string
+        socials:
+          type: object
           nullable: true
-          example: https://instagram.com/ptmtlb
+          description: Sosial media mitra
+          properties:
+            website:
+              type: string
+              nullable: true
+              example: https://instagram.com/ptmtlb
+            instagram:
+              type: string
+              nullable: true
+            linkedin:
+              type: string
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
         gallery:
           type: array
           description: URL gambar galeri (maks 5)
@@ -2281,6 +2418,23 @@ components:
           nullable: true
           description: "Nilai akreditasi: A, B, C, atau Belum Terakreditasi"
           example: A
+        socials:
+          type: object
+          nullable: true
+          description: Sosial media sekolah
+          properties:
+            website:
+              type: string
+              nullable: true
+            instagram:
+              type: string
+              nullable: true
+            linkedin:
+              type: string
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
         expertise_fields:
           type: array
           items:

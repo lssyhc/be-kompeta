@@ -25,6 +25,7 @@ class SchoolProfile extends Model
         'npsn',
         'accreditation',
         'address',
+        'socials',
         'expertise_fields',
         'logo_path',
         'image_1_path',
@@ -40,6 +41,7 @@ class SchoolProfile extends Model
     {
         return [
             'expertise_fields' => 'array',
+            'socials' => 'array',
         ];
     }
 

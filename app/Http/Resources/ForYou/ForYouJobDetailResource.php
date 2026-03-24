@@ -42,7 +42,7 @@ class ForYouJobDetailResource extends JsonResource
                 'employee_total_range' => $this->resolveMitraEmployeeRange(),
                 'description' => $this->resolveMitraDescription(),
                 'address' => $this->resolveMitraAddress(),
-                'website_or_social_url' => $this->resolveMitraWebsiteOrSocialUrl(),
+                'socials' => $this->resolveMitraSocials(),
                 'logo_url' => $this->resolveMitraLogoUrl(),
                 'category_label' => $this->resolveMitraType() === User::MITRA_UMKM ? 'UMKM' : 'Perusahaan',
             ],

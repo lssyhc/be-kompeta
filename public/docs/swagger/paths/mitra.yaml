@@ -135,7 +135,11 @@ paths:
                   address: Jakarta Selatan, DKI Jakarta
                   industry_sector: Outsourcing dan layanan tenaga kerja
                   employee_total_range: 501-1000
-                  website_or_social_url: https://example.com/binajasa
+                  socials:
+                    website: https://example.com/binajasa
+                    instagram: https://instagram.com/binajasa
+                    linkedin: https://linkedin.com/company/binajasa
+                    whatsapp: "6281234567890"
                   gallery:
                     - https://via.placeholder.com/400x300?text=Binajasa+1
                     - https://via.placeholder.com/400x300?text=Binajasa+2

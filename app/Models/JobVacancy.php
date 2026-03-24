@@ -221,15 +221,25 @@ class JobVacancy extends Model
         return null;
     }
 
-    public function resolveMitraWebsiteOrSocialUrl(): ?string
+    public function resolveMitraSocials(): ?array
     {
         $mitraUser = $this->mitraUser;
 
-        if (! $mitraUser instanceof User || $mitraUser->mitra_type !== User::MITRA_PERUSAHAAN) {
+        if (! $mitraUser instanceof User) {
             return null;
         }
 
-        return $this->resolveCompanyProfile($mitraUser)?->website_or_social_url;
+        if ($mitraUser->mitra_type === User::MITRA_PERUSAHAAN) {
+            /** @var array|null */
+            return $this->resolveCompanyProfile($mitraUser)?->socials;
+        }
+
+        if ($mitraUser->mitra_type === User::MITRA_UMKM) {
+            /** @var array|null */
+            return $this->resolveUmkmProfile($mitraUser)?->socials;
+        }
+
+        return null;
     }
 
     public function resolveMitraLogoUrl(): ?string

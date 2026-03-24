@@ -212,7 +212,11 @@ paths:
                       employee_total_range: 501-1000
                       description: Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.
                       address: Jakarta Selatan, DKI Jakarta
-                      website_or_social_url: https://example.com/binajasa
+                      socials:
+                        website: https://example.com/binajasa
+                        instagram: https://instagram.com/binajasa
+                        linkedin: null
+                        whatsapp: null
                       logo_url: https://via.placeholder.com/200x200?text=Binajasa
                       category_label: Perusahaan
                   recommendations:

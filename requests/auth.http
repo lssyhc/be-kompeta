@@ -62,6 +62,14 @@ Content-Disposition: form-data; name="expertise_fields[]"
 
 TKJ
 --BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[website]"
+
+https://smknegeri1.sch.id
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[instagram]"
+
+https://instagram.com/smknegeri1
+--BoundaryKOMPETA
 Content-Disposition: form-data; name="short_description"
 
 SMK unggulan yang berfokus pada teknologi informasi dan komunikasi.
@@ -142,9 +150,21 @@ Content-Disposition: form-data; name="office_address"
 
 Jl. Sudirman No. 10, Jakarta Pusat
 --BoundaryKOMPETA
-Content-Disposition: form-data; name="website_or_social_url"
+Content-Disposition: form-data; name="socials[website]"
 
 https://www.majujaya.co.id
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[instagram]"
+
+https://instagram.com/majujaya
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[linkedin]"
+
+https://linkedin.com/company/majujaya
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[whatsapp]"
+
+6281234567890
 --BoundaryKOMPETA
 Content-Disposition: form-data; name="short_description"
 
@@ -224,6 +244,14 @@ Elektronik
 Content-Disposition: form-data; name="business_address"
 
 Jl. Pasar Baru No. 5, Bandung
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[instagram]"
+
+https://instagram.com/budijayaelektronik
+--BoundaryKOMPETA
+Content-Disposition: form-data; name="socials[whatsapp]"
+
+6281999888777
 --BoundaryKOMPETA
 Content-Disposition: form-data; name="short_description"
 

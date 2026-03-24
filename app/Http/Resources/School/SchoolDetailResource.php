@@ -53,6 +53,7 @@ class SchoolDetailResource extends JsonResource
             'gallery' => $gallery,
             'short_description' => $profile->short_description,
             'accreditation' => $profile->accreditation,
+            'socials' => $profile->socials,
             'expertise_fields' => is_array($expertiseFields)
                 ? $expertiseFields
                 : (json_decode((string) $expertiseFields, true) ?? []),

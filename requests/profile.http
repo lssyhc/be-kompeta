@@ -230,7 +230,12 @@ Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
   "profile": {
     "short_description": "Perusahaan outsourcing dan operasional bisnis.",
     "office_address": "Jakarta Selatan",
-    "website_or_social_url": "https://example.com/binajasa",
+    "socials": {
+      "website": "https://example.com/binajasa",
+      "instagram": "https://instagram.com/binajasa",
+      "linkedin": "https://linkedin.com/company/binajasa",
+      "whatsapp": "6281234567890"
+    },
     "industry_sector": "Outsourcing",
     "employee_total_range": "501-1000"
   }

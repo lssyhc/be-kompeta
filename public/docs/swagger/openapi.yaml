@@ -517,8 +517,6 @@ components:
       properties:
         id:
           type: integer
-        no:
-          type: integer
         nama:
           type: string
         title:

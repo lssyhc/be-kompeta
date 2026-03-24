@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AccountApprovedMail;
+use App\Mail\AccountRejectedMail;
 use App\Models\CompanyProfile;
 use App\Models\SchoolProfile;
 use App\Models\UmkmProfile;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminRegistrationController extends Controller
 {
@@ -54,11 +59,9 @@ class AdminRegistrationController extends Controller
             ->paginate($perPage)
             ->appends($request->query());
 
-        $startNo = ($paginator->currentPage() - 1) * $paginator->perPage();
-
         $paginator->setCollection(
             $paginator->getCollection()->values()->map(
-                fn (User $user, int $index): array => $this->transformRegistrationItem($user, $startNo + $index + 1)
+                fn (User $user, int $index): array => $this->transformRegistrationItem($user)
             )
         );
 
@@ -84,7 +87,7 @@ class AdminRegistrationController extends Controller
         }
 
         return $this->successResponse(
-            $this->transformRegistrationItem($user, $user->id),
+            $this->transformRegistrationItem($user),
             'Detail registrasi berhasil diambil.'
         );
     }
@@ -116,8 +119,17 @@ class AdminRegistrationController extends Controller
             'is_active' => true,
         ])->save();
 
+        try {
+            Mail::to($user->email)->send(new AccountApprovedMail($user));
+        } catch (Exception $e) {
+            Log::error('Gagal mengirim email approval akun', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return $this->successResponse(
-            $this->transformRegistrationItem($user->fresh(['schoolProfile', 'companyProfile', 'umkmProfile']), $user->id),
+            $this->transformRegistrationItem($user->fresh(['schoolProfile', 'companyProfile', 'umkmProfile'])),
             'Registrasi berhasil disetujui.'
         );
     }
@@ -144,13 +156,26 @@ class AdminRegistrationController extends Controller
             return $this->errorResponse('Registrasi ini tidak dalam status pending.', 422);
         }
 
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
         $user->forceFill([
             'account_status' => User::STATUS_REJECTED,
             'is_active' => false,
         ])->save();
 
+        try {
+            Mail::to($user->email)->send(new AccountRejectedMail($user, $validated['reason'] ?? null));
+        } catch (Exception $e) {
+            Log::error('Gagal mengirim email penolakan (reject) akun', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return $this->successResponse(
-            $this->transformRegistrationItem($user->fresh(['schoolProfile', 'companyProfile', 'umkmProfile']), $user->id),
+            $this->transformRegistrationItem($user->fresh(['schoolProfile', 'companyProfile', 'umkmProfile'])),
             'Registrasi berhasil ditolak.'
         );
     }
@@ -164,11 +189,10 @@ class AdminRegistrationController extends Controller
             ->first();
     }
 
-    private function transformRegistrationItem(User $user, int $no): array
+    private function transformRegistrationItem(User $user): array
     {
         return [
             'id' => $user->id,
-            'no' => $no,
             'nama' => $user->name,
             'title' => $this->resolveTitle($user),
             'status' => $user->account_status,

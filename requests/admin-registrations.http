@@ -53,6 +53,7 @@ Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 
 ### ============================================================
 ### 5. APPROVE REGISTRASI
+###    Email notifikasi akan dikirim ke user yang disetujui.
 ### ============================================================
 PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/approve
 Accept: application/json
@@ -61,10 +62,27 @@ Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 6. REJECT REGISTRASI
+### 6. REJECT REGISTRASI (dengan alasan)
+###    Email notifikasi penolakan akan dikirim ke user.
+###    Field "reason" bersifat opsional (maks 500 karakter).
 ### ============================================================
 PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/reject
 Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
+
+{
+  "reason": "Dokumen NIB tidak valid atau sudah kedaluwarsa. Silakan daftar ulang dengan dokumen yang masih berlaku."
+}
+
+###
+
+### ============================================================
+### 6b. REJECT REGISTRASI (tanpa alasan)
+### ============================================================
+PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/reject
+Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 
 ###

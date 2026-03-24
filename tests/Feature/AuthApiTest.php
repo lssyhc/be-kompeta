@@ -77,7 +77,7 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(403)
             ->assertJsonPath('success', false)
-            ->assertJsonPath('message', 'Akun tidak aktif.');
+            ->assertJsonPath('message', 'Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti.');
 
         $this->assertNull($school->fresh()->last_login_at);
     }
@@ -117,7 +117,6 @@ class AuthApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.id', $school->id)
-            ->assertJsonPath('data.no', $school->id)
             ->assertJsonPath('data.nama', 'SMK Approval 1')
             ->assertJsonPath('data.title', 'Sekolah')
             ->assertJsonPath('data.status', User::STATUS_ACTIVE)

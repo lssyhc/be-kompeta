@@ -60,7 +60,6 @@ paths:
                 message: Daftar registrasi berhasil diambil.
                 data:
                   - id: 10
-                    no: 1
                     nama: SMK Pending Sejahtera
                     title: Sekolah
                     status: pending
@@ -152,7 +151,6 @@ paths:
                 message: Detail registrasi berhasil diambil.
                 data:
                   id: 10
-                  no: 10
                   nama: SMK Pending Sejahtera
                   title: Sekolah
                   status: pending
@@ -216,6 +214,8 @@ paths:
         Mengubah status registrasi menjadi `active` dan `is_active=true`.
         Hanya registrasi dengan status `pending` yang dapat disetujui.
         Hanya user dengan role `admin` yang dapat mengakses.
+
+        **Side-effect:** Email notifikasi persetujuan otomatis dikirim ke user terkait (async via queue).
       parameters:
         - in: path
           name: id
@@ -236,7 +236,6 @@ paths:
                 message: Registrasi berhasil disetujui.
                 data:
                   id: 10
-                  no: 10
                   nama: SMK Pending Sejahtera
                   title: Sekolah
                   status: active
@@ -312,6 +311,30 @@ paths:
         Mengubah status registrasi menjadi `rejected` dan `is_active=false`.
         Hanya registrasi dengan status `pending` yang dapat ditolak.
         Hanya user dengan role `admin` yang dapat mengakses.
+
+        **Side-effect:** Email notifikasi penolakan otomatis dikirim ke user terkait (async via queue).
+        Jika `reason` disertakan, alasan penolakan akan ditampilkan di dalam email.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  nullable: true
+                  maxLength: 500
+                  description: Alasan penolakan (opsional, maks 500 karakter). Jika diisi, akan ditampilkan di email penolakan.
+                  example: Dokumen NIB tidak valid atau sudah kedaluwarsa.
+            examples:
+              dengan_alasan:
+                summary: Reject dengan alasan spesifik
+                value:
+                  reason: Dokumen NIB tidak valid atau sudah kedaluwarsa.
+              tanpa_alasan:
+                summary: Reject tanpa alasan (email pakai teks generik)
+                value: {}
       parameters:
         - in: path
           name: id
@@ -332,7 +355,6 @@ paths:
                 message: Registrasi berhasil ditolak.
                 data:
                   id: 10
-                  no: 10
                   nama: SMK Pending Sejahtera
                   title: Sekolah
                   status: rejected
@@ -382,17 +404,30 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Data tidak dalam status pending
+          description: Data tidak dalam status pending atau validasi payload gagal
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              example:
-                success: false
-                message: Hanya registrasi dengan status pending yang dapat ditolak.
-                data: null
-                errors: null
-                meta: null
+              examples:
+                not_pending:
+                  summary: Registrasi tidak berstatus pending
+                  value:
+                    success: false
+                    message: Hanya registrasi dengan status pending yang dapat ditolak.
+                    data: null
+                    errors: null
+                    meta: null
+                validasi_gagal:
+                  summary: Validasi payload gagal (misal reason > 500 char)
+                  value:
+                    success: false
+                    message: Validasi gagal.
+                    data: null
+                    errors:
+                      reason:
+                        - The reason must not be greater than 500 characters.
+                    meta: null
         "500":
           description: Kesalahan server internal
           content:

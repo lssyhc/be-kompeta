@@ -107,7 +107,7 @@ class AuthController extends Controller
         return $this->successResponse([
             'user' => $this->compactUser($user),
             'role_profile' => $this->resolveRoleProfile($user),
-        ], 'Registrasi berhasil. Akun menunggu persetujuan admin.', 201);
+        ], 'Registrasi berhasil. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun, informasi selanjutnya akan dikirimkan melalui email yang Anda daftarkan.', 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -123,12 +123,12 @@ class AuthController extends Controller
             return $this->errorResponse('Kredensial login tidak valid.', 422);
         }
 
-        if (! $user->is_active) {
-            return $this->errorResponse('Akun tidak aktif.', 403);
+        if ($user->account_status === User::STATUS_PENDING) {
+            return $this->errorResponse('Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti.', 403);
         }
 
-        if ($user->account_status !== User::STATUS_ACTIVE) {
-            return $this->errorResponse('Akun belum aktif atau masih menunggu verifikasi.', 403);
+        if ($user->account_status === User::STATUS_REJECTED) {
+            return $this->errorResponse('Akun tidak disetujui. Silakan periksa email yang Anda daftarkan untuk membaca informasi penolakan lebih lanjut dari Tim Kompeta.', 403);
         }
 
         $user->forceFill([

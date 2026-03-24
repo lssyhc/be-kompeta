@@ -10,6 +10,7 @@ paths:
         **Alur setelah registrasi:**
         - Akun sekolah dan mitra dibuat dengan `account_status=pending` dan `is_active=false`.
         - Akun harus menunggu persetujuan admin melalui endpoint `/admin/registrations/{id}/approve`.
+        - Setelah admin approve/reject, email notifikasi otomatis dikirim ke email pendaftar.
 
         **⚠️ Endpoint ini memerlukan `multipart/form-data` karena mengandung file upload.**
         Jika Swagger UI menampilkan text editor (bukan form), gunakan Postman/curl untuk mengirim file.
@@ -94,7 +95,7 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAuthRegister"
               example:
                 success: true
-                message: Registrasi berhasil. Akun menunggu persetujuan admin.
+                message: Registrasi berhasil. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun, informasi selanjutnya akan dikirimkan melalui email yang Anda daftarkan.
                 data:
                   user:
                     id: 10
@@ -208,25 +209,25 @@ paths:
                 errors: null
                 meta: null
         "403":
-          description: Akun tidak aktif atau belum diverifikasi admin
+          description: Akun belum disetujui atau ditolak
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               examples:
-                tidak_aktif:
-                  summary: Akun di-nonaktifkan
+                pending:
+                  summary: Akun masih pending (menunggu approval admin)
                   value:
                     success: false
-                    message: Akun tidak aktif.
+                    message: "Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti."
                     data: null
                     errors: null
                     meta: null
-                belum_diverifikasi:
-                  summary: Akun masih pending/menunggu verifikasi admin
+                rejected:
+                  summary: Akun ditolak admin
                   value:
                     success: false
-                    message: Akun belum aktif atau masih menunggu verifikasi.
+                    message: "Akun tidak disetujui. Silakan periksa email yang Anda daftarkan untuk membaca informasi penolakan lebih lanjut dari Tim Kompeta."
                     data: null
                     errors: null
                     meta: null

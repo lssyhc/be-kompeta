@@ -80,6 +80,8 @@ paths:
 
   /school/students:
     $ref: "./paths/school-students.yaml#/paths/~1school~1students"
+  /school/students/import:
+    $ref: "./paths/school-students.yaml#/paths/~1school~1students~1import"
   /school/students/search:
     $ref: "./paths/school-students.yaml#/paths/~1school~1students~1search"
   /school/students/{id}:
@@ -1394,6 +1396,7 @@ components:
         - major
         - school_origin
         - graduation_status
+        - class_year
       properties:
         full_name:
           type: string
@@ -1432,6 +1435,61 @@ components:
         address:
           type: string
           example: Bogor, Jawa Barat
+
+    ImportStudentsRequest:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: "File Excel (.xlsx, .xls) atau CSV (.csv), maksimal 2 MB"
+
+    ImportStudentsResponse:
+      type: object
+      properties:
+        successful_count:
+          type: integer
+          example: 45
+        failed_count:
+          type: integer
+          example: 3
+        failures:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+                example: 5
+              attribute:
+                type: string
+                example: nisn
+              errors:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "NISN sudah terdaftar."
+
+    SuccessEnvelopeImportStudents:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Import siswa selesai. 45 berhasil, 3 gagal."
+        data:
+          $ref: "#/components/schemas/ImportStudentsResponse"
+        errors:
+          nullable: true
+          example: null
+        meta:
+          nullable: true
+          example: null
 
     UpdateStudentRequest:
       type: object

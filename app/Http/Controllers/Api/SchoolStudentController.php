@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\School\ImportStudentsRequest;
 use App\Http\Requests\School\StoreStudentRequest;
 use App\Http\Requests\School\UpdateStudentRequest;
+use App\Imports\StudentsImport;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -43,7 +45,7 @@ class SchoolStudentController extends Controller
                 'school_origin' => $validated['school_origin'],
                 'graduation_status' => $validated['graduation_status'],
                 'unique_code' => $this->generateUniqueCode(),
-                'class_year' => $validated['class_year'] ?? null,
+                'class_year' => $validated['class_year'],
                 'phone_number' => $validated['phone_number'] ?? null,
                 'address' => $validated['address'] ?? null,
             ]);
@@ -206,6 +208,28 @@ class SchoolStudentController extends Controller
         });
 
         return $this->successResponse(null, 'Data siswa berhasil dihapus.');
+    }
+
+    public function import(ImportStudentsRequest $request): JsonResponse
+    {
+        $schoolUser = $request->user();
+
+        if ($schoolUser->role !== User::ROLE_SEKOLAH) {
+            return $this->errorResponse('Hanya user sekolah yang dapat mengimpor data siswa.', 403);
+        }
+
+        $import = new StudentsImport($schoolUser->id);
+        $import->import($request->file('file'));
+
+        $failures = $import->getFormattedFailures();
+        $successCount = $import->getSuccessCount();
+        $failedCount = count($failures);
+
+        return $this->successResponse([
+            'successful_count' => $successCount,
+            'failed_count' => $failedCount,
+            'failures' => $failures,
+        ], "Import siswa selesai. {$successCount} berhasil, {$failedCount} gagal.", 200);
     }
 
     private function generateUniqueCode(): string

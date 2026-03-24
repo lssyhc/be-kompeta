@@ -104,8 +104,8 @@ paths:
         2. Buat `StudentProfile` dengan `school_user_id` dari sekolah login
         3. Generate `unique_code` 8 karakter acak untuk login siswa
 
-        **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`
-        **Field opsional:** `class_year`, `phone_number`, `address`, `photo_profile` (file gambar)
+        **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`
+        **Field opsional:** `phone_number`, `address`, `photo_profile` (file gambar)
 
         NISN harus unik secara global.
       requestBody:
@@ -178,6 +178,106 @@ paths:
                 errors:
                   nisn:
                     - The nisn has already been taken.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /school/students/import:
+    post:
+      tags: [School Students]
+      summary: Import batch siswa dari file Excel
+      description: |
+        Mengimpor data siswa secara batch dari file Excel (.xlsx, .xls) atau CSV (.csv).
+        Hanya user dengan role `sekolah` yang dapat mengakses.
+
+        **Format kolom Excel yang diharapkan (baris pertama = header):**
+        | Kolom | Wajib | Keterangan |
+        |-------|-------|------------|
+        | `full_name` | Ya | Nama lengkap siswa |
+        | `nisn` | Ya | 10 digit, harus unik |
+        | `major` | Ya | Jurusan |
+        | `school_origin` | Ya | Asal sekolah |
+        | `graduation_status` | Ya | Status kelulusan |
+        | `class_year` | Ya | Angkatan (4 digit) |
+        | `phone_number` | Tidak | Nomor telepon |
+        | `address` | Tidak | Alamat |
+
+        **Catatan:**
+        - Photo profile **tidak termasuk** dalam import
+        - Baris yang gagal validasi akan di-skip, baris lainnya tetap diproses
+        - Setiap baris valid akan membuat `User` (role siswa) + `StudentProfile`
+        - Maksimum ukuran file: 2 MB
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/ImportStudentsRequest"
+      responses:
+        "200":
+          description: Import selesai (berisi ringkasan berhasil dan gagal)
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeImportStudents"
+              example:
+                success: true
+                message: "Import siswa selesai. 45 berhasil, 3 gagal."
+                data:
+                  successful_count: 45
+                  failed_count: 3
+                  failures:
+                    - row: 5
+                      attribute: nisn
+                      errors:
+                        - "NISN sudah terdaftar."
+                    - row: 12
+                      attribute: nisn
+                      errors:
+                        - "NISN harus 10 digit."
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role sekolah
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user sekolah yang dapat mengimpor data siswa.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal (file tidak dikirim, format file salah, dll.)
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  file:
+                    - The file field is required.
                 meta: null
         "500":
           description: Kesalahan server internal

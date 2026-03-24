@@ -57,6 +57,7 @@ Route::get('/docs/openapi', function () {
 Route::middleware('auth:sanctum')->prefix('school')->group(function () {
     Route::get('/students', [SchoolStudentController::class, 'index']);
     Route::post('/students', [SchoolStudentController::class, 'store']);
+    Route::post('/students/import', [SchoolStudentController::class, 'import']);
     Route::get('/students/search', [SchoolStudentController::class, 'search']);
     Route::get('/students/{id}', [SchoolStudentController::class, 'show']);
     Route::put('/students/{id}', [SchoolStudentController::class, 'update']);

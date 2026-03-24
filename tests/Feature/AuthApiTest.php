@@ -326,6 +326,7 @@ class AuthApiTest extends TestCase
             'major' => 'RPL',
             'school_origin' => 'SMK Negeri 1',
             'graduation_status' => 'Belum Lulus',
+            'class_year' => '2024',
         ], [
             'Accept' => 'application/json',
         ]);

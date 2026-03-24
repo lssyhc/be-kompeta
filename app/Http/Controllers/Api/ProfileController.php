@@ -147,7 +147,7 @@ class ProfileController extends Controller
 
     private function deleteOldFile(?string $path, string $disk): void
     {
-        if ($path && Storage::disk($disk)->exists($path)) {
+        if ($path && $path !== User::DEFAULT_PROFILE_PHOTO_PATH && Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);
         }
     }

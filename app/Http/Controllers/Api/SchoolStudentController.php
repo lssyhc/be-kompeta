@@ -40,7 +40,9 @@ class SchoolStudentController extends Controller
                 'school_user_id' => $schoolUser->id,
                 'full_name' => $validated['full_name'],
                 'nisn' => $validated['nisn'],
-                'photo_profile_path' => $request->file('photo_profile')?->store('profiles/students/photos', 'public'),
+                'photo_profile_path' => $request->file('photo_profile')
+                    ? $request->file('photo_profile')->store('profiles/students/photos', 'public')
+                    : User::DEFAULT_PROFILE_PHOTO_PATH,
                 'major' => $validated['major'],
                 'school_origin' => $validated['school_origin'],
                 'graduation_status' => $validated['graduation_status'],

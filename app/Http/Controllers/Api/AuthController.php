@@ -99,6 +99,7 @@ class AuthController extends Controller
                 AdminProfile::query()->create([
                     'user_id' => $user->id,
                     'full_name' => $validated['name'] ?? $validated['email'],
+                    'avatar_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 ]);
             }
 

@@ -38,7 +38,10 @@ class UserProfileSeeder extends Seeder
 
         AdminProfile::query()->updateOrCreate(
             ['user_id' => $admin->id],
-            ['full_name' => $admin->name]
+            [
+                'full_name' => $admin->name,
+                'avatar_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+            ]
         );
     }
 
@@ -380,7 +383,7 @@ class UserProfileSeeder extends Seeder
                 'user_id' => $studentA1->id,
                 'school_user_id' => $schoolA->id,
                 'full_name' => 'Budi Santoso',
-                'photo_profile_path' => null,
+                'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'major' => 'IPA',
                 'school_origin' => 'SMA Negeri 1 Bogor',
                 'graduation_status' => 'graduated',
@@ -408,7 +411,7 @@ class UserProfileSeeder extends Seeder
                 'user_id' => $studentA2->id,
                 'school_user_id' => $schoolA->id,
                 'full_name' => 'Siti Rahayu',
-                'photo_profile_path' => null,
+                'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'major' => 'IPA',
                 'school_origin' => 'SMA Negeri 1 Bogor',
                 'graduation_status' => 'active',
@@ -436,7 +439,7 @@ class UserProfileSeeder extends Seeder
                 'user_id' => $studentB1->id,
                 'school_user_id' => $schoolB->id,
                 'full_name' => 'Ahmad Wijaya',
-                'photo_profile_path' => null,
+                'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'major' => 'IPS',
                 'school_origin' => 'SMA Negeri 2 Jakarta',
                 'graduation_status' => 'graduated',
@@ -635,7 +638,7 @@ class UserProfileSeeder extends Seeder
                     'user_id' => $studentUser->id,
                     'school_user_id' => $school->id,
                     'full_name' => $fullName,
-                    'photo_profile_path' => null,
+                    'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                     'major' => $i % 3 === 0 ? 'RPL' : ($i % 3 === 1 ? 'TKJ' : 'AKL'),
                     'school_origin' => 'SMK Pusat Talenta Nusantara',
                     'graduation_status' => $graduationStatus,

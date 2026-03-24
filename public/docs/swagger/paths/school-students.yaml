@@ -107,6 +107,8 @@ paths:
         **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`
         **Field opsional:** `phone_number`, `address`, `photo_profile` (file gambar)
 
+        Jika `photo_profile` tidak dikirim, sistem akan otomatis menggunakan foto profil default.
+
         NISN harus unik secara global.
       requestBody:
         required: true
@@ -207,7 +209,7 @@ paths:
         | `address` | Tidak | Alamat |
 
         **Catatan:**
-        - Photo profile **tidak termasuk** dalam import
+        - Photo profile **tidak termasuk** dalam import, sistem otomatis menggunakan foto profil default
         - Baris yang gagal validasi akan di-skip, baris lainnya tetap diproses
         - Setiap baris valid akan membuat `User` (role siswa) + `StudentProfile`
         - Maksimum ukuran file: 2 MB

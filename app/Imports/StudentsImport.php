@@ -50,6 +50,7 @@ class StudentsImport implements SkipsOnFailure, ToCollection, WithHeadingRow, Wi
                     'graduation_status' => $row['graduation_status'],
                     'class_year' => (string) $row['class_year'],
                     'unique_code' => $this->generateUniqueCode(),
+                    'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                     'phone_number' => isset($row['phone_number']) ? (string) $row['phone_number'] : null,
                     'address' => $row['address'] ?? null,
                 ]);

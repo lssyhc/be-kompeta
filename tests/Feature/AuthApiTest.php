@@ -347,6 +347,34 @@ class AuthApiTest extends TestCase
         $this->assertNotEmpty($studentProfile->unique_code);
     }
 
+    public function test_student_created_without_photo_gets_default_profile_picture(): void
+    {
+        Storage::fake('public');
+
+        $school = User::factory()->create([
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => 'active',
+        ]);
+
+        Sanctum::actingAs($school);
+
+        $response = $this->postJson('/api/school/students', [
+            'full_name' => 'Tanpa Foto',
+            'nisn' => '9999999999',
+            'major' => 'RPL',
+            'school_origin' => 'SMK Negeri 1',
+            'graduation_status' => 'Belum Lulus',
+            'class_year' => '2024',
+        ]);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('student_profiles', [
+            'nisn' => '9999999999',
+            'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+        ]);
+    }
+
     public function test_school_can_hard_delete_its_student(): void
     {
         $school = User::factory()->create([

@@ -85,7 +85,7 @@ Content-Type: image/jpeg
 ###
 
 ### ============================================================
-### 2. TAMBAH SISWA (tanpa foto profil — foto bersifat opsional)
+### 2. TAMBAH SISWA (tanpa foto profil — otomatis menggunakan foto profil default)
 ### ============================================================
 
 # @name tambahSiswa2

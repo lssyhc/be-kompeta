@@ -34,6 +34,8 @@ class User extends Authenticatable
 
     public const STATUS_REJECTED = 'rejected';
 
+    public const DEFAULT_PROFILE_PHOTO_PATH = 'defaults/profile-picture.png';
+
     /**
      * The attributes that are mass assignable.
      *

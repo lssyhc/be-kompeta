@@ -417,6 +417,7 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 
 ### ============================================================
 ### 11. UPDATE PROFILE SISWA (JSON only)
+### Siswa TIDAK bisa mengubah user.name maupun profile.full_name
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -426,7 +427,6 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 
 {
   "profile": {
-    "full_name": "Budi Santoso",
     "description": "Siswa RPL fokus backend Laravel.",
     "socials": {
       "instagram": "https://instagram.com/budisantoso",
@@ -527,8 +527,8 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 ###
 
 ### ============================================================
-### 14c. SYNC: Siswa — kirim hanya user.name
-### Expect: profile.full_name ikut berubah
+### 14c. SYNC: Siswa — siswa TIDAK bisa mengubah nama
+### Expect: 422 karena user.name tidak diizinkan untuk siswa
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -539,6 +539,24 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 {
   "user": {
     "name": "Budi Sync Test"
+  }
+}
+
+###
+
+### ============================================================
+### 14c2. SYNC: Siswa — siswa TIDAK bisa mengubah full_name
+### Expect: 422 karena profile.full_name tidak diizinkan untuk siswa
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+{
+  "profile": {
+    "full_name": "Budi Ganti Nama"
   }
 }
 

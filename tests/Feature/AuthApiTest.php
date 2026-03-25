@@ -683,7 +683,7 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('data.role_profile.full_name', 'New Admin Name');
     }
 
-    public function test_student_name_syncs_from_profile_to_user(): void
+    public function test_student_cannot_update_name(): void
     {
         $student = User::factory()->create([
             'name' => 'Old Name',
@@ -703,13 +703,16 @@ class AuthApiTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        $response = $this->putJson('/api/profile', [
-            'profile' => ['full_name' => 'Synced Student Name'],
-        ]);
+        $this->putJson('/api/profile', [
+            'profile' => ['full_name' => 'New Name'],
+        ])->assertStatus(422);
 
-        $response->assertStatus(200)
-            ->assertJsonPath('data.user.name', 'Synced Student Name')
-            ->assertJsonPath('data.role_profile.full_name', 'Synced Student Name');
+        $this->putJson('/api/profile', [
+            'user' => ['name' => 'New Name'],
+        ])->assertStatus(422);
+
+        $this->assertDatabaseHas('users', ['id' => $student->id, 'name' => 'Old Name']);
+        $this->assertDatabaseHas('student_profiles', ['user_id' => $student->id, 'full_name' => 'Old Name']);
     }
 
     public function test_company_name_syncs_from_profile_to_user(): void

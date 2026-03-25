@@ -107,7 +107,7 @@ paths:
         Endpoint menerima `multipart/form-data` untuk mendukung upload file (logo, gambar, dokumen) bersama data teks.
 
         **Payload:**
-        - `user[name]` (opsional): nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)
+        - `user[name]` (opsional): nama tampilan user (admin, mitra perusahaan, mitra umkm)
         - `user[email]` (opsional): email user (sekolah, mitra perusahaan, mitra umkm)
         - `profile[field]` (opsional): data profile spesifik role
         - File upload di level root (opsional): file gambar/dokumen sesuai role
@@ -119,7 +119,7 @@ paths:
         | sekolah             | `accreditation`, `address`, `expertise_fields`, `short_description`, `socials` |
         | mitra perusahaan    | `company_name`, `industry_sector`, `employee_total_range`, `office_address`, `socials`, `short_description` |
         | mitra umkm          | `business_name`, `owner_personal_nib`, `business_type`, `business_address`, `socials`, `short_description` |
-        | siswa               | `full_name`, `description`, `socials`, `address` |
+        | siswa               | `description`, `socials`, `address` |
 
         **Field `user` per role:**
         | Role                | Field yang diterima |
@@ -128,7 +128,7 @@ paths:
         | sekolah             | `email` |
         | mitra perusahaan    | `name`, `email` |
         | mitra umkm          | `name`, `email` |
-        | siswa               | `name` |
+        | siswa               | _(tidak dapat mengubah nama)_ |
 
         **File upload per role:**
         | Role                | Field file | Tipe | Max size |
@@ -146,12 +146,12 @@ paths:
         | siswa               | `photo_profile` | image | 2 MB |
 
         **Sinkronisasi nama otomatis:**
-        Untuk role admin, siswa, mitra perusahaan, dan mitra umkm, field `user.name` dan nama di profile
+        Untuk role admin, mitra perusahaan, dan mitra umkm, field `user.name` dan nama di profile
         (`full_name` / `company_name` / `business_name`) saling sinkron otomatis.
         - Jika hanya `user.name` dikirim → nama profile otomatis diperbarui.
         - Jika hanya nama profile dikirim → `user.name` otomatis diperbarui.
         - Jika keduanya dikirim dengan nilai berbeda → nama profile yang digunakan, `user.name` mengikuti.
-        - Sekolah dikecualikan (tidak dapat mengubah nama).
+        - Sekolah dan siswa dikecualikan (tidak dapat mengubah nama).
 
         File lama otomatis dihapus saat file baru diupload.
       requestBody:
@@ -164,7 +164,7 @@ paths:
                 "user[name]":
                   type: string
                   maxLength: 255
-                  description: "Nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)"
+                  description: "Nama tampilan user (admin, mitra perusahaan, mitra umkm)"
                 "user[email]":
                   type: string
                   format: email
@@ -173,7 +173,7 @@ paths:
                 "profile[full_name]":
                   type: string
                   maxLength: 255
-                  description: "[Admin/Siswa] Nama lengkap"
+                  description: "[Admin] Nama lengkap"
                 "profile[company_name]":
                   type: string
                   maxLength: 255

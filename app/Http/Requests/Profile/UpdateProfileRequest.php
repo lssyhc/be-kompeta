@@ -52,10 +52,8 @@ class UpdateProfileRequest extends FormRequest
 
         if ($user->role === User::ROLE_SISWA) {
             return array_merge([
-                'user' => ['nullable', 'array:name'],
-                'user.name' => ['sometimes', 'string', 'max:255'],
-                'profile' => ['sometimes', 'array:full_name,description,socials,address'],
-                'profile.full_name' => ['sometimes', 'string', 'max:255'],
+                'user' => ['prohibited'],
+                'profile' => ['sometimes', 'array:description,socials,address'],
                 'profile.description' => ['sometimes', 'nullable', 'string', 'max:2000'],
                 'profile.address' => ['sometimes', 'nullable', 'string'],
                 'photo_profile' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],

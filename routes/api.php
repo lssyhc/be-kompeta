@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\MitraJobApplicationController;
+use App\Http\Controllers\Api\OpenApiController;
 use App\Http\Controllers\Api\PartnershipProposalController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PublicStatisticsController;
@@ -14,7 +15,6 @@ use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
 use App\Http\Controllers\Api\StudentJobApplicationController;
 use App\Http\Controllers\Api\StudentPortfolioController;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -36,24 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/application-reminder', [StudentPortfolioController::class, 'applicationReminder']);
 });
 
-Route::get('/docs/openapi', function () {
-    $openApiPath = public_path('docs/swagger/openapi.yaml');
-
-    if (! File::exists($openApiPath)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'OpenAPI spec tidak ditemukan.',
-            'data' => null,
-            'errors' => null,
-            'meta' => null,
-        ], 404);
-    }
-
-    return response()->file($openApiPath, [
-        'Content-Type' => 'application/yaml; charset=UTF-8',
-        'Cache-Control' => 'public, max-age=300',
-    ]);
-});
+Route::get('/docs/openapi', OpenApiController::class);
 
 Route::middleware('auth:sanctum')->prefix('school')->group(function () {
     Route::get('/students', [SchoolStudentController::class, 'index']);

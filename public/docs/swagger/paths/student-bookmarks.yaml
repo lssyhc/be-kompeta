@@ -31,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelope"
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
               example:
                 success: true
                 message: Daftar bookmark berhasil diambil.

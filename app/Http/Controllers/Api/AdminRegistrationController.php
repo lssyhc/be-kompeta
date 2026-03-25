@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +33,7 @@ class AdminRegistrationController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['nullable', 'string', 'in:pending,active,rejected'],
+            'status' => ['nullable', 'string', 'in:pending,active'],
             'role' => ['nullable', 'string', 'in:sekolah,mitra'],
             'mitra_type' => ['nullable', 'string', 'in:perusahaan,umkm'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
@@ -160,9 +161,7 @@ class AdminRegistrationController extends Controller
             'reason' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $user->forceFill([
-            'account_status' => User::STATUS_REJECTED,
-        ])->save();
+        $responseData = $this->transformRegistrationItem($user);
 
         try {
             Mail::to($user->email)->send(new AccountRejectedMail($user, $validated['reason'] ?? null));
@@ -173,10 +172,18 @@ class AdminRegistrationController extends Controller
             ]);
         }
 
-        return $this->successResponse(
-            $this->transformRegistrationItem($user->fresh(['schoolProfile', 'companyProfile', 'umkmProfile'])),
-            'Registrasi berhasil ditolak.'
-        );
+        DB::transaction(function () use ($user): void {
+            $this->deleteUploadedFiles($user);
+
+            $user->schoolProfile()->delete();
+            $user->companyProfile()->delete();
+            $user->umkmProfile()->delete();
+
+            $user->tokens()->delete();
+            $user->delete();
+        });
+
+        return $this->successResponse($responseData, 'Registrasi berhasil ditolak dan data akun telah dihapus.');
     }
 
     private function findRegistrationUser(int $id): ?User
@@ -186,6 +193,72 @@ class AdminRegistrationController extends Controller
             ->where('id', $id)
             ->with(['schoolProfile', 'companyProfile', 'umkmProfile'])
             ->first();
+    }
+
+    private function deleteUploadedFiles(User $user): void
+    {
+        $publicPaths = [];
+        $localPaths = [];
+
+        $schoolProfile = $user->schoolProfile;
+
+        if ($schoolProfile instanceof SchoolProfile) {
+            $publicPaths = array_merge($publicPaths, array_filter([
+                $schoolProfile->logo_path,
+                $schoolProfile->image_1_path,
+                $schoolProfile->image_2_path,
+                $schoolProfile->image_3_path,
+                $schoolProfile->image_4_path,
+                $schoolProfile->image_5_path,
+            ]));
+            $localPaths = array_merge($localPaths, array_filter([
+                $schoolProfile->operational_license_path,
+            ]));
+        }
+
+        $companyProfile = $user->companyProfile;
+
+        if ($companyProfile instanceof CompanyProfile) {
+            $publicPaths = array_merge($publicPaths, array_filter([
+                $companyProfile->company_logo_path,
+                $companyProfile->image_1_path,
+                $companyProfile->image_2_path,
+                $companyProfile->image_3_path,
+                $companyProfile->image_4_path,
+                $companyProfile->image_5_path,
+            ]));
+            $localPaths = array_merge($localPaths, array_filter([
+                $companyProfile->kemenkumham_decree_path,
+            ]));
+        }
+
+        $umkmProfile = $user->umkmProfile;
+
+        if ($umkmProfile instanceof UmkmProfile) {
+            $publicPaths = array_merge($publicPaths, array_filter([
+                $umkmProfile->umkm_logo_path,
+                $umkmProfile->image_1_path,
+                $umkmProfile->image_2_path,
+                $umkmProfile->image_3_path,
+                $umkmProfile->image_4_path,
+                $umkmProfile->image_5_path,
+            ]));
+            $localPaths = array_merge($localPaths, array_filter([
+                $umkmProfile->owner_ktp_photo_path,
+            ]));
+        }
+
+        foreach ($publicPaths as $path) {
+            if (! str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        foreach ($localPaths as $path) {
+            if (Storage::disk('local')->exists($path)) {
+                Storage::disk('local')->delete($path);
+            }
+        }
     }
 
     private function transformRegistrationItem(User $user): array

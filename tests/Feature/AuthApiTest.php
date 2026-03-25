@@ -7,6 +7,7 @@ use App\Models\CompanyProfile;
 use App\Models\SchoolProfile;
 use App\Models\StudentProfile;
 use App\Models\StudentSkill;
+use App\Models\UmkmProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -75,7 +76,7 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(403)
             ->assertJsonPath('success', false)
-            ->assertJsonPath('message', 'Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti.');
+            ->assertJsonPath('message', 'Akun Anda masih dalam proses verifikasi oleh admin Kompeta. Mohon menunggu hingga admin memverifikasi dan menyetujui pendaftaran Anda. Notifikasi hasil verifikasi akan dikirimkan melalui email yang Anda daftarkan.');
 
         $this->assertNull($school->fresh()->last_login_at);
     }
@@ -835,5 +836,168 @@ class AuthApiTest extends TestCase
             'description' => 'Siswa fokus backend Laravel.',
             'address' => 'Jakarta Selatan',
         ]);
+    }
+
+    public function test_admin_reject_deletes_school_user_and_profile(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => User::STATUS_ACTIVE,
+        ]);
+
+        $school = User::factory()->create([
+            'name' => 'SMK Reject Test',
+            'email' => 'reject-school@example.com',
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_PENDING,
+        ]);
+
+        Storage::disk('public')->put('profiles/schools/logos/reject-logo.jpg', 'fake');
+        Storage::disk('local')->put('profiles/schools/legalities/reject-izin.pdf', 'fake');
+
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Reject Test',
+            'npsn' => '77777777',
+            'accreditation' => 'B',
+            'address' => 'Jl. Reject No. 1',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'profiles/schools/logos/reject-logo.jpg',
+            'short_description' => 'Sekolah test reject.',
+            'operational_license_path' => 'profiles/schools/legalities/reject-izin.pdf',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->patchJson('/api/admin/registrations/'.$school->id.'/reject', [
+            'reason' => 'Dokumen tidak lengkap.',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Registrasi berhasil ditolak dan data akun telah dihapus.')
+            ->assertJsonPath('data.id', $school->id)
+            ->assertJsonPath('data.nama', 'SMK Reject Test');
+
+        $this->assertDatabaseMissing('users', ['id' => $school->id]);
+        $this->assertDatabaseMissing('school_profiles', ['user_id' => $school->id]);
+
+        Storage::disk('public')->assertMissing('profiles/schools/logos/reject-logo.jpg');
+        Storage::disk('local')->assertMissing('profiles/schools/legalities/reject-izin.pdf');
+    }
+
+    public function test_rejected_email_can_be_reused_for_new_registration(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => User::STATUS_ACTIVE,
+        ]);
+
+        $school = User::factory()->create([
+            'name' => 'SMK Reuse Email',
+            'email' => 'reuse@example.com',
+            'role' => User::ROLE_SEKOLAH,
+            'account_status' => User::STATUS_PENDING,
+        ]);
+
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Reuse Email',
+            'npsn' => '88888888',
+            'accreditation' => 'A',
+            'address' => 'Jl. Reuse No. 1',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'profiles/schools/logos/reuse.jpg',
+            'short_description' => 'Test reuse email.',
+            'operational_license_path' => 'profiles/schools/legalities/reuse.pdf',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/admin/registrations/'.$school->id.'/reject')
+            ->assertStatus(200);
+
+        $this->assertDatabaseMissing('users', ['email' => 'reuse@example.com']);
+
+        $response = $this->post('/api/auth/register', [
+            'role' => User::ROLE_SEKOLAH,
+            'email' => 'reuse@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'school_name' => 'SMK Reuse Email Baru',
+            'npsn' => '99999999',
+            'accreditation' => 'A',
+            'address' => 'Jl. Reuse Baru No. 1',
+            'expertise_fields' => ['TKJ'],
+            'logo' => UploadedFile::fake()->image('logo.jpg'),
+            'short_description' => 'Pendaftaran ulang.',
+            'operational_license' => UploadedFile::fake()->create('izin.pdf', 100, 'application/pdf'),
+        ], [
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.email', 'reuse@example.com')
+            ->assertJsonPath('data.user.account_status', User::STATUS_PENDING);
+    }
+
+    public function test_admin_reject_deletes_umkm_user_and_profile(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => User::STATUS_ACTIVE,
+        ]);
+
+        $mitra = User::factory()->create([
+            'name' => 'UMKM Reject Test',
+            'email' => 'reject-umkm@example.com',
+            'role' => User::ROLE_MITRA,
+            'mitra_type' => User::MITRA_UMKM,
+            'account_status' => User::STATUS_PENDING,
+        ]);
+
+        Storage::disk('public')->put('profiles/umkm/logos/reject-logo.jpg', 'fake');
+        Storage::disk('local')->put('profiles/umkm/ktp/reject-ktp.jpg', 'fake');
+
+        UmkmProfile::query()->create([
+            'user_id' => $mitra->id,
+            'business_name' => 'UMKM Reject Test',
+            'owner_nik' => '3201234567894444',
+            'business_type' => 'Kuliner',
+            'business_address' => 'Jl. Reject UMKM No. 1',
+            'short_description' => 'UMKM test reject.',
+            'umkm_logo_path' => 'profiles/umkm/logos/reject-logo.jpg',
+            'owner_ktp_photo_path' => 'profiles/umkm/ktp/reject-ktp.jpg',
+            'image_1_path' => 'profiles/umkm/images/reject-1.jpg',
+            'image_2_path' => 'profiles/umkm/images/reject-2.jpg',
+            'image_3_path' => 'profiles/umkm/images/reject-3.jpg',
+            'image_4_path' => 'profiles/umkm/images/reject-4.jpg',
+            'image_5_path' => 'profiles/umkm/images/reject-5.jpg',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->patchJson('/api/admin/registrations/'.$mitra->id.'/reject', [
+            'reason' => 'KTP tidak valid.',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('users', ['id' => $mitra->id]);
+        $this->assertDatabaseMissing('umkm_profiles', ['user_id' => $mitra->id]);
+
+        Storage::disk('public')->assertMissing('profiles/umkm/logos/reject-logo.jpg');
+        Storage::disk('local')->assertMissing('profiles/umkm/ktp/reject-ktp.jpg');
     }
 }

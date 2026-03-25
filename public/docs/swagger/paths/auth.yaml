@@ -214,18 +214,18 @@ paths:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
               examples:
                 pending:
-                  summary: Akun masih pending (menunggu approval admin)
+                  summary: Akun masih pending (menunggu verifikasi admin)
                   value:
                     success: false
-                    message: "Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti."
+                    message: "Akun Anda masih dalam proses verifikasi oleh admin Kompeta. Mohon menunggu hingga admin memverifikasi dan menyetujui pendaftaran Anda. Notifikasi hasil verifikasi akan dikirimkan melalui email yang Anda daftarkan."
                     data: null
                     errors: null
                     meta: null
                 rejected:
-                  summary: Akun ditolak admin
+                  summary: Akun ditolak admin (safety net, normalnya user sudah dihapus)
                   value:
                     success: false
-                    message: "Akun tidak disetujui. Silakan periksa email yang Anda daftarkan untuk membaca informasi penolakan lebih lanjut dari Tim Kompeta."
+                    message: "Pendaftaran akun Anda sebelumnya tidak disetujui dan data akun telah dihapus. Silakan melakukan pendaftaran ulang dengan data dan dokumen yang lengkap."
                     data: null
                     errors: null
                     meta: null

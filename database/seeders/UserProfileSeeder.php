@@ -226,37 +226,6 @@ class UserProfileSeeder extends Seeder
                 'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/pending-nusantara-sk.pdf', 'SK Kemenkumham Pending Nusantara'),
             ]
         );
-
-        $rejectedMitra = User::query()->updateOrCreate(
-            ['email' => 'mitra.rejected@kompeta.test'],
-            [
-                'name' => 'UMKM Ditolak Jaya',
-                'password' => 'password123',
-                'role' => User::ROLE_MITRA,
-                'mitra_type' => User::MITRA_UMKM,
-                'account_status' => User::STATUS_REJECTED,
-            ]
-        );
-
-        UmkmProfile::query()->updateOrCreate(
-            ['user_id' => $rejectedMitra->id],
-            [
-                'business_name' => 'UMKM Ditolak Jaya',
-                'owner_nik' => '3201234567893333',
-                'owner_personal_nib' => null,
-                'business_type' => 'Fashion',
-                'business_address' => 'Depok, Jawa Barat',
-                'socials' => UmkmProfile::DEFAULT_SOCIALS,
-                'umkm_logo_path' => 'https://via.placeholder.com/200x200?text=Rejected',
-                'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/rejected-jaya-ktp.jpg', 'KTP Owner UMKM Ditolak Jaya'),
-                'short_description' => 'Data UMKM contoh untuk status registrasi rejected.',
-                'image_1_path' => 'https://via.placeholder.com/400x300?text=Rejected+1',
-                'image_2_path' => 'https://via.placeholder.com/400x300?text=Rejected+2',
-                'image_3_path' => 'https://via.placeholder.com/400x300?text=Rejected+3',
-                'image_4_path' => 'https://via.placeholder.com/400x300?text=Rejected+4',
-                'image_5_path' => 'https://via.placeholder.com/400x300?text=Rejected+5',
-            ]
-        );
     }
 
     private function seedSchools(): void

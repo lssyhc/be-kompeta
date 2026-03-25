@@ -126,11 +126,11 @@ class AuthController extends Controller
         }
 
         if ($user->account_status === User::STATUS_PENDING) {
-            return $this->errorResponse('Akun belum disetujui. Mohon menunggu persetujuan dari Tim Kompeta untuk pengaktifan akun. Pemberitahuan pengaktifan akan dikirimkan melalui email Anda nanti.', 403);
+            return $this->errorResponse('Akun Anda masih dalam proses verifikasi oleh admin Kompeta. Mohon menunggu hingga admin memverifikasi dan menyetujui pendaftaran Anda. Notifikasi hasil verifikasi akan dikirimkan melalui email yang Anda daftarkan.', 403);
         }
 
         if ($user->account_status === User::STATUS_REJECTED) {
-            return $this->errorResponse('Akun tidak disetujui. Silakan periksa email yang Anda daftarkan untuk membaca informasi penolakan lebih lanjut dari Tim Kompeta.', 403);
+            return $this->errorResponse('Pendaftaran akun Anda sebelumnya tidak disetujui dan data akun telah dihapus. Silakan melakukan pendaftaran ulang dengan data dan dokumen yang lengkap.', 403);
         }
 
         $user->forceFill([

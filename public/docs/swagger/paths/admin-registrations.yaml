@@ -8,9 +8,11 @@ paths:
         Hanya user dengan role `admin` yang dapat mengakses.
 
         **Filter yang tersedia:**
-        - `status`: Filter berdasarkan status registrasi (`pending`, `active`, `rejected`). Default: `pending`.
+        - `status`: Filter berdasarkan status registrasi (`pending`, `active`). Default: `pending`.
         - `role`: Filter berdasarkan role akun (`sekolah`, `mitra`).
         - `mitra_type`: Filter tipe mitra (`perusahaan`, `umkm`). Hanya berlaku jika role=mitra.
+
+        **Catatan:** Status `rejected` tidak tersedia karena akun yang ditolak langsung dihapus dari sistem.
 
         Diurutkan berdasarkan `created_at` terbaru.
       parameters:
@@ -18,7 +20,7 @@ paths:
           name: status
           schema:
             type: string
-            enum: [pending, active, rejected]
+            enum: [pending, active]
             default: pending
           description: Filter status registrasi
         - in: query
@@ -217,7 +219,7 @@ paths:
         Hanya registrasi dengan status `pending` yang dapat disetujui.
         Hanya user dengan role `admin` yang dapat mengakses.
 
-        **Side-effect:** Email notifikasi persetujuan otomatis dikirim ke user terkait (async via queue).
+        **Side-effect:** Email notifikasi persetujuan otomatis dikirim ke user terkait (sinkron).
       parameters:
         - in: path
           name: id
@@ -392,12 +394,15 @@ paths:
       tags: [Admin Registrations]
       summary: Tolak registrasi pending
       description: |
-        Mengubah status registrasi menjadi `rejected`.
+        Menolak registrasi dan **menghapus seluruh data akun** (user, profil, file yang diunggah).
         Hanya registrasi dengan status `pending` yang dapat ditolak.
         Hanya user dengan role `admin` yang dapat mengakses.
 
-        **Side-effect:** Email notifikasi penolakan otomatis dikirim ke user terkait (async via queue).
-        Jika `reason` disertakan, alasan penolakan akan ditampilkan di dalam email.
+        **Side-effect:**
+        - Email notifikasi penolakan dikirim ke user terkait (sinkron, sebelum data dihapus).
+        - Jika `reason` disertakan, alasan penolakan akan ditampilkan di dalam email.
+        - Setelah email terkirim, seluruh data user, profil, dan file yang diunggah akan dihapus.
+        - Email yang digunakan saat registrasi dapat digunakan kembali untuk pendaftaran ulang.
       requestBody:
         required: false
         content:
@@ -429,19 +434,19 @@ paths:
           example: 10
       responses:
         "200":
-          description: Registrasi berhasil ditolak
+          description: Registrasi berhasil ditolak dan data akun dihapus
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeAdminRegistrationItem"
               example:
                 success: true
-                message: Registrasi berhasil ditolak.
+                message: Registrasi berhasil ditolak dan data akun telah dihapus.
                 data:
                   id: 10
                   nama: SMK Pending Sejahtera
                   title: Sekolah
-                  status: rejected
+                  status: pending
                   detail:
                     email: school.pending@kompeta.test
                     school_name: SMK Pending Sejahtera

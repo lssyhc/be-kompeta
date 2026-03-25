@@ -64,6 +64,8 @@ Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 ### ============================================================
 ### 6. REJECT REGISTRASI (dengan alasan)
 ###    Email notifikasi penolakan akan dikirim ke user.
+###    Setelah email terkirim, data akun (user + profil + file) dihapus.
+###    Email yang ditolak dapat digunakan untuk pendaftaran ulang.
 ###    Field "reason" bersifat opsional (maks 500 karakter).
 ### ============================================================
 PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/reject
@@ -79,6 +81,7 @@ Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 
 ### ============================================================
 ### 6b. REJECT REGISTRASI (tanpa alasan)
+###     Tetap menghapus data akun setelah email terkirim.
 ### ============================================================
 PATCH {{baseUrl}}/admin/registrations/{{targetRegistrationId}}/reject
 Accept: application/json

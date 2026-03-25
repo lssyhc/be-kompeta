@@ -24,7 +24,6 @@ info:
     Akun seeded untuk skenario approval admin:
     - Pending sekolah: school.pending@kompeta.test
     - Pending mitra: mitra.pending@kompeta.test
-    - Rejected mitra: mitra.rejected@kompeta.test
 
     Dataset dummy tambahan (Seeder terbaru):
     - 10 sekolah tambahan aktif:
@@ -574,7 +573,7 @@ components:
           example: Sekolah
         status:
           type: string
-          enum: [pending, active, rejected]
+          enum: [pending, active]
         detail:
           type: object
           additionalProperties: true
@@ -664,10 +663,10 @@ components:
           type: string
           description: |
             Status akun:
-            - pending: Menunggu persetujuan admin
+            - pending: Menunggu verifikasi admin
             - active: Akun aktif
-            - rejected: Ditolak admin
-          enum: [pending, active, rejected]
+            Catatan: Akun yang ditolak akan dihapus dari sistem, sehingga status `rejected` tidak akan muncul dalam data.
+          enum: [pending, active]
           example: active
         last_login_at:
           nullable: true

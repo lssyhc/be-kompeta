@@ -50,6 +50,7 @@ tags:
   - name: School Students
   - name: Student Portfolio
   - name: Student Job Applications
+  - name: Student Bookmarks
   - name: Mitra Job Applications
   - name: Partnership Proposals
   - name: Explore
@@ -98,6 +99,11 @@ paths:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}"
   /student/job-applications/{id}/cv:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}~1cv"
+
+  /student/bookmarks:
+    $ref: "./paths/student-bookmarks.yaml#/paths/~1student~1bookmarks"
+  /student/bookmarks/{id}:
+    $ref: "./paths/student-bookmarks.yaml#/paths/~1student~1bookmarks~1{id}"
 
   /mitra/job-applications:
     $ref: "./paths/mitra-job-applications.yaml#/paths/~1mitra~1job-applications"

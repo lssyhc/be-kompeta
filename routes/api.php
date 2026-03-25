@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PublicStatisticsController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolStudentController;
+use App\Http\Controllers\Api\StudentBookmarkController;
 use App\Http\Controllers\Api\StudentJobApplicationController;
 use App\Http\Controllers\Api\StudentPortfolioController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,10 @@ Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
     Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');
     Route::get('/job-applications/{id}/cv', [StudentJobApplicationController::class, 'downloadCv'])->whereNumber('id');
+
+    Route::get('/bookmarks', [StudentBookmarkController::class, 'index']);
+    Route::post('/bookmarks/{id}', [StudentBookmarkController::class, 'store'])->whereNumber('id');
+    Route::delete('/bookmarks/{id}', [StudentBookmarkController::class, 'destroy'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(function () {

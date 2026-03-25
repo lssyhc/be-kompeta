@@ -212,6 +212,10 @@ class OpenApiContractTest extends TestCase
             ['method' => 'GET', 'uri' => '/api/student/job-applications/1', 'docPath' => '/student/job-applications/{id}'],
             ['method' => 'GET', 'uri' => '/api/student/job-applications/1/cv', 'docPath' => '/student/job-applications/{id}/cv'],
 
+            ['method' => 'GET', 'uri' => '/api/student/bookmarks', 'docPath' => '/student/bookmarks'],
+            ['method' => 'POST', 'uri' => '/api/student/bookmarks/1', 'docPath' => '/student/bookmarks/{id}'],
+            ['method' => 'DELETE', 'uri' => '/api/student/bookmarks/1', 'docPath' => '/student/bookmarks/{id}'],
+
             ['method' => 'GET', 'uri' => '/api/mitra/job-applications', 'docPath' => '/mitra/job-applications'],
             ['method' => 'GET', 'uri' => '/api/mitra/job-applications/1', 'docPath' => '/mitra/job-applications/{id}'],
             ['method' => 'GET', 'uri' => '/api/mitra/job-applications/1/cv', 'docPath' => '/mitra/job-applications/{id}/cv'],

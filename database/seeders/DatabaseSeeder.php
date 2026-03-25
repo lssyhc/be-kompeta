@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BlogArticleSeeder::class);
         $this->call(PartnershipProposalSeeder::class);
         $this->call(StudentJobApplicationSeeder::class);
+        $this->call(StudentBookmarkSeeder::class);
     }
 }

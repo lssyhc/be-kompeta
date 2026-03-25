@@ -1,0 +1,256 @@
+paths:
+  /student/bookmarks:
+    get:
+      tags: [Student Bookmarks]
+      summary: Daftar bookmark lowongan kerja siswa
+      description: |
+        Menampilkan daftar lowongan kerja yang telah di-bookmark oleh siswa yang sedang login (paginated).
+        Hanya lowongan yang masih `published` yang ditampilkan.
+        Diurutkan berdasarkan waktu bookmark terbaru.
+
+        Hanya user dengan role `siswa` yang dapat mengakses.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
+      responses:
+        "200":
+          description: Daftar bookmark berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelope"
+              example:
+                success: true
+                message: Daftar bookmark berhasil diambil.
+                data:
+                  - id: 1
+                    slug: accounting-staff-1602be
+                    position_name: Accounting Staff
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: kantor
+                    work_policy_label: Kerja di kantor
+                    created_at_human: 1 jam yang lalu
+                    salary_label: Rp 5.700.000 – Rp 5.800.000
+                    mitra_name: PT Binajasa Sumber Sarana
+                    mitra_type: perusahaan
+                    province: DKI Jakarta
+                    location: Jakarta Selatan, DKI Jakarta
+                    skills:
+                      - MYOB
+                      - Excel
+                    benefits:
+                      - BPJS Kesehatan
+                      - THR
+                    mitra_logo_url: null
+                    bookmarked_at: "2026-03-25T10:00:00.000000Z"
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat melihat bookmark.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /student/bookmarks/{id}:
+    post:
+      tags: [Student Bookmarks]
+      summary: Tambah bookmark lowongan kerja
+      description: |
+        Menambahkan lowongan kerja ke daftar bookmark siswa.
+
+        **Validasi bisnis:**
+        - Lowongan (`id`) harus ada dan berstatus `published`.
+        - Siswa tidak boleh mem-bookmark lowongan yang sama dua kali (duplikat ditolak dengan 422).
+
+        Hanya user dengan role `siswa` yang dapat mengakses.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lowongan kerja (JobVacancy)
+          example: 1
+      responses:
+        "201":
+          description: Lowongan berhasil ditambahkan ke bookmark
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Lowongan berhasil ditambahkan ke bookmark.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat menambahkan bookmark.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan atau belum dipublikasikan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan atau belum dipublikasikan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Lowongan sudah ada di bookmark
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Lowongan sudah ada di bookmark.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+    delete:
+      tags: [Student Bookmarks]
+      summary: Hapus bookmark lowongan kerja
+      description: |
+        Menghapus lowongan kerja dari daftar bookmark siswa.
+
+        Hanya user dengan role `siswa` yang dapat mengakses.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lowongan kerja (JobVacancy)
+          example: 1
+      responses:
+        "200":
+          description: Bookmark berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Bookmark berhasil dihapus.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat menghapus bookmark.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Bookmark tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Bookmark tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

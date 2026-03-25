@@ -1,0 +1,40 @@
+### ============================================================
+### STUDENT BOOKMARKS API - REST Client Testing
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### Login siswa dulu
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
+}
+
+###
+
+### 1) GET BOOKMARKS (PAGINATED)
+GET {{baseUrl}}/student/bookmarks?per_page=10
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 2) ADD BOOKMARK (ganti id sesuai job vacancy yang tersedia)
+POST {{baseUrl}}/student/bookmarks/2
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 3) REMOVE BOOKMARK
+DELETE {{baseUrl}}/student/bookmarks/1
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###

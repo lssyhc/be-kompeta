@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +12,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     public const ROLE_ADMIN = 'admin';
@@ -36,11 +34,6 @@ class User extends Authenticatable
 
     public const DEFAULT_PROFILE_PHOTO_PATH = 'defaults/profile-picture.png';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -51,20 +44,10 @@ class User extends Authenticatable
         'last_login_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -138,5 +121,11 @@ class User extends Authenticatable
     public function updatedArticles(): HasMany
     {
         return $this->hasMany(Article::class, 'updated_by');
+    }
+
+    public function bookmarkedJobVacancies(): BelongsToMany
+    {
+        return $this->belongsToMany(JobVacancy::class, 'job_vacancy_bookmarks')
+            ->withPivot('created_at');
     }
 }

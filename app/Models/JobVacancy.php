@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobVacancy extends Model
@@ -71,6 +72,12 @@ class JobVacancy extends Model
     public function benefits(): HasMany
     {
         return $this->hasMany(JobVacancyBenefit::class);
+    }
+
+    public function bookmarkedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'job_vacancy_bookmarks')
+            ->withPivot('created_at');
     }
 
     public function scopePublished($query)

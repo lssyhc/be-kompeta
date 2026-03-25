@@ -480,3 +480,121 @@ Content-Type: image/jpeg
 GET {{baseUrl}}/profile
 Accept: application/json
 Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### NAME AUTO-SYNC TESTS
+### Saat update, jika hanya salah satu dari user.name atau
+### profile name field dikirim, field lainnya otomatis sinkron.
+### Jika keduanya dikirim berbeda, profile name yang menang.
+### ============================================================
+
+### ============================================================
+### 14a. SYNC: Admin — kirim hanya profile.full_name
+### Expect: user.name ikut berubah
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+{
+  "profile": {
+    "full_name": "Admin Sync Test"
+  }
+}
+
+###
+
+### ============================================================
+### 14b. SYNC: Admin — kirim hanya user.name
+### Expect: profile.full_name ikut berubah
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
+
+{
+  "user": {
+    "name": "Admin Sync From User"
+  }
+}
+
+###
+
+### ============================================================
+### 14c. SYNC: Siswa — kirim hanya user.name
+### Expect: profile.full_name ikut berubah
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+{
+  "user": {
+    "name": "Budi Sync Test"
+  }
+}
+
+###
+
+### ============================================================
+### 14d. SYNC: Mitra Perusahaan — kirim hanya profile.company_name
+### Expect: user.name ikut berubah
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+{
+  "profile": {
+    "company_name": "PT Binajasa Sync Test"
+  }
+}
+
+###
+
+### ============================================================
+### 14e. SYNC: Mitra UMKM — kirim hanya user.name
+### Expect: profile.business_name ikut berubah
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+{
+  "user": {
+    "name": "UMKM Sync Test"
+  }
+}
+
+###
+
+### ============================================================
+### 14f. SYNC: Mitra Perusahaan — kirim keduanya BEDA
+### Expect: profile.company_name yang menang untuk user.name
+### ============================================================
+
+PUT {{baseUrl}}/profile
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
+
+{
+  "user": {
+    "name": "Nama User Kalah"
+  },
+  "profile": {
+    "company_name": "PT Binajasa Sumber Sarana"
+  }
+}

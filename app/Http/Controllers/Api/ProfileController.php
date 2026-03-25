@@ -62,6 +62,8 @@ class ProfileController extends Controller
             $profile->update($profilePayload);
         }
 
+        $this->syncNameFields($user, $profile, $validated);
+
         return $this->successResponse([
             'user' => $this->compactUser($user),
             'role_profile' => $this->resolveRoleProfile($user),
@@ -245,5 +247,28 @@ class ProfileController extends Controller
         }
 
         return null;
+    }
+
+    private function syncNameFields(User $user, Model $profile, array $validated): void
+    {
+        $profileNameField = match (true) {
+            in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SISWA], true) => 'full_name',
+            $user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_PERUSAHAAN => 'company_name',
+            $user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_UMKM => 'business_name',
+            default => null,
+        };
+
+        if ($profileNameField === null) {
+            return;
+        }
+
+        $userNameUpdated = isset($validated['user']['name']);
+        $profileNameUpdated = isset($validated['profile'][$profileNameField]);
+
+        if ($profileNameUpdated) {
+            $user->update(['name' => $validated['profile'][$profileNameField]]);
+        } elseif ($userNameUpdated) {
+            $profile->update([$profileNameField => $validated['user']['name']]);
+        }
     }
 }

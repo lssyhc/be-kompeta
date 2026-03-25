@@ -145,6 +145,14 @@ paths:
         | mitra umkm          | `image_1`–`image_5` | image | 2 MB |
         | siswa               | `photo_profile` | image | 2 MB |
 
+        **Sinkronisasi nama otomatis:**
+        Untuk role admin, siswa, mitra perusahaan, dan mitra umkm, field `user.name` dan nama di profile
+        (`full_name` / `company_name` / `business_name`) saling sinkron otomatis.
+        - Jika hanya `user.name` dikirim → nama profile otomatis diperbarui.
+        - Jika hanya nama profile dikirim → `user.name` otomatis diperbarui.
+        - Jika keduanya dikirim dengan nilai berbeda → nama profile yang digunakan, `user.name` mengikuti.
+        - Sekolah dikecualikan (tidak dapat mengubah nama).
+
         File lama otomatis dihapus saat file baru diupload.
       requestBody:
         required: false

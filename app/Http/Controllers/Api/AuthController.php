@@ -192,6 +192,7 @@ class AuthController extends Controller
             User::ROLE_MITRA => $validated['mitra_type'] === User::MITRA_PERUSAHAAN
                 ? $validated['company_name']
                 : $validated['business_name'],
+            User::ROLE_ADMIN => $validated['name'] ?? $validated['email'],
             default => $validated['email'],
         };
     }

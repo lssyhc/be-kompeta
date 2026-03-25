@@ -625,6 +625,7 @@ class AuthApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.user.role', User::ROLE_ADMIN)
+            ->assertJsonPath('data.user.name', 'Admin Utama')
             ->assertJsonPath('data.role_profile.full_name', 'Admin Utama');
 
         $this->assertDatabaseHas('admin_profiles', [
@@ -632,7 +633,118 @@ class AuthApiTest extends TestCase
             'full_name' => 'Admin Utama',
         ]);
 
+        $this->assertEquals('Admin Utama', $admin->fresh()->name);
+
         $this->assertInstanceOf(AdminProfile::class, $admin->fresh()->adminProfile);
+    }
+
+    public function test_admin_name_syncs_from_user_to_profile(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'account_status' => 'active',
+        ]);
+
+        AdminProfile::query()->create([
+            'user_id' => $admin->id,
+            'full_name' => 'Original Name',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->putJson('/api/profile', [
+            'user' => ['name' => 'New Admin Name'],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user.name', 'New Admin Name')
+            ->assertJsonPath('data.role_profile.full_name', 'New Admin Name');
+    }
+
+    public function test_student_name_syncs_from_profile_to_user(): void
+    {
+        $student = User::factory()->create([
+            'name' => 'Old Name',
+            'role' => User::ROLE_SISWA,
+            'account_status' => 'active',
+        ]);
+
+        StudentProfile::query()->create([
+            'user_id' => $student->id,
+            'full_name' => 'Old Name',
+            'nisn' => '9999999999',
+            'major' => 'RPL',
+            'school_origin' => 'SMK Test',
+            'graduation_status' => 'Belum Lulus',
+            'unique_code' => 'SYNC12345',
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $response = $this->putJson('/api/profile', [
+            'profile' => ['full_name' => 'Synced Student Name'],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user.name', 'Synced Student Name')
+            ->assertJsonPath('data.role_profile.full_name', 'Synced Student Name');
+    }
+
+    public function test_company_name_syncs_from_profile_to_user(): void
+    {
+        $mitra = User::factory()->create([
+            'name' => 'PT Old',
+            'role' => User::ROLE_MITRA,
+            'mitra_type' => User::MITRA_PERUSAHAAN,
+            'account_status' => 'active',
+        ]);
+
+        CompanyProfile::query()->create([
+            'user_id' => $mitra->id,
+            'company_name' => 'PT Old',
+            'nib' => '1234567890123',
+            'industry_sector' => 'IT',
+            'employee_total_range' => '1-50',
+            'office_address' => 'Jakarta',
+            'short_description' => 'Test company',
+            'company_logo_path' => 'defaults/profile-picture.png',
+            'kemenkumham_decree_path' => 'defaults/document.pdf',
+        ]);
+
+        Sanctum::actingAs($mitra);
+
+        $response = $this->putJson('/api/profile', [
+            'profile' => ['company_name' => 'PT Synced New'],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user.name', 'PT Synced New')
+            ->assertJsonPath('data.role_profile.company_name', 'PT Synced New');
+    }
+
+    public function test_profile_name_wins_when_both_sent_with_different_values(): void
+    {
+        $admin = User::factory()->create([
+            'name' => 'Original',
+            'role' => User::ROLE_ADMIN,
+            'account_status' => 'active',
+        ]);
+
+        AdminProfile::query()->create([
+            'user_id' => $admin->id,
+            'full_name' => 'Original',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->putJson('/api/profile', [
+            'user' => ['name' => 'User Side'],
+            'profile' => ['full_name' => 'Profile Wins'],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user.name', 'Profile Wins')
+            ->assertJsonPath('data.role_profile.full_name', 'Profile Wins');
     }
 
     public function test_admin_profile_update_rejects_unsupported_fields(): void

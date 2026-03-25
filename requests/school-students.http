@@ -68,7 +68,7 @@ Content-Disposition: form-data; name="class_year"
 
 2024
 --BoundaryKOMPETA
-Content-Disposition: form-data; name="phone_number"
+Content-Disposition: form-data; name="socials[whatsapp]"
 
 081234567890
 --BoundaryKOMPETA
@@ -101,15 +101,17 @@ Content-Type: application/json
   "school_origin": "SMK Negeri 1 Contoh",
   "graduation_status": "Lulus",
   "class_year": "2023",
-  "phone_number": "089876543210",
+  "socials": {
+    "whatsapp": "089876543210"
+  },
   "address": "Jl. Alumni No. 10, Bandung"
 }
 
 ###
 
 ### ============================================================
-### 3. TAMBAH SISWA (tanpa phone_number, address)
-###    phone_number dan address bersifat opsional
+### 3. TAMBAH SISWA (tanpa socials, address)
+###    socials dan address bersifat opsional
 ###    class_year WAJIB diisi
 ### ============================================================
 
@@ -313,7 +315,7 @@ Content-Disposition: form-data; name="class_year"
 
 2024
 --BoundaryKOMPETA
-Content-Disposition: form-data; name="phone_number"
+Content-Disposition: form-data; name="socials[whatsapp]"
 
 082111222333
 --BoundaryKOMPETA
@@ -401,7 +403,7 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ###     File     : .xlsx, .xls, atau .csv (maks 2MB)
 ###     Kolom wajib: full_name, nisn, major, school_origin,
 ###                  graduation_status, class_year
-###     Kolom opsional: phone_number, address
+###     Kolom opsional: address
 ###     Photo profile TIDAK termasuk dalam import
 ### ============================================================
 

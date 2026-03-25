@@ -48,7 +48,7 @@ class SchoolStudentController extends Controller
                 'graduation_status' => $validated['graduation_status'],
                 'unique_code' => $this->generateUniqueCode(),
                 'class_year' => $validated['class_year'],
-                'phone_number' => $validated['phone_number'] ?? null,
+                'socials' => $validated['socials'] ?? StudentProfile::DEFAULT_SOCIALS,
                 'address' => $validated['address'] ?? null,
             ]);
 

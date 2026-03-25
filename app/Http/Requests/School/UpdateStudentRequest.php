@@ -22,7 +22,11 @@ class UpdateStudentRequest extends FormRequest
             'school_origin' => ['sometimes', 'string', 'max:255'],
             'graduation_status' => ['sometimes', 'string', 'max:100'],
             'class_year' => ['nullable', 'digits:4'],
-            'phone_number' => ['nullable', 'string', 'max:30'],
+            'socials' => ['nullable', 'array'],
+            'socials.website' => ['nullable', 'url', 'max:255'],
+            'socials.instagram' => ['nullable', 'url', 'max:255'],
+            'socials.linkedin' => ['nullable', 'url', 'max:255'],
+            'socials.whatsapp' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
         ];
     }

@@ -10,7 +10,7 @@ paths:
         - **sekolah** → `school_profiles` (`school_name`, `npsn`, `address`, `accreditation`, `expertise_fields`, `short_description`, dll.)
         - **mitra perusahaan** → `company_profiles` (`company_name`, `nib`, `industry_sector`, `employee_total_range`, `office_address`, `short_description`, dll.)
         - **mitra umkm** → `umkm_profiles` (`business_name`, `owner_nik`, `business_type`, `business_address`, `short_description`, dll.)
-        - **siswa** → `student_profiles` + `job_applications` (`full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`, `description`, `phone_number`, `address`, dll.)
+        - **siswa** → `student_profiles` + `job_applications` (`full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`, `description`, `socials`, `address`, dll.)
 
         Untuk siswa, `role_profile` juga menyertakan `job_applications` — daftar lamaran kerja aktif.
       responses:
@@ -67,7 +67,11 @@ paths:
                         graduation_status: graduated
                         class_year: "2024"
                         description: Siswa berprestasi dengan fokus bidang sains dan data.
-                        phone_number: "082123456789"
+                        socials:
+                          website: null
+                          instagram: https://instagram.com/budisantoso
+                          linkedin: null
+                          whatsapp: "082123456789"
                         address: Bogor, Jawa Barat
                         job_applications:
                           - company_name: PT Binajasa Sumber Sarana
@@ -103,7 +107,8 @@ paths:
         Endpoint menerima `multipart/form-data` untuk mendukung upload file (logo, gambar, dokumen) bersama data teks.
 
         **Payload:**
-        - `user[name]` (opsional): nama tampilan user
+        - `user[name]` (opsional): nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)
+        - `user[email]` (opsional): email user (sekolah, mitra perusahaan, mitra umkm)
         - `profile[field]` (opsional): data profile spesifik role
         - File upload di level root (opsional): file gambar/dokumen sesuai role
 
@@ -112,9 +117,18 @@ paths:
         |---------------------|---------------------|
         | admin               | `full_name` |
         | sekolah             | `accreditation`, `address`, `expertise_fields`, `short_description`, `socials` |
-        | mitra perusahaan    | `industry_sector`, `employee_total_range`, `office_address`, `socials`, `short_description` |
-        | mitra umkm          | `owner_personal_nib`, `business_type`, `business_address`, `socials`, `short_description` |
-        | siswa               | `full_name`, `description`, `phone_number`, `address` |
+        | mitra perusahaan    | `company_name`, `industry_sector`, `employee_total_range`, `office_address`, `socials`, `short_description` |
+        | mitra umkm          | `business_name`, `owner_personal_nib`, `business_type`, `business_address`, `socials`, `short_description` |
+        | siswa               | `full_name`, `description`, `socials`, `address` |
+
+        **Field `user` per role:**
+        | Role                | Field yang diterima |
+        |---------------------|---------------------|
+        | admin               | `name` |
+        | sekolah             | `email` |
+        | mitra perusahaan    | `name`, `email` |
+        | mitra umkm          | `name`, `email` |
+        | siswa               | `name` |
 
         **File upload per role:**
         | Role                | Field file | Tipe | Max size |
@@ -146,7 +160,12 @@ paths:
                     name:
                       type: string
                       maxLength: 255
-                      description: Nama tampilan user
+                      description: "Nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)"
+                    email:
+                      type: string
+                      format: email
+                      maxLength: 255
+                      description: "Email user (sekolah, mitra perusahaan, mitra umkm)"
                 profile:
                   type: object
                   description: Data profile spesifik role (lihat tabel di description)
@@ -155,14 +174,18 @@ paths:
                       type: string
                       maxLength: 255
                       description: "[Admin/Siswa] Nama lengkap"
+                    company_name:
+                      type: string
+                      maxLength: 255
+                      description: "[Perusahaan] Nama perusahaan"
+                    business_name:
+                      type: string
+                      maxLength: 255
+                      description: "[UMKM] Nama usaha"
                     description:
                       type: string
                       maxLength: 2000
                       description: "[Siswa] Deskripsi diri"
-                    phone_number:
-                      type: string
-                      maxLength: 30
-                      description: "[Siswa] Nomor telepon"
                     address:
                       type: string
                       description: "[Siswa/Sekolah] Alamat"
@@ -193,7 +216,7 @@ paths:
                     socials:
                       type: object
                       nullable: true
-                      description: "[Sekolah/Perusahaan/UMKM] Sosial media"
+                      description: "[Sekolah/Perusahaan/UMKM/Siswa] Sosial media"
                       properties:
                         website:
                           type: string
@@ -284,6 +307,8 @@ paths:
               sekolah:
                 summary: Update profile sekolah
                 value:
+                  user:
+                    email: school.a@kompeta.test
                   profile:
                     short_description: Sekolah vokasi unggulan.
                     address: Jl. Pendidikan No. 1
@@ -297,7 +322,11 @@ paths:
               mitra_perusahaan:
                 summary: Update profile mitra perusahaan
                 value:
+                  user:
+                    name: PT Binajasa Sumber Sarana
+                    email: mitra.company.a@kompeta.test
                   profile:
+                    company_name: PT Binajasa Sumber Sarana
                     short_description: Perusahaan software enterprise.
                     office_address: Jl. Sudirman No. 10
                     socials:
@@ -310,7 +339,11 @@ paths:
               mitra_umkm:
                 summary: Update profile mitra UMKM
                 value:
+                  user:
+                    name: Roti Bunda Rasa
+                    email: mitra.umkm.a@kompeta.test
                   profile:
+                    business_name: Roti Bunda Rasa
                     short_description: UMKM kuliner lokal yang berkembang.
                     business_address: Jl. Pasar No. 5
                     business_type: Kuliner
@@ -321,10 +354,14 @@ paths:
               siswa:
                 summary: Update profile siswa
                 value:
+                  user:
+                    name: Budi Santoso
                   profile:
                     full_name: Budi Santoso
                     description: Siswa RPL fokus backend Laravel.
-                    phone_number: "081234567890"
+                    socials:
+                      instagram: https://instagram.com/budisantoso
+                      whatsapp: "081234567890"
                     address: Jakarta Selatan
       responses:
         "200":
@@ -380,7 +417,11 @@ paths:
                         graduation_status: graduated
                         class_year: "2024"
                         description: Siswa berprestasi dengan fokus bidang sains dan data.
-                        phone_number: "082123456789"
+                        socials:
+                          website: null
+                          instagram: https://instagram.com/budisantoso
+                          linkedin: null
+                          whatsapp: "082123456789"
                         address: Bogor, Jawa Barat
                         job_applications:
                           - company_name: PT Binajasa Sumber Sarana

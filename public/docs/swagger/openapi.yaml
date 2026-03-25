@@ -886,9 +886,21 @@ components:
         description:
           nullable: true
           type: string
-        phone_number:
-          nullable: true
-          type: string
+        socials:
+          type: object
+          properties:
+            website:
+              nullable: true
+              type: string
+            instagram:
+              nullable: true
+              type: string
+            linkedin:
+              nullable: true
+              type: string
+            whatsapp:
+              nullable: true
+              type: string
         address:
           nullable: true
           type: string
@@ -1538,10 +1550,26 @@ components:
           minLength: 4
           maxLength: 4
           example: "2024"
-        phone_number:
-          type: string
-          maxLength: 30
-          example: "082123456789"
+        socials:
+          type: object
+          nullable: true
+          properties:
+            website:
+              type: string
+              format: uri
+              nullable: true
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+            linkedin:
+              type: string
+              format: uri
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
+              maxLength: 30
         address:
           type: string
           example: Bogor, Jawa Barat
@@ -1634,10 +1662,26 @@ components:
           minLength: 4
           maxLength: 4
           example: "2025"
-        phone_number:
-          type: string
-          maxLength: 30
-          example: "082123456789"
+        socials:
+          type: object
+          nullable: true
+          properties:
+            website:
+              type: string
+              format: uri
+              nullable: true
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+            linkedin:
+              type: string
+              format: uri
+              nullable: true
+            whatsapp:
+              type: string
+              nullable: true
+              maxLength: 30
         address:
           type: string
           example: Jakarta Selatan

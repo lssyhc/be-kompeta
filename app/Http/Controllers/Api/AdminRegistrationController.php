@@ -296,6 +296,17 @@ class AdminRegistrationController extends Controller
             return $this->errorResponse('Dokumen tidak ditemukan.', 404);
         }
 
-        return Storage::disk('local')->download($path);
+        try {
+            return Storage::disk('local')->download($path);
+        } catch (Exception $e) {
+            Log::error('Gagal mengunduh dokumen registrasi', [
+                'user_id' => $id,
+                'type' => $type,
+                'path' => $path,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->errorResponse('Gagal mengunduh dokumen.', 500);
+        }
     }
 }

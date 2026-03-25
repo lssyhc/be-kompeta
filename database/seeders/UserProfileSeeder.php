@@ -246,7 +246,7 @@ class UserProfileSeeder extends Seeder
                 'owner_personal_nib' => null,
                 'business_type' => 'Fashion',
                 'business_address' => 'Depok, Jawa Barat',
-                'socials' => null,
+                'socials' => UmkmProfile::DEFAULT_SOCIALS,
                 'umkm_logo_path' => 'https://via.placeholder.com/200x200?text=Rejected',
                 'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/rejected-jaya-ktp.jpg', 'KTP Owner UMKM Ditolak Jaya'),
                 'short_description' => 'Data UMKM contoh untuk status registrasi rejected.',
@@ -348,7 +348,7 @@ class UserProfileSeeder extends Seeder
                 'npsn' => '20209999',
                 'accreditation' => 'B',
                 'address' => 'Malang, Jawa Timur',
-                'socials' => null,
+                'socials' => SchoolProfile::DEFAULT_SOCIALS,
                 'expertise_fields' => ['DKV', 'MM'],
                 'logo_path' => 'https://via.placeholder.com/200x200?text=SMK+Pending',
                 'image_1_path' => null,
@@ -390,7 +390,12 @@ class UserProfileSeeder extends Seeder
                 'class_year' => '2024',
                 'unique_code' => 'BUDI0001234X9YZ',
                 'description' => 'Siswa berprestasi dengan fokus bidang sains dan data.',
-                'phone_number' => '082123456789',
+                'socials' => [
+                    'website' => null,
+                    'instagram' => 'https://instagram.com/budisantoso',
+                    'linkedin' => null,
+                    'whatsapp' => '082123456789',
+                ],
                 'address' => 'Bogor, Jawa Barat',
             ]
         );
@@ -418,7 +423,12 @@ class UserProfileSeeder extends Seeder
                 'class_year' => '2025',
                 'unique_code' => 'SITI0001234X9YZ',
                 'description' => 'Siswa aktif dalam kegiatan akademik dan organisasi.',
-                'phone_number' => '081987654321',
+                'socials' => [
+                    'website' => null,
+                    'instagram' => null,
+                    'linkedin' => null,
+                    'whatsapp' => '081987654321',
+                ],
                 'address' => 'Bogor, Jawa Barat',
             ]
         );
@@ -446,7 +456,12 @@ class UserProfileSeeder extends Seeder
                 'class_year' => '2024',
                 'unique_code' => 'qzPSGd04erQblY8G',
                 'description' => 'Lulusan terbaik dengan minat karier operasional bisnis.',
-                'phone_number' => '083456789012',
+                'socials' => [
+                    'website' => null,
+                    'instagram' => null,
+                    'linkedin' => 'https://linkedin.com/in/ahmadwijaya',
+                    'whatsapp' => '083456789012',
+                ],
                 'address' => 'Jakarta, DKI Jakarta',
             ]
         );
@@ -475,7 +490,7 @@ class UserProfileSeeder extends Seeder
                     'npsn' => '31'.str_pad((string) $i, 6, '0', STR_PAD_LEFT),
                     'accreditation' => $i % 3 === 0 ? 'B' : 'A',
                     'address' => "Jl. Pendidikan No. {$i}, Kota Contoh",
-                    'socials' => null,
+                    'socials' => SchoolProfile::DEFAULT_SOCIALS,
                     'expertise_fields' => ['TKJ', 'RPL', 'AKL'],
                     'logo_path' => "https://via.placeholder.com/200x200?text=SMK+Bulk+{$index}",
                     'image_1_path' => "https://via.placeholder.com/400x300?text=SMK+Bulk+{$index}+1",
@@ -528,9 +543,9 @@ class UserProfileSeeder extends Seeder
                         'whatsapp' => null,
                     ],
                     'short_description' => "Perusahaan dummy {$companyName} untuk simulasi mitra tipe perusahaan.",
-                    'company_logo_path' => "profiles/companies/logos/mitra-industri-{$index}.jpg",
-                    'image_1_path' => "profiles/companies/gallery/mitra-industri-{$index}-1.jpg",
-                    'image_2_path' => "profiles/companies/gallery/mitra-industri-{$index}-2.jpg",
+                    'company_logo_path' => "https://via.placeholder.com/200x200?text=Mitra+Industri+{$index}",
+                    'image_1_path' => "https://via.placeholder.com/400x300?text=Mitra+Industri+{$index}+1",
+                    'image_2_path' => "https://via.placeholder.com/400x300?text=Mitra+Industri+{$index}+2",
                     'image_3_path' => null,
                     'image_4_path' => null,
                     'image_5_path' => null,
@@ -565,7 +580,7 @@ class UserProfileSeeder extends Seeder
                     'owner_personal_nib' => "NIB-UMKM-BULK-{$index}",
                     'business_type' => $i % 2 === 0 ? 'Kuliner' : 'Kerajinan',
                     'business_address' => "Sentra UMKM No. {$i}, Kota Contoh",
-                    'socials' => null,
+                    'socials' => UmkmProfile::DEFAULT_SOCIALS,
                     'umkm_logo_path' => "https://via.placeholder.com/200x200?text=UMKM+Bulk+{$index}",
                     'owner_ktp_photo_path' => $this->storeLocalFile(
                         "profiles/umkm/ktp/umkm-bulk-{$index}-ktp.jpg",
@@ -601,7 +616,7 @@ class UserProfileSeeder extends Seeder
                 'npsn' => '31999999',
                 'accreditation' => 'A',
                 'address' => 'Jl. Pendidikan Nasional No. 200, Kota Contoh',
-                'socials' => null,
+                'socials' => SchoolProfile::DEFAULT_SOCIALS,
                 'expertise_fields' => ['RPL', 'TKJ', 'AKL', 'DKV'],
                 'logo_path' => 'https://via.placeholder.com/200x200?text=SMK+Talenta',
                 'image_1_path' => 'https://via.placeholder.com/400x300?text=SMK+Talenta+1',
@@ -645,7 +660,7 @@ class UserProfileSeeder extends Seeder
                     'class_year' => $graduationStatus === 'graduated' ? '2024' : '2026',
                     'unique_code' => 'MS'.str_pad((string) $i, 14, '0', STR_PAD_LEFT),
                     'description' => "Profil dummy {$fullName} untuk simulasi data siswa sekolah besar.",
-                    'phone_number' => '08'.str_pad((string) $i, 10, '0', STR_PAD_LEFT),
+                    'socials' => StudentProfile::DEFAULT_SOCIALS,
                     'address' => 'Kota Contoh, Indonesia',
                 ]
             );
@@ -654,7 +669,16 @@ class UserProfileSeeder extends Seeder
 
     private function storeLocalFile(string $path, string $content): string
     {
-        Storage::disk('local')->put($path, $content);
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        if ($extension === 'pdf') {
+            $binary = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF";
+        } else {
+            // Minimal valid JPEG (1x1 pixel)
+            $binary = base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AJQAB/9k=');
+        }
+
+        Storage::disk('local')->put($path, $binary);
 
         return $path;
     }

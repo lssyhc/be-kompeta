@@ -60,7 +60,7 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 ###    Endpoint: PUT /api/profile
 ###    Field yang dapat diisi sendiri oleh siswa:
 ###    - description (max 2000 karakter)
-###    - phone_number
+###    - socials
 ###    - address
 ### ============================================================
 
@@ -72,7 +72,10 @@ Content-Type: application/json
 {
   "profile": {
     "description": "Saya adalah siswa SMK jurusan RPL yang memiliki minat di bidang pengembangan web dan mobile. Berpengalaman dalam JavaScript, PHP, dan Python.",
-    "phone_number": "081234567890",
+    "socials": {
+      "instagram": "https://instagram.com/siswa",
+      "whatsapp": "081234567890"
+    },
     "address": "Jl. Siswa Berprestasi No. 5, Jakarta Selatan"
   }
 }
@@ -97,7 +100,7 @@ Content-Type: application/json
 ###
 
 ### ============================================================
-### 3. UPDATE PROFIL SISWA - Hanya phone & address
+### 3. UPDATE PROFIL SISWA - Hanya socials & address
 ### ============================================================
 
 PUT {{baseUrl}}/profile
@@ -107,7 +110,9 @@ Content-Type: application/json
 
 {
   "profile": {
-    "phone_number": "087812345678",
+    "socials": {
+      "whatsapp": "087812345678"
+    },
     "address": "Jl. Baru No. 99, Bandung"
   }
 }

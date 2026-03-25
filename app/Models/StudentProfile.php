@@ -16,6 +16,13 @@ class StudentProfile extends Model
         'photo_profile_url',
     ];
 
+    public const DEFAULT_SOCIALS = [
+        'website' => null,
+        'instagram' => null,
+        'linkedin' => null,
+        'whatsapp' => null,
+    ];
+
     protected $fillable = [
         'user_id',
         'school_user_id',
@@ -28,9 +35,23 @@ class StudentProfile extends Model
         'class_year',
         'unique_code',
         'description',
-        'phone_number',
+        'socials',
         'address',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'socials' => 'array',
+        ];
+    }
+
+    public function getSocialsAttribute(?string $value): array
+    {
+        $decoded = $value ? json_decode($value, true) : [];
+
+        return array_merge(self::DEFAULT_SOCIALS, $decoded ?? []);
+    }
 
     public function user(): BelongsTo
     {

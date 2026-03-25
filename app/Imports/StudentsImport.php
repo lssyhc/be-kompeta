@@ -51,7 +51,7 @@ class StudentsImport implements SkipsOnFailure, ToCollection, WithHeadingRow, Wi
                     'class_year' => (string) $row['class_year'],
                     'unique_code' => $this->generateUniqueCode(),
                     'photo_profile_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
-                    'phone_number' => isset($row['phone_number']) ? (string) $row['phone_number'] : null,
+                    'socials' => StudentProfile::DEFAULT_SOCIALS,
                     'address' => $row['address'] ?? null,
                 ]);
 
@@ -69,7 +69,6 @@ class StudentsImport implements SkipsOnFailure, ToCollection, WithHeadingRow, Wi
             'school_origin' => ['required', 'string', 'max:255'],
             'graduation_status' => ['required', 'string', 'max:100'],
             'class_year' => ['required', 'digits:4'],
-            'phone_number' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
         ];
     }

@@ -37,11 +37,25 @@ class UmkmProfile extends Model
         'image_5_path',
     ];
 
+    public const DEFAULT_SOCIALS = [
+        'website' => null,
+        'instagram' => null,
+        'linkedin' => null,
+        'whatsapp' => null,
+    ];
+
     protected function casts(): array
     {
         return [
             'socials' => 'array',
         ];
+    }
+
+    public function getSocialsAttribute(?string $value): array
+    {
+        $decoded = $value ? json_decode($value, true) : [];
+
+        return array_merge(self::DEFAULT_SOCIALS, $decoded ?? []);
     }
 
     public function user()

@@ -105,7 +105,7 @@ paths:
         3. Generate `unique_code` 8 karakter acak untuk login siswa
 
         **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`
-        **Field opsional:** `phone_number`, `address`, `photo_profile` (file gambar)
+        **Field opsional:** `socials`, `address`, `photo_profile` (file gambar)
 
         Jika `photo_profile` tidak dikirim, sistem akan otomatis menggunakan foto profil default.
 
@@ -123,7 +123,9 @@ paths:
               school_origin: SMA Negeri 1 Bogor
               graduation_status: graduated
               class_year: "2024"
-              phone_number: "082123456789"
+              socials:
+                instagram: https://instagram.com/budisantoso
+                whatsapp: "082123456789"
               address: Bogor, Jawa Barat
       responses:
         "201":
@@ -205,7 +207,6 @@ paths:
         | `school_origin` | Ya | Asal sekolah |
         | `graduation_status` | Ya | Status kelulusan |
         | `class_year` | Ya | Angkatan (4 digit) |
-        | `phone_number` | Tidak | Nomor telepon |
         | `address` | Tidak | Alamat |
 
         **Catatan:**
@@ -412,7 +413,11 @@ paths:
                     class_year: "2024"
                     unique_code: BUDI0001234X9YZ
                     description: Siswa berprestasi dengan fokus bidang sains dan data.
-                    phone_number: "082123456789"
+                    socials:
+                      website: null
+                      instagram: https://instagram.com/budisantoso
+                      linkedin: null
+                      whatsapp: "082123456789"
                     address: Bogor, Jawa Barat
                 errors: null
                 meta: null
@@ -505,7 +510,11 @@ paths:
                     class_year: "2025"
                     unique_code: BUDI0001234X9YZ
                     description: Siswa berprestasi dengan fokus bidang sains dan data.
-                    phone_number: "082123456789"
+                    socials:
+                      website: null
+                      instagram: https://instagram.com/budisantoso
+                      linkedin: null
+                      whatsapp: "082123456789"
                     address: Jakarta Selatan
                 errors: null
                 meta: null

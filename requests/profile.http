@@ -161,11 +161,19 @@ Content-Type: application/json
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 
 {
+  "user": {
+    "email": "school.a.updated@kompeta.test"
+  },
   "profile": {
     "short_description": "Sekolah vokasi unggulan untuk bidang teknologi dan bisnis.",
     "address": "Jl. Pendidikan No. 1, Bogor",
     "accreditation": "A",
-    "expertise_fields": ["RPL", "TKJ", "AKL"]
+    "expertise_fields": ["RPL", "TKJ", "AKL"],
+    "socials": {
+      "website": "https://smkn1contoh.sch.id",
+      "instagram": "https://instagram.com/smkn1contoh",
+      "whatsapp": "6281200001111"
+    }
   }
 }
 
@@ -180,6 +188,10 @@ Accept: application/json
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 Content-Type: multipart/form-data; boundary=----SekolahUpload
 
+------SekolahUpload
+Content-Disposition: form-data; name="user[email]"
+
+school.a.updated@kompeta.test
 ------SekolahUpload
 Content-Disposition: form-data; name="profile[short_description]"
 
@@ -227,7 +239,12 @@ Content-Type: application/json
 Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
 
 {
+  "user": {
+    "name": "PT Binajasa Sumber Sarana Tbk",
+    "email": "mitra.company.updated@kompeta.test"
+  },
   "profile": {
+    "company_name": "PT Binajasa Sumber Sarana Tbk",
     "short_description": "Perusahaan outsourcing dan operasional bisnis.",
     "office_address": "Jakarta Selatan",
     "socials": {
@@ -252,6 +269,18 @@ Accept: application/json
 Authorization: Bearer {{loginMitraPerusahaan.response.body.$.data.token}}
 Content-Type: multipart/form-data; boundary=----PerusahaanUpload
 
+------PerusahaanUpload
+Content-Disposition: form-data; name="user[name]"
+
+PT Binajasa Sumber Sarana Tbk
+------PerusahaanUpload
+Content-Disposition: form-data; name="user[email]"
+
+mitra.company.updated@kompeta.test
+------PerusahaanUpload
+Content-Disposition: form-data; name="profile[company_name]"
+
+PT Binajasa Sumber Sarana Tbk
 ------PerusahaanUpload
 Content-Disposition: form-data; name="profile[short_description]"
 
@@ -295,11 +324,20 @@ Content-Type: application/json
 Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
 
 {
+  "user": {
+    "name": "Roti Bunda Rasa Premium",
+    "email": "mitra.umkm.updated@kompeta.test"
+  },
   "profile": {
+    "business_name": "Roti Bunda Rasa Premium",
     "short_description": "UMKM bakery dengan fokus produksi harian.",
     "business_address": "Semarang, Jawa Tengah",
     "business_type": "Kuliner",
-    "owner_personal_nib": "NIB-UMKM-001"
+    "owner_personal_nib": "NIB-UMKM-001",
+    "socials": {
+      "instagram": "https://instagram.com/rotibundarasa",
+      "whatsapp": "6281399998888"
+    }
   }
 }
 
@@ -314,6 +352,18 @@ Accept: application/json
 Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
 Content-Type: multipart/form-data; boundary=----UmkmUpload
 
+------UmkmUpload
+Content-Disposition: form-data; name="user[name]"
+
+Roti Bunda Rasa Premium
+------UmkmUpload
+Content-Disposition: form-data; name="user[email]"
+
+mitra.umkm.updated@kompeta.test
+------UmkmUpload
+Content-Disposition: form-data; name="profile[business_name]"
+
+Roti Bunda Rasa Premium
 ------UmkmUpload
 Content-Disposition: form-data; name="profile[short_description]"
 
@@ -348,7 +398,7 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 
 {
   "profile": {
-    "phone_number": "081234567890"
+    "npsn": "12345678"
   }
 }
 
@@ -378,7 +428,10 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
   "profile": {
     "full_name": "Budi Santoso",
     "description": "Siswa RPL fokus backend Laravel.",
-    "phone_number": "081234567890",
+    "socials": {
+      "instagram": "https://instagram.com/budisantoso",
+      "whatsapp": "081234567890"
+    },
     "address": "Jakarta Selatan"
   }
 }
@@ -399,7 +452,11 @@ Content-Disposition: form-data; name="profile[description]"
 
 Siswa RPL fokus backend Laravel.
 ------SiswaUpload
-Content-Disposition: form-data; name="profile[phone_number]"
+Content-Disposition: form-data; name="profile[socials][instagram]"
+
+https://instagram.com/budisantoso
+------SiswaUpload
+Content-Disposition: form-data; name="profile[socials][whatsapp]"
 
 081234567890
 ------SiswaUpload

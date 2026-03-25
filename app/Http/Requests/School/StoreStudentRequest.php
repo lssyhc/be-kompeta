@@ -21,7 +21,11 @@ class StoreStudentRequest extends FormRequest
             'school_origin' => ['required', 'string', 'max:255'],
             'graduation_status' => ['required', 'string', 'max:100'],
             'class_year' => ['required', 'digits:4'],
-            'phone_number' => ['nullable', 'string', 'max:30'],
+            'socials' => ['nullable', 'array'],
+            'socials.website' => ['nullable', 'url', 'max:255'],
+            'socials.instagram' => ['nullable', 'url', 'max:255'],
+            'socials.linkedin' => ['nullable', 'url', 'max:255'],
+            'socials.whatsapp' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
         ];
     }

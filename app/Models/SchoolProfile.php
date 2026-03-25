@@ -37,12 +37,26 @@ class SchoolProfile extends Model
         'operational_license_path',
     ];
 
+    public const DEFAULT_SOCIALS = [
+        'website' => null,
+        'instagram' => null,
+        'linkedin' => null,
+        'whatsapp' => null,
+    ];
+
     protected function casts(): array
     {
         return [
             'expertise_fields' => 'array',
             'socials' => 'array',
         ];
+    }
+
+    public function getSocialsAttribute(?string $value): array
+    {
+        $decoded = $value ? json_decode($value, true) : [];
+
+        return array_merge(self::DEFAULT_SOCIALS, $decoded ?? []);
     }
 
     public function user()

@@ -50,6 +50,7 @@ tags:
   - name: School Students
   - name: Student Portfolio
   - name: Student Job Applications
+  - name: Mitra Job Applications
   - name: Partnership Proposals
   - name: Explore
   - name: For You
@@ -97,6 +98,13 @@ paths:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}"
   /student/job-applications/{id}/cv:
     $ref: "./paths/student-job-applications.yaml#/paths/~1student~1job-applications~1{id}~1cv"
+
+  /mitra/job-applications:
+    $ref: "./paths/mitra-job-applications.yaml#/paths/~1mitra~1job-applications"
+  /mitra/job-applications/{id}:
+    $ref: "./paths/mitra-job-applications.yaml#/paths/~1mitra~1job-applications~1{id}"
+  /mitra/job-applications/{id}/cv:
+    $ref: "./paths/mitra-job-applications.yaml#/paths/~1mitra~1job-applications~1{id}~1cv"
 
   /partnership-proposals:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals"
@@ -417,6 +425,29 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/StudentJobApplication"
+
+    SuccessEnvelopeMitraJobApplication:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/MitraJobApplication"
+
+    SuccessEnvelopeMitraJobApplicationList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/MitraJobApplication"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
 
     SuccessEnvelopeStudentJobApplicationList:
       allOf:
@@ -1084,6 +1115,55 @@ components:
           type: string
         has_cv_file:
           type: boolean
+
+    MitraJobApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+        job_vacancy_id:
+          type: integer
+        job_slug:
+          nullable: true
+          type: string
+        position_name:
+          type: string
+        status:
+          type: string
+          enum: [submitted]
+        applied_at:
+          nullable: true
+          type: string
+          format: date-time
+        cover_letter:
+          nullable: true
+          type: string
+        has_cv_file:
+          type: boolean
+        student:
+          nullable: true
+          type: object
+          properties:
+            id:
+              type: integer
+            full_name:
+              type: string
+            photo_profile_url:
+              nullable: true
+              type: string
+            school_origin:
+              nullable: true
+              type: string
+            major:
+              nullable: true
+              type: string
+            graduation_status:
+              nullable: true
+              type: string
+            skills:
+              type: array
+              items:
+                type: string
 
     PartnershipProposal:
       type: object

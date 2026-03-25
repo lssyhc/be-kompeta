@@ -17,7 +17,7 @@ class UpdateArticleRequest extends FormRequest
             'content_type_id' => ['sometimes', 'integer', 'exists:content_types,id'],
             'title' => ['sometimes', 'string', 'max:255'],
             'body' => ['sometimes', 'string'],
-            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'thumbnail' => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
             'is_published' => ['sometimes', 'boolean'],
             'published_at' => ['nullable', 'date'],
         ];

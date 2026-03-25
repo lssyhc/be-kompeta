@@ -1,0 +1,94 @@
+### ============================================================
+### MITRA JOB APPLICATIONS API - REST Client Testing
+### ============================================================
+### Data seeder yang tersedia:
+### - mitra.company.a@kompeta.test → punya vacancy: accounting-staff-1602be (id=1), security-freelance-jakarta (id=2)
+###   → menerima lamaran dari Budi Santoso (NISN 0001234567) untuk Accounting Staff
+### - mitra.company.b@kompeta.test → punya vacancy: data-entry-operator-bandung (id=3), junior-qa-tester-remote (id=4)
+###   → menerima lamaran dari Ahmad Wijaya (NISN 0002345678) untuk Data Entry Operator
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### Login mitra perusahaan (PT Binajasa Sumber Sarana)
+# @name loginMitra
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.company.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
+### ============================================================
+### 1) LIST LAMARAN MASUK (semua)
+### Endpoint: GET /api/mitra/job-applications
+### ============================================================
+
+# @name listApplications
+GET {{baseUrl}}/mitra/job-applications
+Accept: application/json
+Authorization: Bearer {{loginMitra.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 2) LIST LAMARAN MASUK - DENGAN PAGINATION
+### ============================================================
+
+# @name listApplicationsPaginated
+GET {{baseUrl}}/mitra/job-applications?page=1&per_page=5
+Accept: application/json
+Authorization: Bearer {{loginMitra.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 3) LIST LAMARAN MASUK - FILTER BY JOB VACANCY
+### Vacancy id=1 = accounting-staff-1602be (milik mitra.company.a)
+### ============================================================
+
+# @name listApplicationsByVacancy
+GET {{baseUrl}}/mitra/job-applications?job_vacancy_id=1
+Accept: application/json
+Authorization: Bearer {{loginMitra.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 4) DETAIL LAMARAN
+### Endpoint: GET /api/mitra/job-applications/{id}
+### Gunakan ID dari response list (#1): listApplications.response.body.$.data[0].id
+### ============================================================
+
+@applicationId = {{listApplications.response.body.$.data[0].id}}
+
+# @name showApplication
+GET {{baseUrl}}/mitra/job-applications/{{applicationId}}
+Accept: application/json
+Authorization: Bearer {{loginMitra.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 5) DOWNLOAD CV PELAMAR
+### Endpoint: GET /api/mitra/job-applications/{id}/cv
+### ============================================================
+
+# @name downloadCv
+GET {{baseUrl}}/mitra/job-applications/{{applicationId}}/cv
+Accept: application/octet-stream
+Authorization: Bearer {{loginMitra.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 6) AKSES TANPA AUTH (expect 401)
+### ============================================================
+
+# @name noAuthTest
+GET {{baseUrl}}/mitra/job-applications
+Accept: application/json

@@ -1,0 +1,256 @@
+paths:
+  /mitra/job-applications:
+    get:
+      tags: [Mitra Job Applications]
+      summary: Daftar lamaran masuk ke mitra
+      description: |
+        Menampilkan daftar lamaran kerja yang masuk ke lowongan milik mitra yang sedang login (paginated).
+        Diurutkan berdasarkan `applied_at`, `created_at` (terbaru dulu).
+
+        Hanya user dengan role `mitra` yang dapat mengakses.
+
+        **Filter opsional:**
+        - `job_vacancy_id`: Filter berdasarkan lowongan tertentu
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Nomor halaman (dimulai dari 1)
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+          description: Jumlah item per halaman (default 12, maks 50)
+        - in: query
+          name: job_vacancy_id
+          schema:
+            type: integer
+          description: Filter berdasarkan ID lowongan tertentu
+      responses:
+        "200":
+          description: Daftar lamaran masuk berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobApplicationList"
+              example:
+                success: true
+                message: Daftar lamaran masuk berhasil diambil.
+                data:
+                  - id: 1
+                    job_vacancy_id: 1
+                    job_slug: accounting-staff-1602be
+                    position_name: Accounting Staff
+                    status: submitted
+                    applied_at: "2026-03-21T09:00:00+07:00"
+                    cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
+                    has_cv_file: true
+                    student:
+                      id: 1
+                      full_name: Budi Santoso
+                      photo_profile_url: null
+                      school_origin: SMA Negeri 1 Bogor
+                      major: Akuntansi
+                      graduation_status: active
+                      skills: []
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengakses lamaran masuk.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /mitra/job-applications/{id}:
+    get:
+      tags: [Mitra Job Applications]
+      summary: Detail lamaran masuk
+      description: |
+        Menampilkan detail satu lamaran kerja yang masuk ke lowongan milik mitra.
+        Termasuk profil siswa: nama, foto, asal sekolah, jurusan, skills, pengalaman, prestasi.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lamaran kerja (StudentApplication)
+          example: 1
+      responses:
+        "200":
+          description: Detail lamaran berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobApplication"
+              example:
+                success: true
+                message: Detail lamaran berhasil diambil.
+                data:
+                  id: 1
+                  job_vacancy_id: 1
+                  job_slug: accounting-staff-1602be
+                  position_name: Accounting Staff
+                  status: submitted
+                  applied_at: "2026-03-21T09:00:00+07:00"
+                  cover_letter: Saya memiliki ketelitian dan ketertarikan pada bidang akuntansi operasional.
+                  has_cv_file: true
+                  student:
+                    id: 1
+                    full_name: Budi Santoso
+                    photo_profile_url: null
+                    school_origin: SMA Negeri 1 Bogor
+                    major: Akuntansi
+                    graduation_status: active
+                    skills:
+                      - Microsoft Excel
+                      - Akuntansi Dasar
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengakses detail lamaran.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lamaran tidak ditemukan atau bukan milik mitra login
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lamaran tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /mitra/job-applications/{id}/cv:
+    get:
+      tags: [Mitra Job Applications]
+      summary: Download CV pelamar
+      description: |
+        Mengunduh file CV yang dilampirkan oleh siswa pada lamaran kerja.
+        Hanya mitra pemilik lowongan terkait yang dapat mengunduh.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lamaran kerja (StudentApplication)
+          example: 1
+      responses:
+        "200":
+          description: File CV berhasil diunduh
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengunduh CV pelamar.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lamaran atau dokumen CV tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Dokumen CV tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

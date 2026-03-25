@@ -30,11 +30,11 @@ class UpdateProfileRequest extends FormRequest
         ];
 
         $galleryRules = [
-            'image_1' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'image_2' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'image_3' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'image_4' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'image_5' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image_1' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+            'image_2' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+            'image_3' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+            'image_4' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+            'image_5' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
         ];
 
         if ($user->role === User::ROLE_SISWA) {
@@ -45,7 +45,7 @@ class UpdateProfileRequest extends FormRequest
                 'profile.full_name' => ['sometimes', 'string', 'max:255'],
                 'profile.description' => ['sometimes', 'nullable', 'string', 'max:2000'],
                 'profile.address' => ['sometimes', 'nullable', 'string'],
-                'photo_profile' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'photo_profile' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
             ], $socialsRules);
         }
 
@@ -59,7 +59,7 @@ class UpdateProfileRequest extends FormRequest
                 'profile.expertise_fields' => ['sometimes', 'array', 'min:1'],
                 'profile.expertise_fields.*' => ['required_with:profile.expertise_fields', 'string', 'max:100'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
-                'logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'logo' => ['sometimes', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
                 'operational_license' => ['sometimes', 'file', 'mimes:pdf', 'max:5120'],
             ], $socialsRules, $galleryRules);
         }
@@ -75,7 +75,7 @@ class UpdateProfileRequest extends FormRequest
                 'profile.employee_total_range' => ['sometimes', 'string', 'max:50'],
                 'profile.office_address' => ['sometimes', 'string'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
-                'company_logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'company_logo' => ['sometimes', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
                 'kemenkumham_decree' => ['sometimes', 'file', 'mimes:pdf', 'max:5120'],
             ], $socialsRules, $galleryRules);
         }
@@ -91,8 +91,8 @@ class UpdateProfileRequest extends FormRequest
                 'profile.business_type' => ['sometimes', 'string', 'max:100'],
                 'profile.business_address' => ['sometimes', 'string'],
                 'profile.short_description' => ['sometimes', 'string', 'max:1000'],
-                'umkm_logo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-                'owner_ktp_photo' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'umkm_logo' => ['sometimes', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+                'owner_ktp_photo' => ['sometimes', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
             ], $socialsRules, $galleryRules);
         }
 
@@ -102,7 +102,7 @@ class UpdateProfileRequest extends FormRequest
                 'user.name' => ['sometimes', 'string', 'max:255'],
                 'profile' => ['sometimes', 'array:full_name'],
                 'profile.full_name' => ['sometimes', 'string', 'max:255'],
-                'avatar' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'avatar' => ['sometimes', 'nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
             ];
         }
 

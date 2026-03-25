@@ -210,16 +210,24 @@ class OpenApiContractTest extends TestCase
             ['method' => 'GET', 'uri' => '/api/student/job-applications', 'docPath' => '/student/job-applications'],
             ['method' => 'POST', 'uri' => '/api/student/job-applications', 'docPath' => '/student/job-applications'],
             ['method' => 'GET', 'uri' => '/api/student/job-applications/1', 'docPath' => '/student/job-applications/{id}'],
+            ['method' => 'GET', 'uri' => '/api/student/job-applications/1/cv', 'docPath' => '/student/job-applications/{id}/cv'],
+
+            ['method' => 'GET', 'uri' => '/api/mitra/job-applications', 'docPath' => '/mitra/job-applications'],
+            ['method' => 'GET', 'uri' => '/api/mitra/job-applications/1', 'docPath' => '/mitra/job-applications/{id}'],
+            ['method' => 'GET', 'uri' => '/api/mitra/job-applications/1/cv', 'docPath' => '/mitra/job-applications/{id}/cv'],
 
             ['method' => 'GET', 'uri' => '/api/partnership-proposals', 'docPath' => '/partnership-proposals'],
             ['method' => 'POST', 'uri' => '/api/partnership-proposals', 'docPath' => '/partnership-proposals'],
             ['method' => 'GET', 'uri' => '/api/partnership-proposals/1', 'docPath' => '/partnership-proposals/{id}'],
+            ['method' => 'GET', 'uri' => '/api/partnership-proposals/1/proposal-pdf', 'docPath' => '/partnership-proposals/{id}/proposal-pdf'],
+            ['method' => 'GET', 'uri' => '/api/partnership-proposals/1/signature', 'docPath' => '/partnership-proposals/{id}/signature'],
 
             ['method' => 'POST', 'uri' => '/api/admin/blog/articles', 'docPath' => '/admin/blog/articles'],
             ['method' => 'GET', 'uri' => '/api/admin/registrations', 'docPath' => '/admin/registrations'],
             ['method' => 'GET', 'uri' => '/api/admin/registrations/1', 'docPath' => '/admin/registrations/{id}'],
             ['method' => 'PATCH', 'uri' => '/api/admin/registrations/1/approve', 'docPath' => '/admin/registrations/{id}/approve'],
             ['method' => 'PATCH', 'uri' => '/api/admin/registrations/1/reject', 'docPath' => '/admin/registrations/{id}/reject'],
+            ['method' => 'GET', 'uri' => '/api/admin/registrations/1/documents/school-license', 'docPath' => '/admin/registrations/{id}/documents/{type}'],
         ];
 
         foreach ($protectedProbes as $probe) {

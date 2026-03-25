@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
+use App\Http\Controllers\Api\MitraJobApplicationController;
 use App\Http\Controllers\Api\PartnershipProposalController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PublicStatisticsController;
@@ -78,6 +79,12 @@ Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(functi
     Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
     Route::get('/{id}/proposal-pdf', [PartnershipProposalController::class, 'downloadProposalPdf'])->whereNumber('id');
     Route::get('/{id}/signature', [PartnershipProposalController::class, 'downloadSignature'])->whereNumber('id');
+});
+
+Route::middleware('auth:sanctum')->prefix('mitra/job-applications')->group(function () {
+    Route::get('/', [MitraJobApplicationController::class, 'index']);
+    Route::get('/{id}', [MitraJobApplicationController::class, 'show'])->whereNumber('id');
+    Route::get('/{id}/cv', [MitraJobApplicationController::class, 'downloadCv'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('admin/blog')->group(function () {

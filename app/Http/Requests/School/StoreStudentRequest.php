@@ -18,7 +18,6 @@ class StoreStudentRequest extends FormRequest
             'nisn' => ['required', 'digits:10', 'unique:student_profiles,nisn'],
             'photo_profile' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'major' => ['required', 'string', 'max:100'],
-            'school_origin' => ['required', 'string', 'max:255'],
             'graduation_status' => ['required', 'string', 'max:100'],
             'class_year' => ['required', 'digits:4'],
             'socials' => ['nullable', 'array'],

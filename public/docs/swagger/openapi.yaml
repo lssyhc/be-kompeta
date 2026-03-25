@@ -1516,7 +1516,6 @@ components:
         - full_name
         - nisn
         - major
-        - school_origin
         - graduation_status
         - class_year
       properties:
@@ -1537,10 +1536,6 @@ components:
           type: string
           maxLength: 100
           example: IPA
-        school_origin:
-          type: string
-          maxLength: 255
-          example: SMA Negeri 1 Bogor
         graduation_status:
           type: string
           maxLength: 100
@@ -1590,26 +1585,6 @@ components:
         successful_count:
           type: integer
           example: 45
-        failed_count:
-          type: integer
-          example: 3
-        failures:
-          type: array
-          items:
-            type: object
-            properties:
-              row:
-                type: integer
-                example: 5
-              attribute:
-                type: string
-                example: nisn
-              errors:
-                type: array
-                items:
-                  type: string
-                example:
-                  - "NISN sudah terdaftar."
 
     SuccessEnvelopeImportStudents:
       type: object
@@ -1619,7 +1594,7 @@ components:
           example: true
         message:
           type: string
-          example: "Import siswa selesai. 45 berhasil, 3 gagal."
+          example: "Import siswa selesai. 45 berhasil."
         data:
           $ref: "#/components/schemas/ImportStudentsResponse"
         errors:
@@ -1649,10 +1624,6 @@ components:
           type: string
           maxLength: 100
           example: IPA
-        school_origin:
-          type: string
-          maxLength: 255
-          example: SMA Negeri 1 Bogor
         graduation_status:
           type: string
           maxLength: 100

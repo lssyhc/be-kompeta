@@ -19,7 +19,6 @@ class UpdateStudentRequest extends FormRequest
             'nisn' => ['sometimes', 'digits:10', Rule::unique('student_profiles', 'nisn')->ignore($this->route('id'))],
             'photo_profile' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'major' => ['sometimes', 'string', 'max:100'],
-            'school_origin' => ['sometimes', 'string', 'max:255'],
             'graduation_status' => ['sometimes', 'string', 'max:100'],
             'class_year' => ['nullable', 'digits:4'],
             'socials' => ['nullable', 'array'],

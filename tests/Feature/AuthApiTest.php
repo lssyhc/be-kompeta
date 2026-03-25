@@ -317,6 +317,18 @@ class AuthApiTest extends TestCase
             'account_status' => 'active',
         ]);
 
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Negeri 1',
+            'npsn' => '20201234',
+            'accreditation' => 'A',
+            'address' => 'Jl. Test No. 1',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'defaults/profile-picture.png',
+            'short_description' => 'Test school.',
+            'operational_license_path' => 'defaults/document.pdf',
+        ]);
+
         Sanctum::actingAs($school);
 
         $response = $this->post('/api/school/students', [
@@ -324,7 +336,6 @@ class AuthApiTest extends TestCase
             'nisn' => '1234567890',
             'photo_profile' => UploadedFile::fake()->image('student.jpg'),
             'major' => 'RPL',
-            'school_origin' => 'SMK Negeri 1',
             'graduation_status' => 'Belum Lulus',
             'class_year' => '2024',
         ], [
@@ -356,13 +367,24 @@ class AuthApiTest extends TestCase
             'account_status' => 'active',
         ]);
 
+        SchoolProfile::query()->create([
+            'user_id' => $school->id,
+            'school_name' => 'SMK Negeri 1',
+            'npsn' => '20209876',
+            'accreditation' => 'A',
+            'address' => 'Jl. Test No. 2',
+            'expertise_fields' => ['RPL'],
+            'logo_path' => 'defaults/profile-picture.png',
+            'short_description' => 'Test school.',
+            'operational_license_path' => 'defaults/document.pdf',
+        ]);
+
         Sanctum::actingAs($school);
 
         $response = $this->postJson('/api/school/students', [
             'full_name' => 'Tanpa Foto',
             'nisn' => '9999999999',
             'major' => 'RPL',
-            'school_origin' => 'SMK Negeri 1',
             'graduation_status' => 'Belum Lulus',
             'class_year' => '2024',
         ]);

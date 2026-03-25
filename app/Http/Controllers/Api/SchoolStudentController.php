@@ -7,6 +7,7 @@ use App\Http\Requests\School\ImportStudentsRequest;
 use App\Http\Requests\School\StoreStudentRequest;
 use App\Http\Requests\School\UpdateStudentRequest;
 use App\Imports\StudentsImport;
+use App\Models\SchoolProfile;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +27,11 @@ class SchoolStudentController extends Controller
 
         $validated = $request->validated();
 
-        $student = DB::transaction(function () use ($request, $validated, $schoolUser) {
+        /** @var SchoolProfile $schoolProfile */
+        $schoolProfile = SchoolProfile::query()->where('user_id', $schoolUser->id)->firstOrFail();
+        $schoolName = $schoolProfile->school_name;
+
+        $student = DB::transaction(function () use ($request, $validated, $schoolUser, $schoolName) {
             $studentUser = User::query()->create([
                 'name' => $validated['full_name'],
                 'email' => null,
@@ -44,7 +49,7 @@ class SchoolStudentController extends Controller
                     ? $request->file('photo_profile')->store('profiles/students/photos', 'public')
                     : User::DEFAULT_PROFILE_PHOTO_PATH,
                 'major' => $validated['major'],
-                'school_origin' => $validated['school_origin'],
+                'school_origin' => $schoolName,
                 'graduation_status' => $validated['graduation_status'],
                 'unique_code' => $this->generateUniqueCode(),
                 'class_year' => $validated['class_year'],
@@ -220,18 +225,26 @@ class SchoolStudentController extends Controller
             return $this->errorResponse('Hanya user sekolah yang dapat mengimpor data siswa.', 403);
         }
 
-        $import = new StudentsImport($schoolUser->id);
+        /** @var SchoolProfile $schoolProfile */
+        $schoolProfile = SchoolProfile::query()->where('user_id', $schoolUser->id)->firstOrFail();
+        $schoolName = $schoolProfile->school_name;
+
+        $import = new StudentsImport($schoolUser->id, $schoolName);
         $import->import($request->file('file'));
 
-        $failures = $import->getFormattedFailures();
+        $invalidFields = $import->getInvalidFields();
+
+        if (count($invalidFields) > 0) {
+            $fieldList = implode(', ', $invalidFields);
+
+            return $this->errorResponse("Data tidak valid. Terdapat kesalahan pada field: {$fieldList}.", 422);
+        }
+
         $successCount = $import->getSuccessCount();
-        $failedCount = count($failures);
 
         return $this->successResponse([
             'successful_count' => $successCount,
-            'failed_count' => $failedCount,
-            'failures' => $failures,
-        ], "Import siswa selesai. {$successCount} berhasil, {$failedCount} gagal.", 200);
+        ], "Import siswa selesai. {$successCount} berhasil.", 200);
     }
 
     private function generateUniqueCode(): string

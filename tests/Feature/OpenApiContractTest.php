@@ -200,6 +200,7 @@ class OpenApiContractTest extends TestCase
 
             ['method' => 'GET', 'uri' => '/api/school/students', 'docPath' => '/school/students'],
             ['method' => 'POST', 'uri' => '/api/school/students', 'docPath' => '/school/students'],
+            ['method' => 'POST', 'uri' => '/api/school/students/import', 'docPath' => '/school/students/import'],
             ['method' => 'GET', 'uri' => '/api/school/students/search', 'docPath' => '/school/students/search'],
             ['method' => 'GET', 'uri' => '/api/school/students/1', 'docPath' => '/school/students/{id}'],
             ['method' => 'PUT', 'uri' => '/api/school/students/1', 'docPath' => '/school/students/{id}'],

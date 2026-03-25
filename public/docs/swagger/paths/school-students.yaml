@@ -104,10 +104,12 @@ paths:
         2. Buat `StudentProfile` dengan `school_user_id` dari sekolah login
         3. Generate `unique_code` 8 karakter acak untuk login siswa
 
-        **Field wajib:** `full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`
+        **Field wajib:** `full_name`, `nisn`, `major`, `graduation_status`, `class_year`
         **Field opsional:** `socials`, `address`, `photo_profile` (file gambar)
 
         Jika `photo_profile` tidak dikirim, sistem akan otomatis menggunakan foto profil default.
+
+        Field `school_origin` diisi otomatis dari profil sekolah yang login.
 
         NISN harus unik secara global.
       requestBody:
@@ -120,7 +122,6 @@ paths:
               full_name: Budi Santoso
               nisn: "0001234567"
               major: IPA
-              school_origin: SMA Negeri 1 Bogor
               graduation_status: graduated
               class_year: "2024"
               socials:
@@ -204,14 +205,14 @@ paths:
         | `full_name` | Ya | Nama lengkap siswa |
         | `nisn` | Ya | 10 digit, harus unik |
         | `major` | Ya | Jurusan |
-        | `school_origin` | Ya | Asal sekolah |
         | `graduation_status` | Ya | Status kelulusan |
         | `class_year` | Ya | Angkatan (4 digit) |
         | `address` | Tidak | Alamat |
 
         **Catatan:**
+        - Field `school_origin` diisi otomatis dari profil sekolah yang login
         - Photo profile **tidak termasuk** dalam import, sistem otomatis menggunakan foto profil default
-        - Baris yang gagal validasi akan di-skip, baris lainnya tetap diproses
+        - Jika terdapat data tidak valid, seluruh import akan dibatalkan dan dikembalikan error 422
         - Setiap baris valid akan membuat `User` (role siswa) + `StudentProfile`
         - Maksimum ukuran file: 2 MB
       requestBody:
@@ -222,26 +223,16 @@ paths:
               $ref: "../openapi.yaml#/components/schemas/ImportStudentsRequest"
       responses:
         "200":
-          description: Import selesai (berisi ringkasan berhasil dan gagal)
+          description: Import berhasil (semua data valid)
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeImportStudents"
               example:
                 success: true
-                message: "Import siswa selesai. 45 berhasil, 3 gagal."
+                message: "Import siswa selesai. 45 berhasil."
                 data:
                   successful_count: 45
-                  failed_count: 3
-                  failures:
-                    - row: 5
-                      attribute: nisn
-                      errors:
-                        - "NISN sudah terdaftar."
-                    - row: 12
-                      attribute: nisn
-                      errors:
-                        - "NISN harus 10 digit."
                 errors: null
                 meta: null
         "401":
@@ -269,19 +260,30 @@ paths:
                 errors: null
                 meta: null
         "422":
-          description: Validasi gagal (file tidak dikirim, format file salah, dll.)
+          description: Validasi gagal (file tidak dikirim, format file salah, atau data konten tidak valid)
           content:
             application/json:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
-              example:
-                success: false
-                message: Validasi gagal.
-                data: null
-                errors:
-                  file:
-                    - The file field is required.
-                meta: null
+              examples:
+                file_missing:
+                  summary: File tidak dikirim
+                  value:
+                    success: false
+                    message: Validasi gagal.
+                    data: null
+                    errors:
+                      file:
+                        - The file field is required.
+                    meta: null
+                invalid_content:
+                  summary: Isi dokumen tidak valid
+                  value:
+                    success: false
+                    message: "Data tidak valid. Terdapat kesalahan pada field: nisn, class_year."
+                    data: null
+                    errors: null
+                    meta: null
         "500":
           description: Kesalahan server internal
           content:

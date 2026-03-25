@@ -56,10 +56,6 @@ Content-Disposition: form-data; name="major"
 
 Rekayasa Perangkat Lunak
 --BoundaryKOMPETA
-Content-Disposition: form-data; name="school_origin"
-
-SMA Negeri 1 Bogor
---BoundaryKOMPETA
 Content-Disposition: form-data; name="graduation_status"
 
 Belum Lulus
@@ -98,7 +94,6 @@ Content-Type: application/json
   "full_name": "Andi Pratama",
   "nisn": "0987654321",
   "major": "Teknik Komputer dan Jaringan",
-  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Lulus",
   "class_year": "2023",
   "socials": {
@@ -124,7 +119,6 @@ Content-Type: application/json
   "full_name": "Siti Rahma",
   "nisn": "1122334455",
   "major": "Akuntansi",
-  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -144,7 +138,6 @@ Content-Type: application/json
   "full_name": "Siswa Duplikat",
   "nisn": "1234567890",
   "major": "RPL",
-  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -164,7 +157,6 @@ Content-Type: application/json
   "full_name": "Siswa Salah NISN",
   "nisn": "12345",
   "major": "RPL",
-  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -401,10 +393,11 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ### 23. IMPORT BATCH SISWA DARI FILE EXCEL
 ###     Endpoint : POST /api/school/students/import
 ###     File     : .xlsx, .xls, atau .csv (maks 2MB)
-###     Kolom wajib: full_name, nisn, major, school_origin,
+###     Kolom wajib: full_name, nisn, major,
 ###                  graduation_status, class_year
 ###     Kolom opsional: address
 ###     Photo profile TIDAK termasuk dalam import
+###     school_origin otomatis diisi dari profil sekolah
 ### ============================================================
 
 # @name importSiswa

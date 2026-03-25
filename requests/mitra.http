@@ -80,7 +80,7 @@ Accept: application/json
 ### ============================================================
 ### 7. DETAIL MITRA
 ### Endpoint: GET /api/public/mitra/{id}
-### Ganti {mitraId} dengan ID user mitra yang valid
+### ID dari seeder: mitra.company.a (user id=2)
 ### ============================================================
 
 @mitraId = 2

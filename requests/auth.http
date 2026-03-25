@@ -434,8 +434,7 @@ Authorization: Bearer {{loginAdmin.response.body.$.data.token}}
 
 ### ============================================================
 ### 11. LOGIN - Siswa (NISN + school_origin + unique_code)
-###     Isi nilai unique_code dari respons tambah siswa
-###     di school-students.http (#2)
+###     Data diambil dari seeder student A1 (Budi Santoso)
 ###     Response tambahan onboarding:
 ###     - requires_skill_setup (true/false)
 ###     - next_step (add_skill/null)
@@ -448,9 +447,9 @@ Content-Type: application/json
 
 {
   "role": "siswa",
-  "nisn": "1234567890",
-  "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "GANTIDULU"
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
 }
 
 ###
@@ -481,8 +480,8 @@ Content-Type: application/json
 
 {
   "role": "siswa",
-  "nisn": "1234567890",
-  "school_origin": "SMK Negeri 1 Contoh",
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
   "unique_code": "SALAHKODE"
 }
 

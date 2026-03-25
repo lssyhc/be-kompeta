@@ -58,10 +58,10 @@ Accept: application/json
 ### ============================================================
 ### 5. DETAIL SEKOLAH
 ### Endpoint: GET /api/public/schools/{id}
-### Ganti {schoolId} dengan ID user sekolah yang valid
+### ID dari seeder: school.a (user id=8)
 ### ============================================================
 
-@schoolId = 6
+@schoolId = 8
 
 # @name schoolDetail
 GET {{baseUrl}}/public/schools/{{schoolId}}

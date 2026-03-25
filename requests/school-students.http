@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
   "role": "sekolah",
-  "email": "smk.negeri1@example.com",
+  "email": "school.a@kompeta.test",
   "password": "password123"
 }
 
@@ -58,7 +58,7 @@ Rekayasa Perangkat Lunak
 --BoundaryKOMPETA
 Content-Disposition: form-data; name="school_origin"
 
-SMK Negeri 1 Contoh
+SMA Negeri 1 Bogor
 --BoundaryKOMPETA
 Content-Disposition: form-data; name="graduation_status"
 
@@ -98,7 +98,7 @@ Content-Type: application/json
   "full_name": "Andi Pratama",
   "nisn": "0987654321",
   "major": "Teknik Komputer dan Jaringan",
-  "school_origin": "SMK Negeri 1 Contoh",
+  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Lulus",
   "class_year": "2023",
   "socials": {
@@ -124,7 +124,7 @@ Content-Type: application/json
   "full_name": "Siti Rahma",
   "nisn": "1122334455",
   "major": "Akuntansi",
-  "school_origin": "SMK Negeri 1 Contoh",
+  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -144,7 +144,7 @@ Content-Type: application/json
   "full_name": "Siswa Duplikat",
   "nisn": "1234567890",
   "major": "RPL",
-  "school_origin": "SMK Negeri 1 Contoh",
+  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -164,7 +164,7 @@ Content-Type: application/json
   "full_name": "Siswa Salah NISN",
   "nisn": "12345",
   "major": "RPL",
-  "school_origin": "SMK Negeri 1 Contoh",
+  "school_origin": "SMA Negeri 1 Bogor",
   "graduation_status": "Belum Lulus",
   "class_year": "2024"
 }
@@ -268,7 +268,7 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 ### ============================================================
 ### 15. DETAIL SISWA
 ###     Endpoint : GET /api/school/students/{id}
-###     Ganti {id} dengan ID student_profile dari daftar siswa
+###     ID student_profile dari seeder (default: 1)
 ###     Response menyertakan: skills, experiences, achievements, applications
 ### ============================================================
 

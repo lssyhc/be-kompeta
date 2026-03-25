@@ -73,9 +73,7 @@ Accept: application/json
 ### ============================================================
 ### 7. DETAIL FOR YOU
 ### Endpoint: GET /api/public/for-you/jobs/{slug}
-### Cara pakai:
-### - Jalankan forYouListDefault
-### - Copy slug dari response data[0].slug
+### Slug dari seeder: accounting-staff-1602be
 ### ============================================================
 
 # @name forYouDetail

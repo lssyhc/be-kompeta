@@ -82,9 +82,9 @@ Content-Type: application/json
 
 {
   "role": "siswa",
-  "nisn": "1234567890",
-  "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "GANTIDULU"
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
 }
 
 ###
@@ -136,7 +136,7 @@ System Admin Kompeta
 Content-Disposition: form-data; name="avatar"; filename="avatar.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------AdminUpload--
 
 ###
@@ -204,17 +204,17 @@ A
 Content-Disposition: form-data; name="logo"; filename="logo.png"
 Content-Type: image/png
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------SekolahUpload
 Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------SekolahUpload
 Content-Disposition: form-data; name="operational_license"; filename="license.pdf"
 Content-Type: application/pdf
 
-< ./sample-files/sample-pdf.pdf
+< ./sample-files/document.pdf
 ------SekolahUpload--
 
 ###
@@ -289,17 +289,17 @@ Perusahaan outsourcing dan operasional bisnis.
 Content-Disposition: form-data; name="company_logo"; filename="company-logo.png"
 Content-Type: image/png
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------PerusahaanUpload
 Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------PerusahaanUpload
 Content-Disposition: form-data; name="kemenkumham_decree"; filename="decree.pdf"
 Content-Type: application/pdf
 
-< ./sample-files/sample-pdf.pdf
+< ./sample-files/document.pdf
 ------PerusahaanUpload--
 
 ###
@@ -372,17 +372,17 @@ UMKM bakery dengan fokus produksi harian.
 Content-Disposition: form-data; name="umkm_logo"; filename="umkm-logo.png"
 Content-Type: image/png
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------UmkmUpload
 Content-Disposition: form-data; name="owner_ktp_photo"; filename="ktp.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------UmkmUpload
 Content-Disposition: form-data; name="image_1"; filename="image1.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------UmkmUpload--
 
 ###
@@ -463,7 +463,7 @@ Content-Disposition: form-data; name="profile[socials][whatsapp]"
 Content-Disposition: form-data; name="photo_profile"; filename="photo.jpg"
 Content-Type: image/jpeg
 
-< ./sample-files/sample-image.jpg
+< ./sample-files/logo.jpg
 ------SiswaUpload--
 
 ###

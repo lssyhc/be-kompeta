@@ -4,23 +4,25 @@
 @baseUrl = http://localhost:8000/api
 @adminEmail = admin@kompeta.test
 @adminPassword = admin12345
-@accessToken =
 
 ### ============================================================
 ### 1. LOGIN ADMIN (ambil token)
 ### ============================================================
 # @name adminLogin
 POST {{baseUrl}}/auth/login
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 Accept: application/json
 
-role=admin&email={{adminEmail}}&password={{adminPassword}}
+{
+  "role": "admin",
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
 
 ###
 
 ### ============================================================
-### 2. SET TOKEN MANUAL
-### Copy token dari response adminLogin ke variable @accessToken
+### 2. (Token otomatis dari response adminLogin)
 ### ============================================================
 
 ### ============================================================
@@ -70,7 +72,7 @@ Accept: application/json
 
 ### ============================================================
 ### 8. GET ARTICLE DETAIL
-### Ganti slug sesuai data Anda
+### Slug dari seeder: artikel-perdana-kompeta
 ### ============================================================
 # @name blogDetail
 GET {{baseUrl}}/public/blog/articles/artikel-perdana-kompeta
@@ -87,7 +89,7 @@ Accept: application/json
 ### ============================================================
 # @name blogCreateByAdmin
 POST {{baseUrl}}/admin/blog/articles
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 Accept: application/json
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -123,7 +125,7 @@ Content-Type: image/jpeg
 @articleSlug = artikel-dari-rest-client
 # @name blogUpdateByAdmin
 PUT {{baseUrl}}/admin/blog/articles/{{articleSlug}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 Accept: application/json
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -144,7 +146,7 @@ Konten artikel yang sudah diperbarui.
 ### ============================================================
 # @name blogDeleteByAdmin
 DELETE {{baseUrl}}/admin/blog/articles/{{articleSlug}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{adminLogin.response.body.$.data.token}}
 Accept: application/json
 
 ###

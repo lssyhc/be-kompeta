@@ -4,7 +4,7 @@
 @baseUrl = http://localhost:8000/api
 @adminEmail = admin@kompeta.test
 @adminPassword = admin12345
-@targetRegistrationId = 1
+@targetRegistrationId = 6
 
 ### ============================================================
 ### 1. LOGIN ADMIN
@@ -107,10 +107,24 @@ Accept: application/json
 
 ### ============================================================
 ### 9. AKSES DENGAN TOKEN NON-ADMIN (harus 403)
-###    Contoh gunakan token sekolah/mitra dari auth.http
+###    Menggunakan token sekolah dari login di bawah ini
 ### ============================================================
+
+# @name loginSekolahForTest
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "school.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
 GET {{baseUrl}}/admin/registrations
 Accept: application/json
-Authorization: Bearer GANTI_DENGAN_TOKEN_NON_ADMIN
+Authorization: Bearer {{loginSekolahForTest.response.body.$.data.token}}
 
 ###

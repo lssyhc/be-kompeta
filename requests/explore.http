@@ -103,10 +103,7 @@ Accept: application/json
 ### ============================================================
 ### 9. AMBIL DETAIL LOWONGAN
 ### Endpoint: GET /api/public/explore/jobs/{slug}
-### Cara pakai:
-### - Jalankan exploreListDefault dulu
-### - Copy slug dari response data[0].slug
-### - Ganti placeholder SLUG_DI_SINI
+### Slug dari seeder: accounting-staff-1602be
 ### ============================================================
 
 # @name exploreDetail

@@ -21,25 +21,12 @@ Content-Type: application/json
 
 {
   "role": "siswa",
-  "nisn": "1234567890",
-  "school_origin": "SMK Negeri 1 Contoh",
-  "unique_code": "GANTIDULU"
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
 }
 
 ###
-
-### ============================================================
-### CATATAN: Ganti nilai "unique_code" di atas dengan kode unik
-###          yang muncul di respons tambah siswa dari sekolah.
-###          Contoh respons tambah siswa:
-###          {
-###            "user": {
-###              "student_profile": {
-###                "unique_code": "ABCD1234"
-###              }
-###            }
-###          }
-### ============================================================
 
 ### ============================================================
 ### CHECK ONBOARDING AWAL (sebelum tambah skill)
@@ -437,13 +424,22 @@ Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
 ###     Memastikan role guard bekerja dengan benar
 ### ============================================================
 
-### Ganti token di bawah dengan token dari login sekolah
-### (copy dari auth.http #7 - Login Sekolah)
-@tokenSekolahManual = PASTE_TOKEN_SEKOLAH_DI_SINI
+# @name loginSekolahForTest
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "school.a@kompeta.test",
+  "password": "password123"
+}
+
+###
 
 POST {{baseUrl}}/student/portfolio-items
 Accept: application/json
-Authorization: Bearer {{tokenSekolahManual}}
+Authorization: Bearer {{loginSekolahForTest.response.body.$.data.token}}
 Content-Type: application/json
 
 {

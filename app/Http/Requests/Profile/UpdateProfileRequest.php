@@ -13,6 +13,19 @@ class UpdateProfileRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        foreach (['user', 'profile'] as $field) {
+            $value = $this->input($field);
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) {
+                    $this->merge([$field => $decoded]);
+                }
+            }
+        }
+    }
+
     public function rules(): array
     {
         $user = $this->user();

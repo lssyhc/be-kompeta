@@ -161,97 +161,88 @@ paths:
             schema:
               type: object
               properties:
-                user:
-                  type: object
-                  description: Data umum user yang ingin diperbarui
-                  properties:
-                    name:
-                      type: string
-                      maxLength: 255
-                      description: "Nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)"
-                    email:
-                      type: string
-                      format: email
-                      maxLength: 255
-                      description: "Email user (sekolah, mitra perusahaan, mitra umkm)"
-                profile:
-                  type: object
-                  description: Data profile spesifik role (lihat tabel di description)
-                  properties:
-                    full_name:
-                      type: string
-                      maxLength: 255
-                      description: "[Admin/Siswa] Nama lengkap"
-                    company_name:
-                      type: string
-                      maxLength: 255
-                      description: "[Perusahaan] Nama perusahaan"
-                    business_name:
-                      type: string
-                      maxLength: 255
-                      description: "[UMKM] Nama usaha"
-                    description:
-                      type: string
-                      maxLength: 2000
-                      description: "[Siswa] Deskripsi diri"
-                    address:
-                      type: string
-                      description: "[Siswa/Sekolah] Alamat"
-                    accreditation:
-                      type: string
-                      enum: [A, B, C, Belum Terakreditasi]
-                      description: "[Sekolah] Akreditasi"
-                    expertise_fields:
-                      type: array
-                      items:
-                        type: string
-                      description: "[Sekolah] Bidang keahlian"
-                    short_description:
-                      type: string
-                      maxLength: 1000
-                      description: "[Sekolah/Perusahaan/UMKM] Deskripsi singkat"
-                    industry_sector:
-                      type: string
-                      maxLength: 100
-                      description: "[Perusahaan] Sektor industri"
-                    employee_total_range:
-                      type: string
-                      maxLength: 50
-                      description: "[Perusahaan] Range jumlah karyawan"
-                    office_address:
-                      type: string
-                      description: "[Perusahaan] Alamat kantor"
-                    socials:
-                      type: object
-                      nullable: true
-                      description: "[Sekolah/Perusahaan/UMKM/Siswa] Sosial media"
-                      properties:
-                        website:
-                          type: string
-                          format: uri
-                          nullable: true
-                        instagram:
-                          type: string
-                          format: uri
-                          nullable: true
-                        linkedin:
-                          type: string
-                          format: uri
-                          nullable: true
-                        whatsapp:
-                          type: string
-                          nullable: true
-                    owner_personal_nib:
-                      type: string
-                      maxLength: 50
-                      description: "[UMKM] NIB pemilik"
-                    business_type:
-                      type: string
-                      maxLength: 100
-                      description: "[UMKM] Jenis usaha"
-                    business_address:
-                      type: string
-                      description: "[UMKM] Alamat usaha"
+                "user[name]":
+                  type: string
+                  maxLength: 255
+                  description: "Nama tampilan user (admin, mitra perusahaan, mitra umkm, siswa)"
+                "user[email]":
+                  type: string
+                  format: email
+                  maxLength: 255
+                  description: "Email user (sekolah, mitra perusahaan, mitra umkm)"
+                "profile[full_name]":
+                  type: string
+                  maxLength: 255
+                  description: "[Admin/Siswa] Nama lengkap"
+                "profile[company_name]":
+                  type: string
+                  maxLength: 255
+                  description: "[Perusahaan] Nama perusahaan"
+                "profile[business_name]":
+                  type: string
+                  maxLength: 255
+                  description: "[UMKM] Nama usaha"
+                "profile[description]":
+                  type: string
+                  maxLength: 2000
+                  description: "[Siswa] Deskripsi diri"
+                "profile[address]":
+                  type: string
+                  description: "[Siswa/Sekolah] Alamat"
+                "profile[accreditation]":
+                  type: string
+                  enum: [A, B, C, Belum Terakreditasi]
+                  description: "[Sekolah] Akreditasi"
+                "profile[expertise_fields][]":
+                  type: array
+                  items:
+                    type: string
+                  description: "[Sekolah] Bidang keahlian"
+                "profile[short_description]":
+                  type: string
+                  maxLength: 1000
+                  description: "[Sekolah/Perusahaan/UMKM] Deskripsi singkat"
+                "profile[industry_sector]":
+                  type: string
+                  maxLength: 100
+                  description: "[Perusahaan] Sektor industri"
+                "profile[employee_total_range]":
+                  type: string
+                  maxLength: 50
+                  description: "[Perusahaan] Range jumlah karyawan"
+                "profile[office_address]":
+                  type: string
+                  description: "[Perusahaan] Alamat kantor"
+                "profile[socials][website]":
+                  type: string
+                  format: uri
+                  nullable: true
+                  description: "[Sekolah/Perusahaan/UMKM/Siswa] Website URL"
+                "profile[socials][instagram]":
+                  type: string
+                  format: uri
+                  nullable: true
+                  description: "[Sekolah/Perusahaan/UMKM/Siswa] Instagram URL"
+                "profile[socials][linkedin]":
+                  type: string
+                  format: uri
+                  nullable: true
+                  description: "[Sekolah/Perusahaan/UMKM/Siswa] LinkedIn URL"
+                "profile[socials][whatsapp]":
+                  type: string
+                  nullable: true
+                  description: "[Sekolah/Perusahaan/UMKM/Siswa] WhatsApp number"
+                "profile[owner_personal_nib]":
+                  type: string
+                  maxLength: 50
+                  description: "[UMKM] NIB pemilik"
+                "profile[business_type]":
+                  type: string
+                  maxLength: 100
+                  description: "[UMKM] Jenis usaha"
+                "profile[business_address]":
+                  type: string
+                  description: "[UMKM] Alamat usaha"
                 avatar:
                   type: string
                   format: binary
@@ -308,69 +299,55 @@ paths:
               admin:
                 summary: Update profile admin
                 value:
-                  user:
-                    name: Admin Kompeta
-                  profile:
-                    full_name: Admin Kompeta
+                  "user[name]": Admin Kompeta
+                  "profile[full_name]": Admin Kompeta
               sekolah:
                 summary: Update profile sekolah
                 value:
-                  user:
-                    email: school.a@kompeta.test
-                  profile:
-                    short_description: Sekolah vokasi unggulan.
-                    address: Jl. Pendidikan No. 1
-                    accreditation: A
-                    expertise_fields:
-                      - RPL
-                      - TKJ
-                    socials:
-                      website: https://smknegeri1.sch.id
-                      instagram: https://instagram.com/smknegeri1
+                  "user[email]": school.a@kompeta.test
+                  "profile[short_description]": Sekolah vokasi unggulan.
+                  "profile[address]": Jl. Pendidikan No. 1
+                  "profile[accreditation]": A
+                  "profile[expertise_fields][]":
+                    - RPL
+                    - TKJ
+                  "profile[socials][website]": https://smknegeri1.sch.id
+                  "profile[socials][instagram]": https://instagram.com/smknegeri1
               mitra_perusahaan:
                 summary: Update profile mitra perusahaan
                 value:
-                  user:
-                    name: PT Binajasa Sumber Sarana
-                    email: mitra.company.a@kompeta.test
-                  profile:
-                    company_name: PT Binajasa Sumber Sarana
-                    short_description: Perusahaan software enterprise.
-                    office_address: Jl. Sudirman No. 10
-                    socials:
-                      website: https://example.com
-                      instagram: https://instagram.com/company
-                      linkedin: https://linkedin.com/company/example
-                      whatsapp: "6281234567890"
-                    industry_sector: Teknologi Informasi
-                    employee_total_range: 51-200
+                  "user[name]": PT Binajasa Sumber Sarana
+                  "user[email]": mitra.company.a@kompeta.test
+                  "profile[company_name]": PT Binajasa Sumber Sarana
+                  "profile[short_description]": Perusahaan software enterprise.
+                  "profile[office_address]": Jl. Sudirman No. 10
+                  "profile[socials][website]": https://example.com
+                  "profile[socials][instagram]": https://instagram.com/company
+                  "profile[socials][linkedin]": https://linkedin.com/company/example
+                  "profile[socials][whatsapp]": "6281234567890"
+                  "profile[industry_sector]": Teknologi Informasi
+                  "profile[employee_total_range]": 51-200
               mitra_umkm:
                 summary: Update profile mitra UMKM
                 value:
-                  user:
-                    name: Roti Bunda Rasa
-                    email: mitra.umkm.a@kompeta.test
-                  profile:
-                    business_name: Roti Bunda Rasa
-                    short_description: UMKM kuliner lokal yang berkembang.
-                    business_address: Jl. Pasar No. 5
-                    business_type: Kuliner
-                    owner_personal_nib: "9876543210"
-                    socials:
-                      instagram: https://instagram.com/umkm
-                      whatsapp: "6281234567890"
+                  "user[name]": Roti Bunda Rasa
+                  "user[email]": mitra.umkm.a@kompeta.test
+                  "profile[business_name]": Roti Bunda Rasa
+                  "profile[short_description]": UMKM kuliner lokal yang berkembang.
+                  "profile[business_address]": Jl. Pasar No. 5
+                  "profile[business_type]": Kuliner
+                  "profile[owner_personal_nib]": "9876543210"
+                  "profile[socials][instagram]": https://instagram.com/umkm
+                  "profile[socials][whatsapp]": "6281234567890"
               siswa:
                 summary: Update profile siswa
                 value:
-                  user:
-                    name: Budi Santoso
-                  profile:
-                    full_name: Budi Santoso
-                    description: Siswa RPL fokus backend Laravel.
-                    socials:
-                      instagram: https://instagram.com/budisantoso
-                      whatsapp: "081234567890"
-                    address: Jakarta Selatan
+                  "user[name]": Budi Santoso
+                  "profile[full_name]": Budi Santoso
+                  "profile[description]": Siswa RPL fokus backend Laravel.
+                  "profile[socials][instagram]": https://instagram.com/budisantoso
+                  "profile[socials][whatsapp]": "081234567890"
+                  "profile[address]": Jakarta Selatan
       responses:
         "200":
           description: Profil berhasil diperbarui

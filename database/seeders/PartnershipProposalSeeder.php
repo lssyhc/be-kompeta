@@ -17,9 +17,7 @@ class PartnershipProposalSeeder extends Seeder
         $umkmA = User::query()->where('email', 'mitra.umkm.a@kompeta.test')->firstOrFail();
 
         $submittedProposalPdf = $this->storeLocalFile('partnership/proposals/proposal-sman2-ke-binajasa.pdf', 'Proposal kemitraan SMAN 2 ke Binajasa');
-        $submittedSignature = $this->storeLocalFile('partnership/signatures/signature-sman2.pdf', 'Signature Kepala Sekolah SMAN 2');
         $draftProposalPdf = $this->storeLocalFile('partnership/proposals/proposal-roti-bunda-ke-sman1.pdf', 'Proposal kemitraan Roti Bunda ke SMAN 1');
-        $draftSignature = $this->storeLocalFile('partnership/signatures/signature-roti-bunda.pdf', 'Signature Owner Roti Bunda');
 
         PartnershipProposal::query()->updateOrCreate(
             [
@@ -30,7 +28,6 @@ class PartnershipProposalSeeder extends Seeder
                 'school_user_id' => $schoolB->id,
                 'mitra_user_id' => $companyA->id,
                 'proposal_pdf_path' => $submittedProposalPdf,
-                'signature_path' => $submittedSignature,
                 'notes' => 'Pengajuan kerja sama magang siswa kelas XII untuk periode Juli-Desember.',
                 'status' => PartnershipProposal::STATUS_SUBMITTED,
                 'submitted_at' => now()->subDays(9),
@@ -46,7 +43,6 @@ class PartnershipProposalSeeder extends Seeder
                 'school_user_id' => $schoolA->id,
                 'mitra_user_id' => $umkmA->id,
                 'proposal_pdf_path' => $draftProposalPdf,
-                'signature_path' => $draftSignature,
                 'notes' => 'Kolaborasi kewirausahaan untuk program kelas industri UMKM.',
                 'status' => PartnershipProposal::STATUS_SUBMITTED,
                 'submitted_at' => now()->subDays(3),

@@ -101,7 +101,6 @@ paths:
 
         **File yang wajib diunggah:**
         - `proposal_pdf`: File proposal (PDF, maks 5 MB)
-        - `signature_file`: File tanda tangan (PDF, maks 5 MB)
       requestBody:
         required: true
         content:
@@ -238,7 +237,6 @@ paths:
                   status_submit: submitted
                   tanggal_submit: "2026-03-14T12:00:00+07:00"
                   proposal_pdf_url: http://localhost:8000/api/partnership-proposals/1/proposal-pdf
-                  signature_url: http://localhost:8000/api/partnership-proposals/1/signature
                   created_at: "2026-03-14T10:00:00+07:00"
                   updated_at: "2026-03-14T12:00:00+07:00"
                 errors: null
@@ -320,62 +318,6 @@ paths:
               example:
                 success: false
                 message: Dokumen proposal tidak ditemukan.
-                data: null
-                errors: null
-                meta: null
-        "500":
-          description: Kesalahan server internal
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
-
-  /partnership-proposals/{id}/signature:
-    get:
-      tags: [Partnership Proposals]
-      summary: Download file tanda tangan
-      description: |
-        Mengunduh file tanda tangan dari pengajuan kemitraan.
-        User harus merupakan pihak yang terlibat (proposer atau target).
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID pengajuan kemitraan
-          example: 1
-      responses:
-        "200":
-          description: File tanda tangan berhasil diunduh
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-        "401":
-          description: Token tidak valid atau sudah expired
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
-              example:
-                success: false
-                message: Unauthenticated.
-                data: null
-                errors: null
-                meta: null
-        "404":
-          description: Pengajuan atau dokumen tidak ditemukan
-          content:
-            application/json:
-              schema:
-                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
-              example:
-                success: false
-                message: Dokumen tanda tangan tidak ditemukan.
                 data: null
                 errors: null
                 meta: null

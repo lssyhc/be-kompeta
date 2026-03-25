@@ -78,7 +78,6 @@ Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(functi
     Route::post('/', [PartnershipProposalController::class, 'store']);
     Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
     Route::get('/{id}/proposal-pdf', [PartnershipProposalController::class, 'downloadProposalPdf'])->whereNumber('id');
-    Route::get('/{id}/signature', [PartnershipProposalController::class, 'downloadSignature'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('mitra/job-applications')->group(function () {

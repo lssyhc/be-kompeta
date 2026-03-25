@@ -20,7 +20,6 @@ class PartnershipProposal extends Model
         'school_user_id',
         'mitra_user_id',
         'proposal_pdf_path',
-        'signature_path',
         'notes',
         'status',
         'submitted_at',

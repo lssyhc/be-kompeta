@@ -36,11 +36,6 @@ Content-Disposition: form-data; name="proposal_pdf"; filename="proposal.pdf"
 Content-Type: application/pdf
 
 < ./sample-files/proposal.pdf
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="signature_file"; filename="signature.pdf"
-Content-Type: application/pdf
-
-< ./sample-files/signature.pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
@@ -69,12 +64,5 @@ Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
 
 ### 5) DOWNLOAD PROPOSAL PDF
 GET {{baseUrl}}/partnership-proposals/{{proposalId}}/proposal-pdf
-Accept: application/octet-stream
-Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
-
-###
-
-### 6) DOWNLOAD SIGNATURE
-GET {{baseUrl}}/partnership-proposals/{{proposalId}}/signature
 Accept: application/octet-stream
 Authorization: Bearer {{loginSekolah.response.body.$.data.token}}

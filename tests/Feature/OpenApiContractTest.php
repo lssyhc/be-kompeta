@@ -220,7 +220,6 @@ class OpenApiContractTest extends TestCase
             ['method' => 'POST', 'uri' => '/api/partnership-proposals', 'docPath' => '/partnership-proposals'],
             ['method' => 'GET', 'uri' => '/api/partnership-proposals/1', 'docPath' => '/partnership-proposals/{id}'],
             ['method' => 'GET', 'uri' => '/api/partnership-proposals/1/proposal-pdf', 'docPath' => '/partnership-proposals/{id}/proposal-pdf'],
-            ['method' => 'GET', 'uri' => '/api/partnership-proposals/1/signature', 'docPath' => '/partnership-proposals/{id}/signature'],
 
             ['method' => 'POST', 'uri' => '/api/admin/blog/articles', 'docPath' => '/admin/blog/articles'],
             ['method' => 'GET', 'uri' => '/api/admin/registrations', 'docPath' => '/admin/registrations'],

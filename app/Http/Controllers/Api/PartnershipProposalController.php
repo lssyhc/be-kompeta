@@ -96,7 +96,6 @@ class PartnershipProposalController extends Controller
             'school_user_id' => $schoolUserId,
             'mitra_user_id' => $mitraUserId,
             'proposal_pdf_path' => $request->file('proposal_pdf')->store('partnership/proposals', 'local'),
-            'signature_path' => $request->file('signature_file')->store('partnership/signatures', 'local'),
             'notes' => $validated['notes'] ?? null,
             'status' => PartnershipProposal::STATUS_SUBMITTED,
             'submitted_at' => now(),
@@ -150,23 +149,6 @@ class PartnershipProposalController extends Controller
 
         if (empty($path) || ! Storage::disk('local')->exists($path)) {
             return $this->errorResponse('Dokumen proposal tidak ditemukan.', 404);
-        }
-
-        return Storage::disk('local')->download($path);
-    }
-
-    public function downloadSignature(Request $request, int $id): mixed
-    {
-        $proposal = $this->findAuthorizedProposal($request, $id);
-
-        if (! $proposal instanceof PartnershipProposal) {
-            return $this->errorResponse('Pengajuan kemitraan tidak ditemukan.', 404);
-        }
-
-        $path = $proposal->signature_path;
-
-        if (empty($path) || ! Storage::disk('local')->exists($path)) {
-            return $this->errorResponse('Dokumen tanda tangan tidak ditemukan.', 404);
         }
 
         return Storage::disk('local')->download($path);

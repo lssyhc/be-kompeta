@@ -112,8 +112,6 @@ paths:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}"
   /partnership-proposals/{id}/proposal-pdf:
     $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1proposal-pdf"
-  /partnership-proposals/{id}/signature:
-    $ref: "./paths/partnership-proposals.yaml#/paths/~1partnership-proposals~1{id}~1signature"
 
   /public/explore/jobs:
     $ref: "./paths/explore.yaml#/paths/~1public~1explore~1jobs"
@@ -1205,9 +1203,6 @@ components:
         proposal_pdf_url:
           nullable: true
           type: string
-        signature_url:
-          nullable: true
-          type: string
         updated_at:
           nullable: true
           type: string
@@ -1821,7 +1816,7 @@ components:
 
     StorePartnershipProposalRequest:
       type: object
-      required: [target_user_id, proposal_pdf, signature_file]
+      required: [target_user_id, proposal_pdf]
       properties:
         target_user_id:
           type: integer
@@ -1831,10 +1826,6 @@ components:
           type: string
           format: binary
           description: "File PDF proposal (wajib, maks 5 MB)"
-        signature_file:
-          type: string
-          format: binary
-          description: "File PDF tanda tangan/surat kuasa (wajib, maks 5 MB)"
         notes:
           type: string
           maxLength: 2000

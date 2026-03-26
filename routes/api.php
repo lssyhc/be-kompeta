@@ -51,6 +51,8 @@ Route::middleware('auth:sanctum')->prefix('school')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('student')->group(function () {
     Route::post('/portfolio-items', [StudentPortfolioController::class, 'storePortfolioItem']);
+    Route::put('/portfolio-items/{id}', [StudentPortfolioController::class, 'updatePortfolioItem'])->whereNumber('id');
+    Route::delete('/portfolio-items/{id}', [StudentPortfolioController::class, 'destroyPortfolioItem'])->whereNumber('id');
     Route::get('/job-applications', [StudentJobApplicationController::class, 'index']);
     Route::post('/job-applications', [StudentJobApplicationController::class, 'store']);
     Route::get('/job-applications/{id}', [StudentJobApplicationController::class, 'show'])->whereNumber('id');

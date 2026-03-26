@@ -90,6 +90,8 @@ paths:
 
   /student/portfolio-items:
     $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items"
+  /student/portfolio-items/{id}:
+    $ref: "./paths/student-portfolio.yaml#/paths/~1student~1portfolio-items~1{id}"
   /application-reminder:
     $ref: "./paths/student-portfolio.yaml#/paths/~1application-reminder"
   /student/job-applications:
@@ -1800,6 +1802,80 @@ components:
           maxLength: 100
           description: "Status pengajuan lamaran (wajib untuk application)"
           example: submitted
+
+    UpdateStudentPortfolioItemRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [skill, experience, achievement, application]
+          description: "Tipe item portfolio yang akan diupdate"
+          example: skill
+        title:
+          type: string
+          maxLength: 255
+          description: "Judul item"
+          example: Vue.js
+        description:
+          type: string
+          description: "Deskripsi item"
+          example: Deskripsi yang diperbarui
+        position:
+          type: string
+          maxLength: 255
+          description: "Posisi/jabatan"
+          example: Full-stack Intern
+        company_name:
+          type: string
+          maxLength: 255
+          description: "Nama perusahaan"
+          example: PT Maju Jaya
+        start_date:
+          type: string
+          format: date
+          description: "Tanggal mulai"
+          example: "2024-01-01"
+        end_date:
+          type: string
+          format: date
+          description: "Tanggal selesai"
+          example: "2024-06-30"
+        achievement_date:
+          type: string
+          format: date
+          description: "Tanggal pencapaian"
+          example: "2024-02-10"
+        institution_name:
+          type: string
+          maxLength: 255
+          description: "Nama institusi pemberi"
+          example: Disdik Provinsi
+        role_type:
+          type: string
+          maxLength: 255
+          description: "Jenis posisi yang dilamar"
+          example: Backend Intern
+        applied_at:
+          type: string
+          format: date
+          description: "Tanggal pengajuan lamaran"
+          example: "2024-03-01"
+        status:
+          type: string
+          maxLength: 100
+          description: "Status pengajuan lamaran"
+          example: accepted
+
+    DestroyStudentPortfolioItemRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [skill, experience, achievement, application]
+          description: "Tipe item portfolio yang akan dihapus"
+          example: skill
 
     StoreStudentJobApplicationRequest:
       type: object

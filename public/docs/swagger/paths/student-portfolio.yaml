@@ -116,6 +116,236 @@ paths:
               schema:
                 $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
 
+  /student/portfolio-items/{id}:
+    put:
+      tags: [Student Portfolio]
+      summary: Update item portfolio siswa
+      description: |
+        Memperbarui item portfolio yang sudah ada berdasarkan `type` dan `id`.
+        Hanya item milik siswa yang sedang login yang dapat diperbarui.
+
+        Field `type` wajib dikirim agar server tahu model mana yang diupdate.
+        Hanya field yang dikirim yang akan diperbarui (partial update).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID item portfolio yang akan diupdate
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/UpdateStudentPortfolioItemRequest"
+            examples:
+              skill:
+                summary: Update skill
+                value:
+                  type: skill
+                  title: Vue.js
+              experience:
+                summary: Update experience
+                value:
+                  type: experience
+                  title: Magang Full-stack
+                  position: Full-stack Intern
+                  end_date: "2024-06-30"
+              achievement:
+                summary: Update achievement
+                value:
+                  type: achievement
+                  title: Juara 1 LKS Nasional
+                  description: Juara 1 tingkat nasional
+              application:
+                summary: Update application
+                value:
+                  type: application
+                  status: accepted
+      responses:
+        "200":
+          description: Data portfolio berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopePortfolioItem"
+              example:
+                success: true
+                message: Data portfolio berhasil diperbarui.
+                data:
+                  item:
+                    id: 1
+                    student_profile_id: 1
+                    title: Vue.js
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat mengelola portfolio.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Item portfolio tidak ditemukan atau bukan milik siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Item portfolio tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  type:
+                    - The selected type is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+    delete:
+      tags: [Student Portfolio]
+      summary: Hapus item portfolio siswa
+      description: |
+        Menghapus item portfolio berdasarkan `type` dan `id`.
+        Hanya item milik siswa yang sedang login yang dapat dihapus.
+
+        Field `type` wajib dikirim dalam request body agar server tahu model mana yang dihapus.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID item portfolio yang akan dihapus
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../openapi.yaml#/components/schemas/DestroyStudentPortfolioItemRequest"
+            examples:
+              skill:
+                summary: Hapus skill
+                value:
+                  type: skill
+              experience:
+                summary: Hapus experience
+                value:
+                  type: experience
+              achievement:
+                summary: Hapus achievement
+                value:
+                  type: achievement
+              application:
+                summary: Hapus application
+                value:
+                  type: application
+      responses:
+        "200":
+          description: Data portfolio berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Data portfolio berhasil dihapus.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Token tidak valid atau sudah expired
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+              example:
+                success: false
+                message: Unauthenticated.
+                data: null
+                errors: null
+                meta: null
+        "403":
+          description: User bukan role siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya user siswa yang dapat mengelola portfolio.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Item portfolio tidak ditemukan atau bukan milik siswa
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Item portfolio tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  type:
+                    - The selected type is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
   /application-reminder:
     get:
       tags: [Student Portfolio]

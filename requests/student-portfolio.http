@@ -448,3 +448,239 @@ Content-Type: application/json
 }
 
 ###
+
+### ============================================================
+###  UPDATE PORTFOLIO ITEMS
+### ============================================================
+
+### ============================================================
+### 21. UPDATE PORTFOLIO - SKILL
+###     Endpoint: PUT /api/student/portfolio-items/{id}
+###     Gunakan ID dari response tambahSkill (#5)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/{{tambahSkill.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "Laravel & Livewire"
+}
+
+###
+
+### ============================================================
+### 22. UPDATE PORTFOLIO - EXPERIENCE (partial update)
+###     Gunakan ID dari response tambahExperience (#8)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/{{tambahExperience.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience",
+  "title": "Magang Full-Stack Developer",
+  "position": "Full-Stack Developer Intern",
+  "end_date": "2023-12-31"
+}
+
+###
+
+### ============================================================
+### 23. UPDATE PORTFOLIO - ACHIEVEMENT
+###     Gunakan ID dari response tambahAchievement (#11)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/{{tambahAchievement.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "achievement",
+  "title": "Juara 1 Lomba Web Design Tingkat Nasional",
+  "description": "Meraih juara 1 dalam kompetisi desain web antar SMK se-Indonesia."
+}
+
+###
+
+### ============================================================
+### 24. UPDATE PORTFOLIO - APPLICATION
+###     Gunakan ID dari response tambahApplication (#13)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/{{tambahApplication.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "application",
+  "status": "accepted"
+}
+
+###
+
+### ============================================================
+### 25. UPDATE PORTFOLIO - Validasi: type tidak valid (422)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/1
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "invalid_type",
+  "title": "Test"
+}
+
+###
+
+### ============================================================
+### 26. UPDATE PORTFOLIO - Item tidak ditemukan (404)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/99999
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "Test"
+}
+
+###
+
+### ============================================================
+### 27. UPDATE PORTFOLIO - Dengan token sekolah (403)
+### ============================================================
+
+PUT {{baseUrl}}/student/portfolio-items/1
+Accept: application/json
+Authorization: Bearer {{loginSekolahForTest.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill",
+  "title": "Ini seharusnya ditolak karena bukan siswa."
+}
+
+###
+
+### ============================================================
+###  DELETE PORTFOLIO ITEMS
+### ============================================================
+
+### ============================================================
+### 28. DELETE PORTFOLIO - SKILL
+###     Endpoint: DELETE /api/student/portfolio-items/{id}
+###     Gunakan ID dari response tambahSkill (#5)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/{{tambahSkill.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill"
+}
+
+###
+
+### ============================================================
+### 29. DELETE PORTFOLIO - EXPERIENCE
+###     Gunakan ID dari response tambahExperience (#8)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/{{tambahExperience.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "experience"
+}
+
+###
+
+### ============================================================
+### 30. DELETE PORTFOLIO - ACHIEVEMENT
+###     Gunakan ID dari response tambahAchievement (#11)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/{{tambahAchievement.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "achievement"
+}
+
+###
+
+### ============================================================
+### 31. DELETE PORTFOLIO - APPLICATION
+###     Gunakan ID dari response tambahApplication (#13)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/{{tambahApplication.response.body.$.data.item.id}}
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "application"
+}
+
+###
+
+### ============================================================
+### 32. DELETE PORTFOLIO - Item tidak ditemukan (404)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/99999
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill"
+}
+
+###
+
+### ============================================================
+### 33. DELETE PORTFOLIO - Validasi: tanpa type (422)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/1
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================================
+### 34. DELETE PORTFOLIO - Dengan token sekolah (403)
+### ============================================================
+
+DELETE {{baseUrl}}/student/portfolio-items/1
+Accept: application/json
+Authorization: Bearer {{loginSekolahForTest.response.body.$.data.token}}
+Content-Type: application/json
+
+{
+  "type": "skill"
+}
+
+###

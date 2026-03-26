@@ -103,7 +103,7 @@ paths:
                     location: Bandung, Jawa Barat
                     skills: [Manual Testing, Test Case Writing, Postman]
                     benefits: [Remote Allowance, Learning Budget]
-                    mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    mitra_logo_url: http://localhost:8000/storage/seed/profile-picture.png
                 errors: null
                 meta:
                   pagination:
@@ -166,7 +166,7 @@ paths:
                     position_name: Junior QA Tester
                     mitra_name: PT Surya Data Nusantara
                     mitra_type: perusahaan
-                    mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    mitra_logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     job_type: penuh_waktu
                     job_type_label: Penuh Waktu
                     work_policy: remote
@@ -192,7 +192,7 @@ paths:
                         instagram: https://instagram.com/suryadata
                         linkedin: null
                         whatsapp: "6289876543210"
-                      logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      logo_url: http://localhost:8000/storage/seed/profile-picture.png
                       category_label: Perusahaan
                 errors: null
                 meta: null

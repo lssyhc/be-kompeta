@@ -54,7 +54,7 @@ paths:
                   - id: 2
                     mitra_type: perusahaan
                     name: PT Binajasa Sumber Sarana
-                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     address: Jakarta Selatan, DKI Jakarta
                     industry_sector: Outsourcing dan layanan tenaga kerja
                     vacancy_count: 2
@@ -69,7 +69,7 @@ paths:
                   - id: 4
                     mitra_type: umkm
                     name: Roti Bunda Rasa
-                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     address: Semarang, Jawa Tengah
                     industry_sector: Kuliner
                     vacancy_count: 2
@@ -130,7 +130,7 @@ paths:
                   id: 2
                   mitra_type: perusahaan
                   name: PT Binajasa Sumber Sarana
-                  logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                  logo_url: http://localhost:8000/storage/seed/profile-picture.png
                   short_description: Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.
                   address: Jakarta Selatan, DKI Jakarta
                   industry_sector: Outsourcing dan layanan tenaga kerja
@@ -141,11 +141,11 @@ paths:
                     linkedin: https://linkedin.com/company/binajasa
                     whatsapp: "6281234567890"
                   gallery:
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
                   vacancy_count: 2
                   vacancies:
                     - id: 1
@@ -164,7 +164,7 @@ paths:
                       skills: [MYOB, Excel, Akuntansi Dasar]
                       benefits:
                         [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
-                      mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      mitra_logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     - id: 2
                       slug: security-freelance-jakarta
                       position_name: Security Freelance
@@ -180,12 +180,12 @@ paths:
                       location: Jakarta Selatan, DKI Jakarta
                       skills: [Office Security, Hotel Security]
                       benefits: [Uang Makan, Seragam Kerja]
-                      mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      mitra_logo_url: http://localhost:8000/storage/seed/profile-picture.png
                   similar_mitra:
                     - id: 3
                       mitra_type: perusahaan
                       name: PT Surya Data Nusantara
-                      logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      logo_url: http://localhost:8000/storage/seed/profile-picture.png
                       address: Bandung, Jawa Barat
                       industry_sector: Teknologi informasi
                       vacancy_count: 3

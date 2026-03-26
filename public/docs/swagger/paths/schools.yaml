@@ -45,12 +45,12 @@ paths:
                   - id: 8
                     school_name: SMA Negeri 1 Bogor
                     address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
-                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     expertise_fields: [IPA, IPS, Bahasa]
                   - id: 9
                     school_name: SMA Negeri 2 Jakarta
                     address: Jl. Sudirman No. 100, Jakarta Pusat, DKI Jakarta
-                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                    logo_url: http://localhost:8000/storage/seed/profile-picture.png
                     expertise_fields: [IPA, IPS]
                 errors: null
                 meta:
@@ -103,13 +103,13 @@ paths:
                   id: 8
                   school_name: SMA Negeri 1 Bogor
                   address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
-                  logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                  logo_url: http://localhost:8000/storage/seed/profile-picture.png
                   gallery:
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
-                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
+                    - http://localhost:8000/storage/seed/profile-picture.png
                   short_description: SMA Negeri 1 Bogor berfokus pada pengembangan akademik, karakter, dan kesiapan karier siswa.
                   accreditation: A
                   expertise_fields: [IPA, IPS, Bahasa]
@@ -123,12 +123,12 @@ paths:
                       full_name: Budi Santoso
                       major: IPA
                       graduation_status: graduated
-                      photo_profile_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      photo_profile_url: http://localhost:8000/storage/seed/profile-picture.png
                     - id: 2
                       full_name: Siti Rahayu
                       major: IPA
                       graduation_status: active
-                      photo_profile_url: http://localhost:8000/storage/seed/template-logo.jpeg
+                      photo_profile_url: http://localhost:8000/storage/seed/profile-picture.png
                   pengajuan_mitra: []
                 errors: null
                 meta: null

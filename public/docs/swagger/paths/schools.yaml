@@ -45,12 +45,12 @@ paths:
                   - id: 8
                     school_name: SMA Negeri 1 Bogor
                     address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
-                    logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+1
+                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                     expertise_fields: [IPA, IPS, Bahasa]
                   - id: 9
                     school_name: SMA Negeri 2 Jakarta
                     address: Jl. Sudirman No. 100, Jakarta Pusat, DKI Jakarta
-                    logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+2
+                    logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                     expertise_fields: [IPA, IPS]
                 errors: null
                 meta:
@@ -73,7 +73,7 @@ paths:
       summary: Detail sekolah
       description: |
         Menampilkan detail lengkap sebuah sekolah beserta:
-        - Profil sekolah (nama, lokasi, logo, galeri, deskripsi, akreditasi)
+        - Profil sekolah (nama, lokasi, logo, galeri, deskripsi, accreditation)
         - Daftar jurusan (expertise_fields)
         - Prestasi siswa sekolah (dari tabel student_achievements)
         - Daftar siswa dari sekolah tersebut
@@ -103,13 +103,13 @@ paths:
                   id: 8
                   school_name: SMA Negeri 1 Bogor
                   address: Jl. Ahmad Yani No. 1, Bogor, Jawa Barat
-                  logo_url: https://via.placeholder.com/200x200?text=SMA+Negeri+1
+                  logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                   gallery:
-                    - https://via.placeholder.com/400x300?text=SMA+Bogor+1
-                    - https://via.placeholder.com/400x300?text=SMA+Bogor+2
-                    - https://via.placeholder.com/400x300?text=SMA+Bogor+3
-                    - https://via.placeholder.com/400x300?text=SMA+Bogor+4
-                    - https://via.placeholder.com/400x300?text=SMA+Bogor+5
+                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/template-logo.jpeg
+                    - http://localhost:8000/storage/seed/template-logo.jpeg
                   short_description: SMA Negeri 1 Bogor berfokus pada pengembangan akademik, karakter, dan kesiapan karier siswa.
                   accreditation: A
                   expertise_fields: [IPA, IPS, Bahasa]
@@ -123,12 +123,12 @@ paths:
                       full_name: Budi Santoso
                       major: IPA
                       graduation_status: graduated
-                      photo_profile_url: https://via.placeholder.com/200x200?text=Budi
+                      photo_profile_url: http://localhost:8000/storage/seed/template-logo.jpeg
                     - id: 2
                       full_name: Siti Rahayu
                       major: IPA
                       graduation_status: active
-                      photo_profile_url: https://via.placeholder.com/200x200?text=Siti
+                      photo_profile_url: http://localhost:8000/storage/seed/template-logo.jpeg
                   pengajuan_mitra: []
                 errors: null
                 meta: null

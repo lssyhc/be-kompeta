@@ -2461,6 +2461,37 @@ components:
           description: Hingga 5 mitra serupa berdasarkan sektor industri
           items:
             $ref: "#/components/schemas/MitraCard"
+        pengajuan_sekolah:
+          type: array
+          description: Daftar pengajuan kemitraan dari sekolah yang terkait mitra ini
+          items:
+            $ref: "#/components/schemas/MitraPartnershipSummary"
+
+    MitraPartnershipSummary:
+      type: object
+      description: Ringkasan pengajuan kemitraan pada detail mitra.
+      properties:
+        school_user_id:
+          type: integer
+          example: 8
+        nama_sekolah:
+          type: string
+          nullable: true
+          example: SMA Negeri 1 Bogor
+        akreditasi:
+          type: string
+          nullable: true
+          example: A
+        tanggal_submit:
+          type: string
+          nullable: true
+          format: date-time
+          description: Tanggal submit proposal (ISO 8601)
+          example: "2026-03-22T08:30:00+07:00"
+        status_submit:
+          type: string
+          enum: [submitted]
+          example: submitted
 
     SchoolCard:
       type: object

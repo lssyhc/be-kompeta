@@ -7,6 +7,7 @@ use App\Http\Resources\Explore\ExploreJobCardResource;
 use App\Http\Resources\Mitra\MitraCardResource;
 use App\Http\Resources\Mitra\MitraDetailResource;
 use App\Models\CompanyProfile;
+use App\Models\PartnershipProposal;
 use App\Models\UmkmProfile;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -59,7 +60,15 @@ class MitraController extends Controller
             ->where('role', User::ROLE_MITRA)
             ->where('account_status', User::STATUS_ACTIVE)
             ->where('id', $id)
-            ->with(['companyProfile', 'umkmProfile'])
+            ->with([
+                'companyProfile',
+                'umkmProfile',
+                'mitraPartnershipProposals' => fn ($query) => $query
+                    ->where('status', PartnershipProposal::STATUS_SUBMITTED)
+                    ->with(['schoolUser.schoolProfile'])
+                    ->orderByDesc('submitted_at')
+                    ->orderByDesc('created_at'),
+            ])
             ->withCount(['jobVacancies as vacancy_count' => fn ($q) => $q->where('is_published', true)])
             ->first();
 

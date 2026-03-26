@@ -118,7 +118,7 @@ paths:
                     skills: [MYOB, Excel, Akuntansi Dasar]
                     benefits:
                       [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
-                    mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                    mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                 errors: null
                 meta:
                   pagination:
@@ -217,7 +217,7 @@ paths:
                         instagram: https://instagram.com/binajasa
                         linkedin: null
                         whatsapp: null
-                      logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                      logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                       category_label: Perusahaan
                   recommendations:
                     - id: 2
@@ -235,7 +235,7 @@ paths:
                       location: Jakarta Selatan, DKI Jakarta
                       skills: [Office Security, Hotel Security]
                       benefits: [Uang Makan, Seragam Kerja]
-                      mitra_logo_url: https://via.placeholder.com/200x200?text=Binajasa
+                      mitra_logo_url: http://localhost:8000/storage/seed/template-logo.jpeg
                 errors: null
                 meta: null
         "404":

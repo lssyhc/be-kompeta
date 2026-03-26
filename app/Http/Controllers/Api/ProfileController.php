@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Models\AdminProfile;
 use App\Models\CompanyProfile;
+use App\Models\PartnershipProposal;
 use App\Models\SchoolProfile;
 use App\Models\StudentApplication;
 use App\Models\StudentProfile;
@@ -199,15 +200,42 @@ class ProfileController extends Controller
         }
 
         if ($user->role === User::ROLE_SEKOLAH) {
-            return SchoolProfile::query()->where('user_id', $user->id)->first();
+            $schoolProfile = SchoolProfile::query()->where('user_id', $user->id)->first();
+
+            if (! $schoolProfile instanceof SchoolProfile) {
+                return null;
+            }
+
+            $profilePayload = $schoolProfile->toArray();
+            $profilePayload['pengajuan_mitra'] = $this->resolveSchoolPartnershipSubmissions($user);
+
+            return $profilePayload;
         }
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_PERUSAHAAN) {
-            return CompanyProfile::query()->where('user_id', $user->id)->first();
+            $companyProfile = CompanyProfile::query()->where('user_id', $user->id)->first();
+
+            if (! $companyProfile instanceof CompanyProfile) {
+                return null;
+            }
+
+            $profilePayload = $companyProfile->toArray();
+            $profilePayload['pengajuan_sekolah'] = $this->resolveMitraPartnershipSubmissions($user);
+
+            return $profilePayload;
         }
 
         if ($user->role === User::ROLE_MITRA && $user->mitra_type === User::MITRA_UMKM) {
-            return UmkmProfile::query()->where('user_id', $user->id)->first();
+            $umkmProfile = UmkmProfile::query()->where('user_id', $user->id)->first();
+
+            if (! $umkmProfile instanceof UmkmProfile) {
+                return null;
+            }
+
+            $profilePayload = $umkmProfile->toArray();
+            $profilePayload['pengajuan_sekolah'] = $this->resolveMitraPartnershipSubmissions($user);
+
+            return $profilePayload;
         }
 
         if ($user->role === User::ROLE_ADMIN) {
@@ -270,5 +298,90 @@ class ProfileController extends Controller
         } elseif ($userNameUpdated) {
             $profile->update([$profileNameField => $validated['user']['name']]);
         }
+    }
+
+    private function resolveSchoolPartnershipSubmissions(User $user): array
+    {
+        /** @var Collection<int, PartnershipProposal> $proposals */
+        $proposals = $user->schoolPartnershipProposals()
+            ->where('status', PartnershipProposal::STATUS_SUBMITTED)
+            ->with(['mitraUser.companyProfile', 'mitraUser.umkmProfile'])
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $proposals->map(function (PartnershipProposal $proposal): array {
+            $mitraUser = $proposal->mitraUser;
+            $mitraName = null;
+            $sectorOrType = null;
+
+            if ($mitraUser instanceof User) {
+                if ($mitraUser->mitra_type === User::MITRA_PERUSAHAAN) {
+                    $companyProfile = $mitraUser->companyProfile;
+                    if ($companyProfile instanceof CompanyProfile) {
+                        $mitraName = $companyProfile->company_name;
+                        $sectorOrType = $companyProfile->industry_sector;
+                    }
+                }
+
+                if ($mitraUser->mitra_type === User::MITRA_UMKM) {
+                    $umkmProfile = $mitraUser->umkmProfile;
+                    if ($umkmProfile instanceof UmkmProfile) {
+                        $mitraName = $umkmProfile->business_name;
+                        $sectorOrType = $umkmProfile->business_type;
+                    }
+                }
+
+                if (! is_string($mitraName) || $mitraName === '') {
+                    $mitraName = $mitraUser->name;
+                }
+            }
+
+            return [
+                'mitra_user_id' => $proposal->mitra_user_id,
+                'nama_mitra' => $mitraName,
+                'sektor_atau_tipe' => $sectorOrType,
+                'mitra_tipe' => $mitraUser instanceof User ? $mitraUser->mitra_type : null,
+                'tanggal_submit' => $proposal->submitted_at?->toIso8601String(),
+                'status_submit' => $proposal->status,
+            ];
+        })->values()->all();
+    }
+
+    private function resolveMitraPartnershipSubmissions(User $user): array
+    {
+        /** @var Collection<int, PartnershipProposal> $proposals */
+        $proposals = $user->mitraPartnershipProposals()
+            ->where('status', PartnershipProposal::STATUS_SUBMITTED)
+            ->with(['schoolUser.schoolProfile'])
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $proposals->map(function (PartnershipProposal $proposal): array {
+            $schoolUser = $proposal->schoolUser;
+            $schoolName = null;
+            $accreditation = null;
+
+            if ($schoolUser instanceof User) {
+                $schoolProfile = $schoolUser->schoolProfile;
+                if ($schoolProfile instanceof SchoolProfile) {
+                    $schoolName = $schoolProfile->school_name;
+                    $accreditation = $schoolProfile->accreditation;
+                }
+
+                if (! is_string($schoolName) || $schoolName === '') {
+                    $schoolName = $schoolUser->name;
+                }
+            }
+
+            return [
+                'school_user_id' => $proposal->school_user_id,
+                'nama_sekolah' => $schoolName,
+                'akreditasi' => $accreditation,
+                'tanggal_submit' => $proposal->submitted_at?->toIso8601String(),
+                'status_submit' => $proposal->status,
+            ];
+        })->values()->all();
     }
 }

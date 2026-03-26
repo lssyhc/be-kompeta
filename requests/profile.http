@@ -143,6 +143,7 @@ Content-Type: image/jpeg
 
 ### ============================================================
 ### 3. GET PROFILE SEKOLAH
+### Response includes role_profile.pengajuan_mitra (list mitra yang mengajukan partnership)
 ### ============================================================
 
 GET {{baseUrl}}/profile
@@ -221,6 +222,7 @@ Content-Type: application/pdf
 
 ### ============================================================
 ### 5. GET PROFILE MITRA PERUSAHAAN
+### Response includes role_profile.pengajuan_sekolah (list sekolah yang mengajukan partnership)
 ### ============================================================
 
 GET {{baseUrl}}/profile
@@ -306,6 +308,7 @@ Content-Type: application/pdf
 
 ### ============================================================
 ### 7. GET PROFILE MITRA UMKM
+### Response includes role_profile.pengajuan_sekolah (list sekolah yang mengajukan partnership)
 ### ============================================================
 
 GET {{baseUrl}}/profile

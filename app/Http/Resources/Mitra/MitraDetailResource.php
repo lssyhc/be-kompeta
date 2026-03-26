@@ -3,6 +3,8 @@
 namespace App\Http\Resources\Mitra;
 
 use App\Models\CompanyProfile;
+use App\Models\PartnershipProposal;
+use App\Models\SchoolProfile;
 use App\Models\UmkmProfile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,7 +38,44 @@ class MitraDetailResource extends JsonResource
             'socials' => $socials,
             'gallery' => $gallery,
             'vacancy_count' => (int) ($this->vacancy_count ?? 0),
+            'pengajuan_sekolah' => $this->formatPartnershipSubmissions(),
         ];
+    }
+
+    private function formatPartnershipSubmissions(): array
+    {
+        /** @var iterable<PartnershipProposal> $submissions */
+        $submissions = $this->mitraPartnershipProposals ?? [];
+
+        return collect($submissions)
+            ->map(function (PartnershipProposal $proposal): array {
+                $schoolUser = $proposal->schoolUser;
+                $schoolName = null;
+                $accreditation = null;
+
+                if ($schoolUser instanceof User) {
+                    $schoolProfile = $schoolUser->schoolProfile;
+
+                    if ($schoolProfile instanceof SchoolProfile) {
+                        $schoolName = $schoolProfile->school_name;
+                        $accreditation = $schoolProfile->accreditation;
+                    }
+
+                    if (! is_string($schoolName) || $schoolName === '') {
+                        $schoolName = $schoolUser->name;
+                    }
+                }
+
+                return [
+                    'school_user_id' => $proposal->school_user_id,
+                    'nama_sekolah' => $schoolName,
+                    'akreditasi' => $accreditation,
+                    'tanggal_submit' => $proposal->submitted_at?->toIso8601String(),
+                    'status_submit' => $proposal->status,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function resolveProfileFields(): array

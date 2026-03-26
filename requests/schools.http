@@ -59,6 +59,7 @@ Accept: application/json
 ### 5. DETAIL SEKOLAH
 ### Endpoint: GET /api/public/schools/{id}
 ### ID dari seeder: school.a (user id=8)
+### Response termasuk: students, student_achievements, pengajuan_mitra
 ### ============================================================
 
 @schoolId = 8

@@ -13,6 +13,10 @@ paths:
         - **siswa** → `student_profiles` + `job_applications` (`full_name`, `nisn`, `major`, `school_origin`, `graduation_status`, `class_year`, `description`, `socials`, `address`, dll.)
 
         Untuk siswa, `role_profile` juga menyertakan `job_applications` — daftar lamaran kerja aktif.
+
+        Untuk sekolah, `role_profile` menyertakan `pengajuan_mitra` — daftar mitra yang mengajukan partnership ke sekolah (status submitted).
+
+        Untuk mitra (perusahaan / UMKM), `role_profile` menyertakan `pengajuan_sekolah` — daftar sekolah yang mengajukan partnership ke mitra (status submitted).
       responses:
         "200":
           description: Profil berhasil diambil
@@ -78,6 +82,101 @@ paths:
                             role_type: Accounting Staff
                             applied_at: "2026-03-19T09:00:00+07:00"
                             status: submitted
+                    errors: null
+                    meta: null
+                sekolah:
+                  summary: Response profile sekolah (termasuk pengajuan_mitra)
+                  value:
+                    success: true
+                    message: Profil berhasil diambil.
+                    data:
+                      user:
+                        id: 2
+                        name: SMK Negeri 1 Kota Bogor
+                        email: school.a@kompeta.test
+                        role: sekolah
+                        mitra_type: null
+                        account_status: active
+                        last_login_at: "2026-06-01T08:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 2
+                        school_name: SMK Negeri 1 Kota Bogor
+                        npsn: "20254126"
+                        address: Jl. Heulang No. 6, Tanah Sareal, Bogor
+                        accreditation: A
+                        expertise_fields:
+                          - Rekayasa Perangkat Lunak
+                          - Teknik Komputer dan Jaringan
+                        short_description: Sekolah vokasi unggulan di Bogor.
+                        pengajuan_mitra:
+                          - mitra_user_id: 6
+                            nama_mitra: PT Binajasa Sumber Sarana
+                            sektor_atau_tipe: Teknologi Informasi
+                            mitra_tipe: perusahaan
+                            tanggal_submit: "2026-04-10T08:00:00+07:00"
+                            status_submit: submitted
+                    errors: null
+                    meta: null
+                mitra_perusahaan:
+                  summary: Response profile mitra perusahaan (termasuk pengajuan_sekolah)
+                  value:
+                    success: true
+                    message: Profil berhasil diambil.
+                    data:
+                      user:
+                        id: 6
+                        name: PT Binajasa Sumber Sarana
+                        email: mitra.company.a@kompeta.test
+                        role: mitra
+                        mitra_type: perusahaan
+                        account_status: active
+                        last_login_at: "2026-06-01T07:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 6
+                        company_name: PT Binajasa Sumber Sarana
+                        nib: "1234567890123"
+                        industry_sector: Teknologi Informasi
+                        employee_total_range: 51-200
+                        office_address: Jl. Sudirman No. 10, Jakarta
+                        short_description: Perusahaan software enterprise.
+                        pengajuan_sekolah:
+                          - school_user_id: 2
+                            nama_sekolah: SMK Negeri 1 Kota Bogor
+                            akreditasi: A
+                            tanggal_submit: "2026-04-10T08:00:00+07:00"
+                            status_submit: submitted
+                    errors: null
+                    meta: null
+                mitra_umkm:
+                  summary: Response profile mitra UMKM (termasuk pengajuan_sekolah)
+                  value:
+                    success: true
+                    message: Profil berhasil diambil.
+                    data:
+                      user:
+                        id: 8
+                        name: Roti Bunda Rasa
+                        email: mitra.umkm.a@kompeta.test
+                        role: mitra
+                        mitra_type: umkm
+                        account_status: active
+                        last_login_at: "2026-06-01T06:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 8
+                        business_name: Roti Bunda Rasa
+                        owner_nik: "3201234567890001"
+                        business_type: Kuliner
+                        business_address: Jl. Pasar No. 5, Bogor
+                        short_description: UMKM kuliner lokal yang berkembang.
+                        pengajuan_sekolah:
+                          - school_user_id: 2
+                            nama_sekolah: SMK Negeri 1 Kota Bogor
+                            akreditasi: A
+                            tanggal_submit: "2026-04-15T09:00:00+07:00"
+                            status_submit: submitted
                     errors: null
                     meta: null
         "401":
@@ -413,6 +512,101 @@ paths:
                             role_type: Accounting Staff
                             applied_at: "2026-03-19T09:00:00+07:00"
                             status: submitted
+                    errors: null
+                    meta: null
+                sekolah:
+                  summary: Response update profile sekolah (termasuk pengajuan_mitra)
+                  value:
+                    success: true
+                    message: Profil berhasil diperbarui.
+                    data:
+                      user:
+                        id: 2
+                        name: SMK Negeri 1 Kota Bogor
+                        email: school.a@kompeta.test
+                        role: sekolah
+                        mitra_type: null
+                        account_status: active
+                        last_login_at: "2026-06-01T08:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 2
+                        school_name: SMK Negeri 1 Kota Bogor
+                        npsn: "20254126"
+                        address: Jl. Heulang No. 6, Tanah Sareal, Bogor
+                        accreditation: A
+                        expertise_fields:
+                          - Rekayasa Perangkat Lunak
+                          - Teknik Komputer dan Jaringan
+                        short_description: Sekolah vokasi unggulan di Bogor.
+                        pengajuan_mitra:
+                          - mitra_user_id: 6
+                            nama_mitra: PT Binajasa Sumber Sarana
+                            sektor_atau_tipe: Teknologi Informasi
+                            mitra_tipe: perusahaan
+                            tanggal_submit: "2026-04-10T08:00:00+07:00"
+                            status_submit: submitted
+                    errors: null
+                    meta: null
+                mitra_perusahaan:
+                  summary: Response update profile mitra perusahaan (termasuk pengajuan_sekolah)
+                  value:
+                    success: true
+                    message: Profil berhasil diperbarui.
+                    data:
+                      user:
+                        id: 6
+                        name: PT Binajasa Sumber Sarana
+                        email: mitra.company.a@kompeta.test
+                        role: mitra
+                        mitra_type: perusahaan
+                        account_status: active
+                        last_login_at: "2026-06-01T07:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 6
+                        company_name: PT Binajasa Sumber Sarana
+                        nib: "1234567890123"
+                        industry_sector: Teknologi Informasi
+                        employee_total_range: 51-200
+                        office_address: Jl. Sudirman No. 10, Jakarta
+                        short_description: Perusahaan software enterprise.
+                        pengajuan_sekolah:
+                          - school_user_id: 2
+                            nama_sekolah: SMK Negeri 1 Kota Bogor
+                            akreditasi: A
+                            tanggal_submit: "2026-04-10T08:00:00+07:00"
+                            status_submit: submitted
+                    errors: null
+                    meta: null
+                mitra_umkm:
+                  summary: Response update profile mitra UMKM (termasuk pengajuan_sekolah)
+                  value:
+                    success: true
+                    message: Profil berhasil diperbarui.
+                    data:
+                      user:
+                        id: 8
+                        name: Roti Bunda Rasa
+                        email: mitra.umkm.a@kompeta.test
+                        role: mitra
+                        mitra_type: umkm
+                        account_status: active
+                        last_login_at: "2026-06-01T06:00:00.000000Z"
+                      role_profile:
+                        id: 1
+                        user_id: 8
+                        business_name: Roti Bunda Rasa
+                        owner_nik: "3201234567890001"
+                        business_type: Kuliner
+                        business_address: Jl. Pasar No. 5, Bogor
+                        short_description: UMKM kuliner lokal yang berkembang.
+                        pengajuan_sekolah:
+                          - school_user_id: 2
+                            nama_sekolah: SMK Negeri 1 Kota Bogor
+                            akreditasi: A
+                            tanggal_submit: "2026-04-15T09:00:00+07:00"
+                            status_submit: submitted
                     errors: null
                     meta: null
         "401":

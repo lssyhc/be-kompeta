@@ -81,6 +81,7 @@ Accept: application/json
 ### 7. DETAIL MITRA
 ### Endpoint: GET /api/public/mitra/{id}
 ### ID dari seeder: mitra.company.a (user id=2)
+### Response termasuk: vacancies, similar_mitra, pengajuan_sekolah
 ### ============================================================
 
 @mitraId = 2

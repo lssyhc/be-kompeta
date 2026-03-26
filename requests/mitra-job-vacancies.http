@@ -1,0 +1,300 @@
+### ============================================================
+### MITRA JOB VACANCIES CRUD API - REST Client Testing
+### ============================================================
+### Data seeder yang tersedia:
+### - mitra.company.a@kompeta.test → PT Binajasa Sumber Sarana
+###   → punya vacancy: accounting-staff-1602be, security-freelance-jakarta, backend-intern-internal
+### - mitra.company.b@kompeta.test → PT Surya Data Nusantara
+###   → punya vacancy: data-entry-operator-bandung, junior-qa-tester-remote, staff-riset-produk-freelance
+### - mitra.umkm.a@kompeta.test → Roti Mama Semarang
+###   → punya vacancy: baker-assistant-semarang, content-creator-umkm-semarang
+### - mitra.umkm.b@kompeta.test → Kerajinan Kayu Jogja
+###   → punya vacancy: operator-produksi-kayu-jogja, magang-admin-marketplace-jogja
+### ============================================================
+@baseUrl = http://localhost:8000/api
+
+### ============================================================
+### LOGIN MITRA PERUSAHAAN (PT Binajasa Sumber Sarana)
+### ============================================================
+
+# @name loginMitraCompany
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.company.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
+### ============================================================
+### LOGIN MITRA UMKM (Roti Mama Semarang)
+### ============================================================
+
+# @name loginMitraUmkm
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.umkm.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
+### ============================================================
+### 1) LIST LOWONGAN MILIK MITRA (semua, default)
+### Endpoint: GET /api/mitra/job-vacancies
+### ============================================================
+
+# @name listVacancies
+GET {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 2) LIST LOWONGAN DENGAN PAGINATION
+### ============================================================
+
+# @name listVacanciesPaginated
+GET {{baseUrl}}/mitra/job-vacancies?page=1&per_page=5
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 3) LIST LOWONGAN - FILTER PUBLISHED ONLY
+### ============================================================
+
+# @name listVacanciesPublished
+GET {{baseUrl}}/mitra/job-vacancies?is_published=true
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 4) LIST LOWONGAN - FILTER DRAFT ONLY
+### ============================================================
+
+# @name listVacanciesDraft
+GET {{baseUrl}}/mitra/job-vacancies?is_published=false
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 5) CREATE LOWONGAN BARU
+### Endpoint: POST /api/mitra/job-vacancies
+### ============================================================
+
+# @name createVacancy
+POST {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+{
+  "position_name": "Frontend Developer",
+  "category": "Teknologi",
+  "job_type": "penuh_waktu",
+  "work_policy": "remote",
+  "experience_level": "fresh_graduate",
+  "province": "DKI Jakarta",
+  "salary_min": 6000000,
+  "salary_max": 8000000,
+  "is_salary_hidden": false,
+  "requirements": "Menguasai HTML, CSS, JavaScript.\nPengalaman React/Vue menjadi nilai plus.\nKomunikatif dan mampu bekerja dalam tim.",
+  "job_description": "Mengembangkan tampilan frontend aplikasi web perusahaan menggunakan framework modern. Berkolaborasi dengan tim backend dan desainer UI/UX.",
+  "is_published": true,
+  "skills": ["HTML", "CSS", "JavaScript", "React", "Vue.js"],
+  "benefits": ["Remote Allowance", "Learning Budget", "BPJS Kesehatan", "Laptop Kerja"]
+}
+
+###
+
+### ============================================================
+### 6) CREATE LOWONGAN DRAFT (belum dipublikasikan)
+### ============================================================
+
+# @name createVacancyDraft
+POST {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+{
+  "position_name": "Graphic Designer",
+  "category": "Desain",
+  "job_type": "freelance",
+  "work_policy": "remote",
+  "experience_level": "kurang_dari_setahun",
+  "province": "Jawa Barat",
+  "salary_min": 3000000,
+  "salary_max": 5000000,
+  "is_salary_hidden": false,
+  "requirements": "Menguasai Adobe Photoshop dan Illustrator.\nMemiliki portofolio desain.",
+  "job_description": "Membuat desain grafis untuk kebutuhan pemasaran dan media sosial perusahaan.",
+  "is_published": false,
+  "skills": ["Photoshop", "Illustrator", "Figma"],
+  "benefits": ["Jam Kerja Fleksibel", "Project Bonus"]
+}
+
+###
+
+### ============================================================
+### 7) DETAIL LOWONGAN
+### Endpoint: GET /api/mitra/job-vacancies/{id}
+### Gunakan ID dari response createVacancy
+### ============================================================
+
+# @name showVacancy
+GET {{baseUrl}}/mitra/job-vacancies/{{createVacancy.response.body.$.data.id}}
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 8) UPDATE LOWONGAN (partial update — ubah gaji dan skills)
+### Endpoint: PUT /api/mitra/job-vacancies/{id}
+### ============================================================
+
+# @name updateVacancy
+PUT {{baseUrl}}/mitra/job-vacancies/{{createVacancy.response.body.$.data.id}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+{
+  "salary_min": 7000000,
+  "salary_max": 9000000,
+  "skills": ["HTML", "CSS", "JavaScript", "React", "Vue.js", "TypeScript"]
+}
+
+###
+
+### ============================================================
+### 9) UPDATE LOWONGAN — PUBLISH DRAFT
+### ============================================================
+
+# @name publishDraft
+PUT {{baseUrl}}/mitra/job-vacancies/{{createVacancyDraft.response.body.$.data.id}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+{
+  "is_published": true
+}
+
+###
+
+### ============================================================
+### 10) DELETE LOWONGAN
+### Endpoint: DELETE /api/mitra/job-vacancies/{id}
+### ============================================================
+
+# @name deleteVacancy
+DELETE {{baseUrl}}/mitra/job-vacancies/{{createVacancyDraft.response.body.$.data.id}}
+Accept: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 11) CREATE LOWONGAN DARI MITRA UMKM
+### ============================================================
+
+# @name createVacancyUmkm
+POST {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+{
+  "position_name": "Kasir Part-Time",
+  "category": "Penjualan",
+  "job_type": "paruh_waktu",
+  "work_policy": "kantor",
+  "experience_level": "tidak_berpengalaman",
+  "province": "Jawa Tengah",
+  "salary_min": 1500000,
+  "salary_max": 2000000,
+  "is_salary_hidden": false,
+  "requirements": "Minimal SMA/SMK.\nJujur dan teliti.",
+  "job_description": "Melayani transaksi pembayaran pelanggan di toko.",
+  "is_published": true,
+  "skills": ["Kasir", "Pelayanan Pelanggan"],
+  "benefits": ["Makan Siang", "Bonus Penjualan"]
+}
+
+###
+
+### ============================================================
+### 12) ERROR: VALIDASI GAGAL (required fields kosong)
+### ============================================================
+
+# @name createVacancyValidationError
+POST {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{loginMitraCompany.response.body.$.data.token}}
+
+{
+  "position_name": "",
+  "category": "",
+  "job_type": "invalid_type",
+  "work_policy": "kantor",
+  "experience_level": "fresh_graduate",
+  "province": "DKI Jakarta",
+  "job_description": ""
+}
+
+###
+
+### ============================================================
+### 13) ERROR: NON-MITRA MENCOBA AKSES (login siswa)
+### ============================================================
+
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
+}
+
+###
+
+# @name listVacanciesAsSiswa
+GET {{baseUrl}}/mitra/job-vacancies
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### 14) ERROR: AKSES LOWONGAN MITRA LAIN
+### Mitra UMKM mencoba akses lowongan milik mitra perusahaan
+### ============================================================
+
+# @name showOtherMitraVacancy
+GET {{baseUrl}}/mitra/job-vacancies/1
+Accept: application/json
+Authorization: Bearer {{loginMitraUmkm.response.body.$.data.token}}
+
+###

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ExploreController;
 use App\Http\Controllers\Api\ForYouController;
 use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\MitraJobApplicationController;
+use App\Http\Controllers\Api\MitraJobVacancyController;
 use App\Http\Controllers\Api\OpenApiController;
 use App\Http\Controllers\Api\PartnershipProposalController;
 use App\Http\Controllers\Api\ProfileController;
@@ -68,6 +69,14 @@ Route::middleware('auth:sanctum')->prefix('partnership-proposals')->group(functi
     Route::post('/', [PartnershipProposalController::class, 'store']);
     Route::get('/{id}', [PartnershipProposalController::class, 'show'])->whereNumber('id');
     Route::get('/{id}/proposal-pdf', [PartnershipProposalController::class, 'downloadProposalPdf'])->whereNumber('id');
+});
+
+Route::middleware('auth:sanctum')->prefix('mitra/job-vacancies')->group(function () {
+    Route::get('/', [MitraJobVacancyController::class, 'index']);
+    Route::post('/', [MitraJobVacancyController::class, 'store']);
+    Route::get('/{id}', [MitraJobVacancyController::class, 'show'])->whereNumber('id');
+    Route::put('/{id}', [MitraJobVacancyController::class, 'update'])->whereNumber('id');
+    Route::delete('/{id}', [MitraJobVacancyController::class, 'destroy'])->whereNumber('id');
 });
 
 Route::middleware('auth:sanctum')->prefix('mitra/job-applications')->group(function () {

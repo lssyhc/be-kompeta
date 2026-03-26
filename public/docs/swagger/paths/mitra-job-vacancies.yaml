@@ -1,0 +1,580 @@
+paths:
+  /mitra/job-vacancies:
+    get:
+      tags: [Mitra Job Vacancies]
+      summary: List lowongan milik mitra
+      description: |
+        Menampilkan daftar lowongan kerja milik mitra yang sedang login.
+        Termasuk lowongan draft (belum dipublikasikan). Bisa difilter berdasarkan status publikasi.
+      parameters:
+        - in: query
+          name: is_published
+          schema:
+            type: string
+            enum: ["0", "1", "true", "false"]
+          description: Filter berdasarkan status publikasi (opsional)
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Nomor halaman
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+          description: Jumlah item per halaman
+      responses:
+        "200":
+          description: Daftar lowongan berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobVacancyList"
+              example:
+                success: true
+                message: Daftar lowongan berhasil diambil.
+                data:
+                  - id: 1
+                    slug: accounting-staff-1602be
+                    position_name: Accounting Staff
+                    category: Keuangan
+                    job_type: penuh_waktu
+                    job_type_label: Penuh Waktu
+                    work_policy: kantor
+                    work_policy_label: Kerja di kantor
+                    experience_level: kurang_dari_setahun
+                    experience_level_label: Kurang dari setahun
+                    province: DKI Jakarta
+                    salary_min: 5700000
+                    salary_max: 5800000
+                    is_salary_hidden: false
+                    salary_label: Rp 5,7 jt-5,8 jt
+                    requirements: "Minimal Sarjana (S1).\nMemahami MYOB."
+                    job_description: Mengerjakan proses jurnal dan laporan keuangan.
+                    is_published: true
+                    skills: [MYOB, Excel, Akuntansi Dasar]
+                    benefits: [BPJS Kesehatan, BPJS Ketenagakerjaan]
+                    created_at: "2026-03-23T05:00:00+07:00"
+                    updated_at: "2026-03-23T05:00:00+07:00"
+                errors: null
+                meta:
+                  pagination:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 12
+                    total: 1
+                    has_more_pages: false
+        "401":
+          description: Belum login / token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+        "403":
+          description: Bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengakses lowongan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+    post:
+      tags: [Mitra Job Vacancies]
+      summary: Buat lowongan baru
+      description: |
+        Membuat lowongan kerja baru untuk mitra yang sedang login.
+        Slug akan di-generate otomatis dari position_name.
+        Skills dan benefits bisa ditambahkan langsung saat pembuatan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - position_name
+                - category
+                - job_type
+                - work_policy
+                - experience_level
+                - province
+                - job_description
+              properties:
+                position_name:
+                  type: string
+                  maxLength: 255
+                  example: Accounting Staff
+                category:
+                  type: string
+                  maxLength: 255
+                  example: Keuangan
+                job_type:
+                  type: string
+                  enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+                  example: penuh_waktu
+                work_policy:
+                  type: string
+                  enum: [kantor, hybrid, remote]
+                  example: kantor
+                experience_level:
+                  type: string
+                  enum:
+                    [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+                  example: kurang_dari_setahun
+                province:
+                  type: string
+                  example: DKI Jakarta
+                salary_min:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  example: 5700000
+                salary_max:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  description: Harus >= salary_min jika keduanya diisi
+                  example: 5800000
+                is_salary_hidden:
+                  type: boolean
+                  default: false
+                  example: false
+                requirements:
+                  type: string
+                  nullable: true
+                  maxLength: 5000
+                  example: "Minimal Sarjana (S1).\nMemahami MYOB.\nKomunikasi baik."
+                job_description:
+                  type: string
+                  maxLength: 10000
+                  example: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                is_published:
+                  type: boolean
+                  default: true
+                  example: true
+                skills:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    maxLength: 100
+                  example: [MYOB, Excel, Akuntansi Dasar]
+                benefits:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    maxLength: 100
+                  example: [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
+      responses:
+        "201":
+          description: Lowongan berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobVacancy"
+              example:
+                success: true
+                message: Lowongan berhasil dibuat.
+                data:
+                  id: 11
+                  slug: accounting-staff-a1b2c3
+                  position_name: Accounting Staff
+                  category: Keuangan
+                  job_type: penuh_waktu
+                  job_type_label: Penuh Waktu
+                  work_policy: kantor
+                  work_policy_label: Kerja di kantor
+                  experience_level: kurang_dari_setahun
+                  experience_level_label: Kurang dari setahun
+                  province: DKI Jakarta
+                  salary_min: 5700000
+                  salary_max: 5800000
+                  is_salary_hidden: false
+                  salary_label: Rp 5,7 jt-5,8 jt
+                  requirements: "Minimal Sarjana (S1).\nMemahami MYOB.\nKomunikasi baik."
+                  job_description: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                  is_published: true
+                  skills: [MYOB, Excel, Akuntansi Dasar]
+                  benefits: [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
+                  created_at: "2026-03-26T10:00:00+07:00"
+                  updated_at: "2026-03-26T10:00:00+07:00"
+                errors: null
+                meta: null
+        "401":
+          description: Belum login / token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+        "403":
+          description: Bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat membuat lowongan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  position_name:
+                    - The position name field is required.
+                  job_type:
+                    - The selected job type is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+
+  /mitra/job-vacancies/{id}:
+    get:
+      tags: [Mitra Job Vacancies]
+      summary: Detail lowongan milik mitra
+      description: |
+        Menampilkan detail sebuah lowongan milik mitra yang sedang login.
+        Hanya bisa mengakses lowongan milik sendiri (ownership check).
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lowongan
+          example: 1
+      responses:
+        "200":
+          description: Detail lowongan berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobVacancy"
+              example:
+                success: true
+                message: Detail lowongan berhasil diambil.
+                data:
+                  id: 1
+                  slug: accounting-staff-1602be
+                  position_name: Accounting Staff
+                  category: Keuangan
+                  job_type: penuh_waktu
+                  job_type_label: Penuh Waktu
+                  work_policy: kantor
+                  work_policy_label: Kerja di kantor
+                  experience_level: kurang_dari_setahun
+                  experience_level_label: Kurang dari setahun
+                  province: DKI Jakarta
+                  salary_min: 5700000
+                  salary_max: 5800000
+                  is_salary_hidden: false
+                  salary_label: Rp 5,7 jt-5,8 jt
+                  requirements: "Minimal Sarjana (S1).\nMemahami MYOB.\nKomunikasi baik."
+                  job_description: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                  is_published: true
+                  skills: [MYOB, Excel, Akuntansi Dasar]
+                  benefits: [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang]
+                  created_at: "2026-03-23T05:00:00+07:00"
+                  updated_at: "2026-03-23T05:00:00+07:00"
+                errors: null
+                meta: null
+        "401":
+          description: Belum login / token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+        "403":
+          description: Bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengakses lowongan.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan atau bukan milik mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+    put:
+      tags: [Mitra Job Vacancies]
+      summary: Update lowongan milik mitra
+      description: |
+        Memperbarui lowongan kerja milik mitra yang sedang login.
+        Semua field bersifat opsional (partial update). Jika skills/benefits dikirim, akan menggantikan data lama.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lowongan
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position_name:
+                  type: string
+                  maxLength: 255
+                  example: Senior Accounting Staff
+                category:
+                  type: string
+                  maxLength: 255
+                  example: Keuangan
+                job_type:
+                  type: string
+                  enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+                  example: penuh_waktu
+                work_policy:
+                  type: string
+                  enum: [kantor, hybrid, remote]
+                  example: hybrid
+                experience_level:
+                  type: string
+                  enum:
+                    [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+                  example: kurang_dari_setahun
+                province:
+                  type: string
+                  example: DKI Jakarta
+                salary_min:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  example: 6000000
+                salary_max:
+                  type: integer
+                  nullable: true
+                  minimum: 0
+                  description: Harus >= salary_min jika keduanya diisi
+                  example: 7000000
+                is_salary_hidden:
+                  type: boolean
+                  example: false
+                requirements:
+                  type: string
+                  nullable: true
+                  maxLength: 5000
+                  example: "Minimal Sarjana (S1).\nMemahami MYOB & SAP."
+                job_description:
+                  type: string
+                  maxLength: 10000
+                  example: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                is_published:
+                  type: boolean
+                  example: true
+                skills:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    maxLength: 100
+                  example: [MYOB, SAP, Excel, Akuntansi Dasar]
+                benefits:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    maxLength: 100
+                  example:
+                    [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang, THR]
+      responses:
+        "200":
+          description: Lowongan berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeMitraJobVacancy"
+              example:
+                success: true
+                message: Lowongan berhasil diperbarui.
+                data:
+                  id: 1
+                  slug: accounting-staff-1602be
+                  position_name: Senior Accounting Staff
+                  category: Keuangan
+                  job_type: penuh_waktu
+                  job_type_label: Penuh Waktu
+                  work_policy: hybrid
+                  work_policy_label: Kerja di kantor / rumah
+                  experience_level: kurang_dari_setahun
+                  experience_level_label: Kurang dari setahun
+                  province: DKI Jakarta
+                  salary_min: 6000000
+                  salary_max: 7000000
+                  is_salary_hidden: false
+                  salary_label: Rp 6 jt-7 jt
+                  requirements: "Minimal Sarjana (S1).\nMemahami MYOB & SAP."
+                  job_description: Mengerjakan proses jurnal, rekonsiliasi, dan laporan keuangan harian perusahaan.
+                  is_published: true
+                  skills: [MYOB, SAP, Excel, Akuntansi Dasar]
+                  benefits:
+                    [BPJS Kesehatan, BPJS Ketenagakerjaan, Makan Siang, THR]
+                  created_at: "2026-03-23T05:00:00+07:00"
+                  updated_at: "2026-03-26T10:30:00+07:00"
+                errors: null
+                meta: null
+        "401":
+          description: Belum login / token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+        "403":
+          description: Bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat mengubah lowongan.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan atau bukan milik mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "422":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope422"
+              example:
+                success: false
+                message: Validasi gagal.
+                data: null
+                errors:
+                  job_type:
+                    - The selected job type is invalid.
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"
+    delete:
+      tags: [Mitra Job Vacancies]
+      summary: Hapus lowongan milik mitra
+      description: |
+        Menghapus lowongan kerja milik mitra yang sedang login.
+        Penghapusan bersifat cascade — skills, benefits, dan bookmarks terkait ikut terhapus.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID lowongan
+          example: 1
+      responses:
+        "200":
+          description: Lowongan berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/SuccessEnvelopeEmpty"
+              example:
+                success: true
+                message: Lowongan berhasil dihapus.
+                data: null
+                errors: null
+                meta: null
+        "401":
+          description: Belum login / token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope401"
+        "403":
+          description: Bukan role mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope403"
+              example:
+                success: false
+                message: Hanya mitra yang dapat menghapus lowongan.
+                data: null
+                errors: null
+                meta: null
+        "404":
+          description: Lowongan tidak ditemukan atau bukan milik mitra
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope404"
+              example:
+                success: false
+                message: Lowongan tidak ditemukan.
+                data: null
+                errors: null
+                meta: null
+        "500":
+          description: Kesalahan server internal
+          content:
+            application/json:
+              schema:
+                $ref: "../openapi.yaml#/components/schemas/ErrorEnvelope500"

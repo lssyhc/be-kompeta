@@ -50,6 +50,7 @@ tags:
   - name: Student Portfolio
   - name: Student Job Applications
   - name: Student Bookmarks
+  - name: Mitra Job Vacancies
   - name: Mitra Job Applications
   - name: Partnership Proposals
   - name: Explore
@@ -105,6 +106,11 @@ paths:
     $ref: "./paths/student-bookmarks.yaml#/paths/~1student~1bookmarks"
   /student/bookmarks/{id}:
     $ref: "./paths/student-bookmarks.yaml#/paths/~1student~1bookmarks~1{id}"
+
+  /mitra/job-vacancies:
+    $ref: "./paths/mitra-job-vacancies.yaml#/paths/~1mitra~1job-vacancies"
+  /mitra/job-vacancies/{id}:
+    $ref: "./paths/mitra-job-vacancies.yaml#/paths/~1mitra~1job-vacancies~1{id}"
 
   /mitra/job-applications:
     $ref: "./paths/mitra-job-applications.yaml#/paths/~1mitra~1job-applications"
@@ -2769,6 +2775,93 @@ components:
           properties:
             data:
               $ref: "#/components/schemas/PublicSummary"
+
+    # ──────────────────────────────────────────────
+    # Mitra Job Vacancies
+    # ──────────────────────────────────────────────
+
+    MitraJobVacancy:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        position_name:
+          type: string
+        category:
+          type: string
+        job_type:
+          type: string
+          enum: [penuh_waktu, kontrak, magang, paruh_waktu, freelance]
+        job_type_label:
+          type: string
+        work_policy:
+          type: string
+          enum: [kantor, hybrid, remote]
+        work_policy_label:
+          type: string
+        experience_level:
+          type: string
+          enum: [tidak_berpengalaman, fresh_graduate, kurang_dari_setahun]
+        experience_level_label:
+          type: string
+        province:
+          type: string
+        salary_min:
+          type: integer
+          nullable: true
+        salary_max:
+          type: integer
+          nullable: true
+        is_salary_hidden:
+          type: boolean
+        salary_label:
+          type: string
+        requirements:
+          type: string
+          nullable: true
+        job_description:
+          type: string
+        is_published:
+          type: boolean
+        skills:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SuccessEnvelopeMitraJobVacancy:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/MitraJobVacancy"
+
+    SuccessEnvelopeMitraJobVacancyList:
+      allOf:
+        - $ref: "#/components/schemas/SuccessEnvelopeEmpty"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/MitraJobVacancy"
+            meta:
+              type: object
+              properties:
+                pagination:
+                  $ref: "#/components/schemas/PaginationMeta"
 
     # ──────────────────────────────────────────────
     # Global Error Responses

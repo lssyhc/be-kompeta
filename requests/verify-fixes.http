@@ -1,0 +1,157 @@
+### ============================================================
+### VERIFY FIXES — R2 File Storage & share_link Domain
+### ============================================================
+### File ini untuk memverifikasi bahwa kedua masalah sudah teratasi:
+### 1. File upload tersimpan di Cloudflare R2 (persistent)
+### 2. share_link menggunakan domain frontend yang benar
+### ============================================================
+
+### Ganti baseUrl ke URL production Render untuk test di server
+@baseUrl = https://be-kompeta.onrender.com/api
+# @baseUrl = http://localhost:8000/api
+
+### ============================================================
+### STEP 0: LOGIN (pilih salah satu sesuai kebutuhan)
+### ============================================================
+
+### Login sebagai Siswa
+# @name loginSiswa
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "siswa",
+  "nisn": "0001234567",
+  "school_origin": "SMA Negeri 1 Bogor",
+  "unique_code": "BUDI0001234X9YZ"
+}
+
+###
+
+### Login sebagai Sekolah
+# @name loginSekolah
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "sekolah",
+  "email": "school.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
+### Login sebagai Mitra Perusahaan
+# @name loginMitraPerusahaan
+POST {{baseUrl}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "role": "mitra",
+  "email": "mitra.company.a@kompeta.test",
+  "password": "password123"
+}
+
+###
+
+### ============================================================
+### FIX #2: VERIFIKASI share_link DOMAIN
+### ============================================================
+### Cek field "share_link" di response.
+### EXPECTED: https://kompeta.vercel.app/explore/<slug>
+### BUKAN:   http://localhost:3000,http://127.0.0.1:3000,...
+### ============================================================
+
+### 2a. Detail lowongan Explore (public, tanpa auth)
+### Ganti slug sesuai data yang ada di database kamu
+# @name verifyShareLinkExplore
+GET {{baseUrl}}/public/explore/jobs/accounting-staff-1602be
+Accept: application/json
+
+###
+
+### 2b. List lowongan Explore — cek apakah data ada
+# @name exploreList
+GET {{baseUrl}}/public/explore/jobs?per_page=3
+Accept: application/json
+
+###
+
+### ============================================================
+### FIX #1: VERIFIKASI FILE UPLOAD KE R2
+### ============================================================
+### Upload foto profil siswa → cek URL di response.
+### EXPECTED URL format: https://pub-xxxxx.r2.dev/profiles/students/photos/...
+### BUKAN:               https://be-kompeta.onrender.com/storage/profiles/...
+### ============================================================
+
+### 1a. Upload foto profil siswa
+# @name uploadPhotoSiswa
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----VerifyR2
+
+------VerifyR2
+Content-Disposition: form-data; name="photo_profile"; filename="profile-picture.png"
+Content-Type: image/png
+
+< ./sample-files/profile-picture.png
+------VerifyR2--
+
+###
+
+### 1b. GET profil siswa — cek photo_profile_url
+### EXPECTED: URL mengandung "r2.dev" (Cloudflare R2)
+# @name getProfileSiswa
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSiswa.response.body.$.data.token}}
+
+###
+
+### 1c. Upload logo sekolah
+# @name uploadLogoSekolah
+PUT {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+Content-Type: multipart/form-data; boundary=----VerifyR2School
+
+------VerifyR2School
+Content-Disposition: form-data; name="logo"; filename="logo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-files/logo.jpg
+------VerifyR2School--
+
+###
+
+### 1d. GET profil sekolah — cek logo_url
+# @name getProfileSekolah
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{loginSekolah.response.body.$.data.token}}
+
+###
+
+### ============================================================
+### CHECKLIST VERIFIKASI
+### ============================================================
+###
+### [FIX #1 - R2 Storage]
+### [ ] 1a: Upload foto siswa → response 200 OK
+### [ ] 1b: GET profil → photo_profile_url mengandung "r2.dev"
+### [ ] 1c: Upload logo sekolah → response 200 OK
+### [ ] 1d: GET profil → logo_url mengandung "r2.dev"
+### [ ] Buka URL image di browser → gambar muncul
+### [ ] Redeploy di Render → buka URL lagi → gambar MASIH ada
+### [ ] Cek Cloudflare R2 bucket → Objects tab → file terlihat
+###
+### [FIX #2 - share_link]
+### [ ] 2a: share_link = "https://kompeta.vercel.app/lowongan/<slug>"
+### [ ] 2a: TIDAK mengandung "localhost" atau comma-separated URLs
+###
+### ============================================================

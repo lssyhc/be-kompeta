@@ -36,7 +36,7 @@ class ExploreJobDetailResource extends JsonResource
             'created_at_human' => ExploreFormatter::relativeTime($this->created_at),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'updated_at_human' => ExploreFormatter::relativeTime($this->updated_at),
-            'share_link' => $frontendBaseUrl.'/explore/'.$this->slug,
+            'share_link' => $frontendBaseUrl.'/lowongan/'.$this->slug,
             'requirements' => $this->requirements,
             'skills' => $this->skills->pluck('name')->values()->all(),
             'work_benefits' => $this->benefits->pluck('name')->values()->all(),

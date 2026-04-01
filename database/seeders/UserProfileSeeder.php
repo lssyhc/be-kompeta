@@ -15,7 +15,7 @@ class UserProfileSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->ensureSeedImage();
+        $this->ensureSeedImages();
         $this->seedAdmin();
         $this->seedMitra();
         $this->seedSchools();
@@ -25,19 +25,69 @@ class UserProfileSeeder extends Seeder
         $this->seedLargeSchoolWithStudents();
     }
 
-    private function ensureSeedImage(): void
+    private function ensureSeedImages(): void
     {
-        $destination = 'seed/profile-picture.png';
+        $disk = Storage::disk('public');
+        $assetSource = __DIR__.'/assets/profile-picture.png';
+        $assetContent = file_exists($assetSource) ? file_get_contents($assetSource) : null;
 
-        if (! Storage::disk('public')->exists($destination)) {
-            $source = __DIR__.'/assets/profile-picture.png';
+        foreach (['seed/profile-picture.png', User::DEFAULT_PROFILE_PHOTO_PATH] as $path) {
+            if (! $disk->exists($path) && $assetContent !== null) {
+                $disk->put($path, $assetContent);
+            }
+        }
 
-            if (! file_exists($source)) {
-                return;
+        $placeholders = [
+            'seed/gallery-1.png' => [800, 500, [52, 73, 94], 'Gallery 1'],
+            'seed/gallery-2.png' => [800, 500, [44, 62, 80], 'Gallery 2'],
+            'seed/gallery-3.png' => [800, 500, [127, 140, 141], 'Gallery 3'],
+            'seed/gallery-4.png' => [800, 500, [108, 122, 137], 'Gallery 4'],
+            'seed/gallery-5.png' => [800, 500, [149, 165, 166], 'Gallery 5'],
+            'seed/thumbnail-blog.png' => [800, 450, [142, 68, 173], 'Kompeta Blog'],
+        ];
+
+        $canGenerateImages = function_exists('imagecreatetruecolor');
+
+        foreach ($placeholders as $path => [$w, $h, $bg, $text]) {
+            if ($disk->exists($path)) {
+                continue;
             }
 
-            Storage::disk('public')->put($destination, file_get_contents($source));
+            if ($canGenerateImages) {
+                $disk->put($path, $this->generatePlaceholderPng($w, $h, $bg, $text));
+            } elseif ($assetContent !== null) {
+                $disk->put($path, $assetContent);
+            }
         }
+    }
+
+    private function generatePlaceholderPng(int $width, int $height, array $bgRgb, string $label): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        $bgColor = imagecolorallocate($image, $bgRgb[0], $bgRgb[1], $bgRgb[2]);
+        $white = imagecolorallocate($image, 255, 255, 255);
+        $lighter = imagecolorallocate($image, min(255, $bgRgb[0] + 40), min(255, $bgRgb[1] + 40), min(255, $bgRgb[2] + 40));
+
+        imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, $bgColor);
+        imagerectangle($image, 0, 0, $width - 1, $height - 1, $lighter);
+
+        $font = 5;
+        $labelWidth = imagefontwidth($font) * strlen($label);
+        $labelHeight = imagefontheight($font);
+        $x = intdiv($width - $labelWidth, 2);
+        $y = intdiv($height - $labelHeight, 2);
+        imagestring($image, $font, max(0, $x), $y, $label, $white);
+
+        $subtitle = 'Seed Data';
+        $subWidth = imagefontwidth(3) * strlen($subtitle);
+        imagestring($image, 3, intdiv($width - $subWidth, 2), $y + $labelHeight + 8, $subtitle, $lighter);
+
+        ob_start();
+        imagepng($image);
+        $binary = ob_get_clean();
+        imagedestroy($image);
+
+        return $binary;
     }
 
     private function seedAdmin(): void
@@ -89,12 +139,12 @@ class UserProfileSeeder extends Seeder
                     'whatsapp' => '6281234567890',
                 ],
                 'short_description' => 'Perusahaan jasa tenaga kerja untuk operasional bisnis dan layanan office support.',
-                'company_logo_path' => 'seed/profile-picture.png',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
-                'image_4_path' => 'seed/profile-picture.png',
-                'image_5_path' => 'seed/profile-picture.png',
+                'company_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
+                'image_4_path' => 'seed/gallery-4.png',
+                'image_5_path' => 'seed/gallery-5.png',
                 'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/binajasa-sk.pdf', 'SK Kemenkumham Binajasa'),
             ]
         );
@@ -125,12 +175,12 @@ class UserProfileSeeder extends Seeder
                     'whatsapp' => '6289876543210',
                 ],
                 'short_description' => 'Mitra digitalisasi operasional dan pengolahan data untuk bisnis menengah.',
-                'company_logo_path' => 'seed/profile-picture.png',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
-                'image_4_path' => 'seed/profile-picture.png',
-                'image_5_path' => 'seed/profile-picture.png',
+                'company_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
+                'image_4_path' => 'seed/gallery-4.png',
+                'image_5_path' => 'seed/gallery-5.png',
                 'kemenkumham_decree_path' => $this->storeLocalFile('profiles/companies/legalities/surya-data-sk.pdf', 'SK Kemenkumham Surya Data'),
             ]
         );
@@ -160,14 +210,14 @@ class UserProfileSeeder extends Seeder
                     'linkedin' => null,
                     'whatsapp' => '6281111222333',
                 ],
-                'umkm_logo_path' => 'seed/profile-picture.png',
+                'umkm_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/roti-bunda-ktp.jpg', 'KTP Owner Roti Bunda Rasa'),
                 'short_description' => 'UMKM kuliner rumahan yang fokus pada bakery harian dan pemesanan acara.',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
-                'image_4_path' => 'seed/profile-picture.png',
-                'image_5_path' => 'seed/profile-picture.png',
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
+                'image_4_path' => 'seed/gallery-4.png',
+                'image_5_path' => 'seed/gallery-5.png',
             ]
         );
 
@@ -196,14 +246,14 @@ class UserProfileSeeder extends Seeder
                     'linkedin' => null,
                     'whatsapp' => '6282222333444',
                 ],
-                'umkm_logo_path' => 'seed/profile-picture.png',
+                'umkm_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'owner_ktp_photo_path' => $this->storeLocalFile('profiles/umkm/ktp/craft-kayu-ktp.jpg', 'KTP Owner Craft Kayu Jogja'),
                 'short_description' => 'UMKM kerajinan kayu untuk kebutuhan dekorasi rumah, hotel, dan kantor.',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
-                'image_4_path' => 'seed/profile-picture.png',
-                'image_5_path' => 'seed/profile-picture.png',
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
+                'image_4_path' => 'seed/gallery-4.png',
+                'image_5_path' => 'seed/gallery-5.png',
             ]
         );
 
@@ -233,7 +283,7 @@ class UserProfileSeeder extends Seeder
                     'whatsapp' => null,
                 ],
                 'short_description' => 'Perusahaan distribusi yang menunggu persetujuan verifikasi.',
-                'company_logo_path' => 'seed/profile-picture.png',
+                'company_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'image_1_path' => null,
                 'image_2_path' => null,
                 'image_3_path' => null,
@@ -270,12 +320,12 @@ class UserProfileSeeder extends Seeder
                     'whatsapp' => '6281234000001',
                 ],
                 'expertise_fields' => ['IPA', 'IPS', 'Bahasa'],
-                'logo_path' => 'seed/profile-picture.png',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
-                'image_4_path' => 'seed/profile-picture.png',
-                'image_5_path' => 'seed/profile-picture.png',
+                'logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
+                'image_4_path' => 'seed/gallery-4.png',
+                'image_5_path' => 'seed/gallery-5.png',
                 'short_description' => 'SMA Negeri 1 Bogor berfokus pada pengembangan akademik, karakter, dan kesiapan karier siswa.',
                 'operational_license_path' => $this->storeLocalFile('profiles/schools/legalities/sman1-bogor-license.pdf', 'Izin Operasional SMA Negeri 1 Bogor'),
             ]
@@ -305,9 +355,9 @@ class UserProfileSeeder extends Seeder
                     'whatsapp' => null,
                 ],
                 'expertise_fields' => ['IPA', 'IPS'],
-                'logo_path' => 'seed/profile-picture.png',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
+                'logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
                 'image_3_path' => null,
                 'image_4_path' => null,
                 'image_5_path' => null,
@@ -335,7 +385,7 @@ class UserProfileSeeder extends Seeder
                 'address' => 'Malang, Jawa Timur',
                 'socials' => SchoolProfile::DEFAULT_SOCIALS,
                 'expertise_fields' => ['DKV', 'MM'],
-                'logo_path' => 'seed/profile-picture.png',
+                'logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                 'image_1_path' => null,
                 'image_2_path' => null,
                 'image_3_path' => null,
@@ -477,9 +527,9 @@ class UserProfileSeeder extends Seeder
                     'address' => "Jl. Pendidikan No. {$i}, Kota Contoh",
                     'socials' => SchoolProfile::DEFAULT_SOCIALS,
                     'expertise_fields' => ['TKJ', 'RPL', 'AKL'],
-                    'logo_path' => 'seed/profile-picture.png',
-                    'image_1_path' => 'seed/profile-picture.png',
-                    'image_2_path' => 'seed/profile-picture.png',
+                    'logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                    'image_1_path' => 'seed/gallery-1.png',
+                    'image_2_path' => 'seed/gallery-2.png',
                     'image_3_path' => null,
                     'image_4_path' => null,
                     'image_5_path' => null,
@@ -528,9 +578,9 @@ class UserProfileSeeder extends Seeder
                         'whatsapp' => null,
                     ],
                     'short_description' => "Perusahaan dummy {$companyName} untuk simulasi mitra tipe perusahaan.",
-                    'company_logo_path' => 'seed/profile-picture.png',
-                    'image_1_path' => 'seed/profile-picture.png',
-                    'image_2_path' => 'seed/profile-picture.png',
+                    'company_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                    'image_1_path' => 'seed/gallery-1.png',
+                    'image_2_path' => 'seed/gallery-2.png',
                     'image_3_path' => null,
                     'image_4_path' => null,
                     'image_5_path' => null,
@@ -566,17 +616,17 @@ class UserProfileSeeder extends Seeder
                     'business_type' => $i % 2 === 0 ? 'Kuliner' : 'Kerajinan',
                     'business_address' => "Sentra UMKM No. {$i}, Kota Contoh",
                     'socials' => UmkmProfile::DEFAULT_SOCIALS,
-                    'umkm_logo_path' => 'seed/profile-picture.png',
+                    'umkm_logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
                     'owner_ktp_photo_path' => $this->storeLocalFile(
                         "profiles/umkm/ktp/umkm-bulk-{$index}-ktp.jpg",
                         "KTP Owner {$businessName}"
                     ),
                     'short_description' => "UMKM dummy {$businessName} untuk simulasi mitra tipe UMKM.",
-                    'image_1_path' => 'seed/profile-picture.png',
-                    'image_2_path' => 'seed/profile-picture.png',
-                    'image_3_path' => 'seed/profile-picture.png',
-                    'image_4_path' => 'seed/profile-picture.png',
-                    'image_5_path' => 'seed/profile-picture.png',
+                    'image_1_path' => 'seed/gallery-1.png',
+                    'image_2_path' => 'seed/gallery-2.png',
+                    'image_3_path' => 'seed/gallery-3.png',
+                    'image_4_path' => 'seed/gallery-4.png',
+                    'image_5_path' => 'seed/gallery-5.png',
                 ]
             );
         }
@@ -603,10 +653,10 @@ class UserProfileSeeder extends Seeder
                 'address' => 'Jl. Pendidikan Nasional No. 200, Kota Contoh',
                 'socials' => SchoolProfile::DEFAULT_SOCIALS,
                 'expertise_fields' => ['RPL', 'TKJ', 'AKL', 'DKV'],
-                'logo_path' => 'seed/profile-picture.png',
-                'image_1_path' => 'seed/profile-picture.png',
-                'image_2_path' => 'seed/profile-picture.png',
-                'image_3_path' => 'seed/profile-picture.png',
+                'logo_path' => User::DEFAULT_PROFILE_PHOTO_PATH,
+                'image_1_path' => 'seed/gallery-1.png',
+                'image_2_path' => 'seed/gallery-2.png',
+                'image_3_path' => 'seed/gallery-3.png',
                 'image_4_path' => null,
                 'image_5_path' => null,
                 'short_description' => 'Sekolah dummy skala besar untuk simulasi data 200 siswa lintas status kelulusan.',
